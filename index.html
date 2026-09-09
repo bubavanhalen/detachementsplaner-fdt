@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Detachementsplaner FDT 2026 – Gesamtliste mit Personensuche nach Name, Funktion und Grad."
+    />
+    <title>Detachementsplaner FDT 2026</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#hauptinhalt" aria-label="Detachementsplaner – zum Hauptinhalt">
+          <span class="brand-mark" aria-hidden="true">FDT</span>
+          <span>
+            <strong>Detachementsplaner</strong>
+            <small>FDT 2026</small>
+          </span>
+        </a>
+
+        <div class="exercise-state">
+          <span class="state-dot" aria-hidden="true"></span>
+          <span>Planungsstand</span>
+          <strong>September 2026</strong>
+        </div>
+      </header>
+
+      <nav class="step-nav" aria-label="Planungsschritte">
+        <span>1 – Grundlagen</span>
+        <span>2 – Personal</span>
+        <span>3 – Detachemente</span>
+        <span>4 – Zuteilung</span>
+        <span class="active" aria-current="page">5 – Übersicht</span>
+      </nav>
+
+      <main id="hauptinhalt">
+        <section class="page-heading" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow">5 – Übersicht</p>
+            <h1 id="page-title">Gesamtliste</h1>
+            <p class="page-copy">Alle eingeplanten Personen und ihre aktuelle Zuteilung.</p>
+          </div>
+          <span class="demo-badge">Beispieldaten</span>
+        </section>
+
+        <nav class="view-tabs" aria-label="Übersichten">
+          <span class="tab active" aria-current="page">Gesamtliste</span>
+        </nav>
+
+        <section class="directory-card" aria-labelledby="directory-title">
+          <div class="directory-toolbar">
+            <div>
+              <h2 id="directory-title">Personen</h2>
+              <p id="result-count" aria-live="polite">12 Personen</p>
+            </div>
+
+            <div class="search-wrap">
+              <label for="person-search">Person suchen</label>
+              <div class="search-control">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+                  <path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+                </svg>
+                <input
+                  id="person-search"
+                  type="search"
+                  inputmode="search"
+                  autocomplete="off"
+                  placeholder="Name, Funktion oder Grad"
+                  aria-describedby="search-hint"
+                />
+                <button id="clear-search" class="clear-search" type="button" hidden>
+                  Suche löschen
+                </button>
+              </div>
+              <span id="search-hint" class="search-hint">Mehrere Begriffe können kombiniert werden.</span>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Funktion</th>
+                  <th scope="col">Grad</th>
+                  <th scope="col">Detachement</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody id="person-table-body"></tbody>
+            </table>
+          </div>
+
+          <div id="empty-state" class="empty-state" hidden>
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24">
+              <path d="M15.5 14h-.79l-.28-.27A6.5 6.5 0 1 0 14 14.5l.27.28v.79L19.49 21 21 19.49 15.5 14Zm-5 0a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" />
+            </svg>
+            <h3>Keine Person gefunden</h3>
+            <p>Prüfe die Schreibweise oder suche nach einem anderen Namen, einer Funktion oder einem Grad.</p>
+            <button id="empty-clear-search" type="button">Suche zurücksetzen</button>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Detachementsplaner FDT 2026</span>
+        <span>Gesamtliste · lokale Beispieldaten</span>
+      </footer>
+    </div>
+
+    <noscript>
+      <p class="noscript">Für die Personensuche muss JavaScript aktiviert sein.</p>
+    </noscript>
+    <script src="app.js"></script>
+  </body>
+</html>
