@@ -1,0 +1,4 @@
+# Projektstände enthalten Personendaten und bleiben lokal.
+FDT_*.json
+*_FDT_*.json
+project-data/

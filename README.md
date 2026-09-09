@@ -1,15 +1,20 @@
 # Detachementsplaner FDT 2026
 
-Statische Weboberfläche für die Gesamtliste des Detachementsplaners. Die Personensuche filtert gleichzeitig nach Name, Funktion und Grad und unterstützt kombinierte Suchbegriffe.
+Der Detachementsplaner ist eine eigenständige Browser-Anwendung. Es gibt keinen Server und keine Datenbank: Import, Planung, Prüfung, Export und lokale Speicherung laufen vollständig im Browser.
 
-## Lokal öffnen
+## Start
 
-Die Website benötigt keine Installation. `index.html` kann direkt im Browser geöffnet oder über einen beliebigen statischen Webserver bereitgestellt werden.
+`index.html` im Browser öffnen. Über **Projekt laden** kann eine bestehende Projektdatei im JSON-Format geladen werden. Der aktuelle Datenstand `FDT_2026_Inf_Ustü_Kp_614_2026-08-08.json` bleibt kompatibel.
 
-## Inhalt
+## Übersicht
 
-- `index.html` – Struktur und Inhalte
-- `styles.css` – responsives Layout und Gestaltung
-- `app.js` – Beispieldaten und Personensuche
+Unter **5 · Übersicht** stehen zwei dichte Arbeitsansichten zur Verfügung:
 
-Die enthaltenen Namen und Zuteilungen sind ausschliesslich Beispieldaten.
+- **Gesamtliste** mit Sofortsuche über Name, Funktion, Grad, Detachement und EC
+- **Personenansicht** mit Detachementen, Einsatzcodes, Führerscheinen sowie sämtlichen Stamm- und Quelldaten
+
+Detachemente besitzen ein optionales Feld **EC**. Es wird beim JSON-Export gespeichert und in Excel-Exporten ausgegeben.
+
+## Datenschutz
+
+Personen- und Projektdateien werden nicht in dieses Repository aufgenommen. Sie werden vom Benutzer lokal ausgewählt und nur im Browser verarbeitet. Die `.gitignore` verhindert, dass typische FDT-Projektdateien versehentlich eingecheckt werden.
