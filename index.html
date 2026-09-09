@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Detachementsplaner FDT 2026</title>
+<title>Detachementsplaner FDT</title>
 <style>
 :root{
   --ink:#111814; --ink2:#273129; --ink3:#5C675D;
@@ -275,7 +275,7 @@ dialog .df{padding:10px 14px;border-top:1px solid var(--line2);display:flex;gap:
 <header class="cmd">
   <div class="cmd-row">
     <div class="brand">Detachementsplaner<small>Einrückung · Zuteilung · Kontrolle</small></div>
-    <input class="projname" id="projName" type="text" placeholder="Projektname" value="FDT 2026 — Inf Ustü Kp 61/4">
+    <input class="projname" id="projName" type="text" placeholder="Projektname" value="Neues FDT-Projekt">
     <div class="spacer"></div>
     <div class="savestate" id="saveState">bereit</div>
     <button class="btn sm" id="btnExport">Projekt sichern (.json)</button>
@@ -351,7 +351,7 @@ let UI = {
 function leerZustand() {
   return {
     v: 2,
-    name: 'FDT 2026 — Inf Ustü Kp 61/4',
+    name: 'Neues FDT-Projekt',
     persons: [],
     dets: [],
     assign: {},
@@ -1687,7 +1687,7 @@ function viewUeber() {
   const offen = P.filter(p => !zugeteilt(p.id)).length;
   $('#v-uebersicht').innerHTML = `<div class="wrap overview-wrap">
     <div class="overview-command">
-      <div><div class="kicker">FDT 2026 · Führungsübersicht</div><h1>Personal- und Detachementslage</h1></div>
+      <div><div class="kicker">FDT · Führungsübersicht</div><h1>Personal- und Detachementslage</h1></div>
       <div class="stamp">${esc(S.name || 'Detachementsplaner')}<br>LOKALE BROWSER-DATEN</div>
     </div>
     <div class="kpi-grid">

@@ -1,4 +1,4 @@
-# Detachementsplaner FDT 2026
+# Detachementsplaner FDT
 
 Der Detachementsplaner ist eine eigenständige Browser-Anwendung. Es gibt keinen Server und keine Datenbank: Import, Planung, Prüfung, Export und lokale Speicherung laufen vollständig im Browser.
 
