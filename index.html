@@ -694,6 +694,33 @@ function importDialog(quelle, file) {
   });
 }
 
+function splitNameValue(raw) {
+  const s = String(raw || '').replace(/\s+/g, ' ').trim();
+  if (!s) return { vorname: '', nachname: '', display: '' };
+  const comma = s.indexOf(',');
+  if (comma >= 0) {
+    const nachname = s.slice(0, comma).trim();
+    const vorname = s.slice(comma + 1).trim();
+    if (nachname && vorname) return { vorname, nachname, display: `${vorname} ${nachname}`.trim() };
+    if (nachname) return { vorname: '', nachname, display: nachname };
+  }
+  const parts = s.split(/\s+/);
+  if (parts.length === 1) return { vorname: '', nachname: parts[0], display: parts[0] };
+  return { vorname: parts.slice(0, -1).join(' '), nachname: parts[parts.length - 1], display: s };
+}
+function normalizePhone(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  const digits = s.replace(/\D/g, '');
+  if (!digits) return '';
+  let norm = digits;
+  if (norm.startsWith('00')) norm = norm.slice(2);
+  if (norm.startsWith('41') && norm.length === 11) norm = norm.slice(2);
+  if (norm.startsWith('0') && norm.length === 10) norm = norm.slice(1);
+  if (norm.length !== 9 || !/^7\d|^[1-9]\d{1,7}$/.test(norm)) return '';
+  return `+41 ${norm.slice(0, 2)} ${norm.slice(2, 5)} ${norm.slice(5, 7)} ${norm.slice(7, 9)}`;
+}
+
 function uebernehmen(quelle, rows, hr, map, dateiname) {
   const heads = (rows[hr] || []).map((h, i) => String(h || '').trim() || 'Spalte ' + (i + 1));
   const daten = rows.slice(hr + 1).filter(r => String(r[map.name] || '').trim() !== '');
@@ -701,16 +728,19 @@ function uebernehmen(quelle, rows, hr, map, dateiname) {
 
   daten.forEach(r => {
     const get = k => map[k] === undefined ? '' : String(r[map[k]] == null ? '' : r[map[k]]).trim();
-    const name = get('name').replace(/\s*,\s*/, ' ').replace(/\s+/g, ' ');  // «Muster, Hans» -> «Muster Hans»
+    const nameRaw = get('name');
+    const { display, vorname, nachname } = splitNameValue(nameRaw);
+    const name = display || nameRaw.replace(/\s*,\s*/, ' ').replace(/\s+/g, ' ');
     if (!name) return;
     const grad = get('grad');
     const key = norm(name);
     const raw = {}; heads.forEach((h, i) => { const v = String(r[i] == null ? '' : r[i]).trim(); if (v) raw[h] = v; });
     const lics = splitLics(get('lics'));
+    const telNorm = normalizePhone(get('tel'));
 
     let p = S.persons.find(x => x.key === key);
     if (!p) {
-      p = { id: uid('p'), key, grad, name, funktion: get('funktion'), dt: get('dt'), einteilung: get('einteilung'), lics, zug: get('zug'), pnr: get('pnr'), tel: get('tel'), mail: get('mail'), wohnort: get('wohnort'), pisa: false, milo: false, raw: {} };
+      p = { id: uid('p'), key, grad, name, vorname, nachname, funktion: get('funktion'), dt: get('dt'), einteilung: get('einteilung'), lics, zug: get('zug'), pnr: get('pnr'), tel: telNorm || get('tel'), mail: get('mail'), wohnort: get('wohnort'), pisa: false, milo: false, raw: {} };
       S.persons.push(p); neu++;
     } else ergaenzt++;
 
@@ -722,9 +752,14 @@ function uebernehmen(quelle, rows, hr, map, dateiname) {
     setzen('einteilung', get('einteilung'), master);
     setzen('zug', get('zug'), master);
     setzen('pnr', get('pnr'), master);
-    setzen('tel', get('tel'), master);
+    setzen('tel', telNorm || get('tel'), master);
     setzen('mail', get('mail'), master);
     setzen('wohnort', get('wohnort'), master);
+    if (vorname || nachname) {
+      if (vorname && (!p.vorname || master)) p.vorname = vorname;
+      if (nachname && (!p.nachname || master)) p.nachname = nachname;
+      if (!p.name || master) p.name = display;
+    }
     if (lics.length && (master || !(p.lics || []).length)) p.lics = lics;
     Object.assign(p.raw, raw);
     p[quelle] = true;
@@ -1827,6 +1862,30 @@ function download(name, inhalt, typ) {
   a.href = URL.createObjectURL(new Blob([inhalt], { type: typ }));
   a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
+function csvEscape(value) {
+  const s = String(value == null ? '' : value).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+function exportGoogleContactsCsv() {
+  const rows = [
+    ['First Name', 'Last Name', 'Email 1 - Value', 'Phone 1 - Type', 'Phone 1 - Value', 'Notes', 'Organization 1 - Name', 'Organization 1 - Title']
+  ];
+  const people = personen().filter(p => (p.name || p.vorname || p.nachname || p.mail || p.tel) && (p.name || p.vorname || p.nachname));
+  people.forEach(p => {
+    const first = p.vorname || (p.name || '').split(/\s+/).slice(0, -1).join(' ') || '';
+    const last = p.nachname || (p.name || '').split(/\s+/).slice(-1)[0] || '';
+    const phone = normalizePhone(p.tel || '');
+    const email = String(p.mail || '').trim();
+    const org = (S.settings && S.settings.eigeneEinheit) ? S.settings.eigeneEinheit : '';
+    const title = p.funktion || fkt(p) || '';
+    const notes = [p.grad, p.zug, p.einteilung, p.dt].filter(Boolean).join(' · ');
+    rows.push([first, last, email, phone ? 'Mobile' : '', phone, notes, org, title]);
+  });
+  const csv = '\uFEFF' + rows.map(r => r.map(csvEscape).join(',')).join('\n') + '\n';
+  download(dateiname('csv'), csv, 'text/csv;charset=utf-8');
+  toast('Google-Kontakte CSV erstellt.');
+}
 function exportBundle() {
   if (!TEMPLATE) { toast('Vorlage nicht verfügbar.'); return; }
   const json = JSON.stringify(S).replace(/</g, '\\u003c');
@@ -1915,7 +1974,14 @@ function start() {
     download(dateiname('json'), JSON.stringify(S, null, 1), 'application/json');
     toast('Projektdatei gesichert.');
   };
-  $('#btnBundle').onclick = exportBundle;
+  $('#btnBundle').onclick = () => {
+    const items = [
+      { t: 'Google Kontakte CSV', fn: exportGoogleContactsCsv },
+      { t: 'Projekt als .json', fn: () => download(dateiname('json'), JSON.stringify(S, null, 1), 'application/json') },
+      { t: 'Eigenständige HTML-Datei', fn: exportBundle }
+    ];
+    modal('Export', '<div class="hint">Wählen Sie den gewünschten Export. Persönliche Daten werden nur bei explizitem Export mitgenommen.</div>', items.map(i => ({ t: i.t, primary: i.t.includes('Google') || i.t.includes('HTML'), fn: () => { i.fn(); return false; } })));
+  };
   $('#btnImport').onclick = () => {
     const f = $('#fileHidden'); f.value = ''; f.accept = '.json';
     f.onchange = () => {
