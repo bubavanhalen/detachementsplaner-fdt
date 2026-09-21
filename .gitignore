@@ -2,3 +2,9 @@
 FDT_*.json
 *_FDT_*.json
 project-data/
+
+# Generierte Exporte und Kontaktlisten (keine sensible Daten in Git)
+*.csv
+*.xlsx
+*.xls
+google-kontakte*.csv
