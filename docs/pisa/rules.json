@@ -1,0 +1,316 @@
+{
+  "schema_version": 1,
+  "language": "de-CH",
+  "source": {
+    "id": "PAT-2026-02-12",
+    "title": "Arbeitshilfe 51.008 d - PISA-Anleitung für die Truppe",
+    "filename": "260211_PAT_D_ORIGINAL_V_0_16.pdf",
+    "document_date": "2026-02-12",
+    "page_count": 180,
+    "sha256": "a4d6bff10ec4fe234d28fd9f50907ba528673fc7109dff480ab1357c37ec497a",
+    "page_convention": "1-basierte PDF-Seiten; gedruckte Seiten ab Seite 9 identisch",
+    "reviewed_on": "2026-09-21",
+    "scope": "Kuratierte Regeln zur Vorbereitung und Erfassung von Marschbefehlen; keine vollständige Modellierung sämtlicher PAT-Kapitel und keine aktuelle Rechtsprüfung."
+  },
+  "conventions": {
+    "status": {"documented": "Aussage im bezeichneten Dokumentstand", "conflict": "Unaufgelöster Widerspruch in der Quelle", "unknown": "Im ausgewerteten Ablauf nicht spezifiziert"},
+    "automation": {"candidate": "Kandidat für eine lokale Prüfung nach Implementierung; keine bestehende PISA-Validierung", "manual": "Menschliche Prüfung bzw. PISA/KF-Nachweis erforderlich", "blocked": "Keine automatische Entscheidung aus dieser Quelle ableiten"},
+    "evidence": {"text": "Dokumenttext", "screenshot": "Visuell geprüfte Formularabbildung", "source_gap": "Belegstellen des betrachteten Ablaufs, keine positive Spezifikation"}
+  },
+  "rules": [
+    {
+      "id": "PISA-DATA-001", "topic": "Bestand", "status": "documented", "automation": "manual", "evidence": "text", "pages": [34,35,36],
+      "title": "Liste 401 und Liste 410 unterscheiden",
+      "statement": "401 enthält alle eingeteilten AdA, auch ohne verbleibende Dienstpflicht, ohne Gast-WK. 410 enthält Einrückungspflichtige inklusive Gast-WK und kann nur bei offenen Dienstvormerken generiert werden. Bei 401 ist ein Stichtag wählbar, bei 410 ist der Dienstantritt gemäss Aufgebotskalender voreingestellt.",
+      "scope": "PISA-Listen als Planungsgrundlage", "tags": ["import", "AW401", "AW410", "MILO", "roster"]
+    },
+    {
+      "id": "PISA-DATA-002", "topic": "Bestand", "status": "documented", "automation": "manual", "evidence": "text", "pages": [42],
+      "title": "Onlineansicht enthält auch Dispensierte",
+      "statement": "Die Onlineansicht Einrückungspflichtige zeigt AdA mit eröffnetem DVM, inklusive mittlerweile Dispensierter/Dienstverschieber. Weiss: eigene; Rot: eigene dispensierte; Blau: Gast-WK; Orange: dispensierte Gast-WK.",
+      "scope": "Onlineansicht Einrückungspflichtige; nicht pauschal jede importierte Datei", "tags": ["DVS", "Dienstverschiebung", "Gast WK", "Vollständigkeit"]
+    },
+    {
+      "id": "PISA-DATA-003", "topic": "Versand", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [37],
+      "title": "DIMILAR-Kommunikationswahl",
+      "statement": "In Liste 401/410 bedeutet Akzeptiert digitale Kommunikation, Abgelehnt Papierkommunikation und ein leeres Feld nicht registriert, damit nur Papierkommunikation.",
+      "scope": "Kanalwahl, kein Zustellnachweis eines einzelnen MB", "tags": ["DIM", "digital", "Papier", "Kommunikation"]
+    },
+    {
+      "id": "PISA-DATA-004", "topic": "Bestand", "status": "documented", "automation": "manual", "evidence": "text", "pages": [45],
+      "title": "Synchronisationsstand berücksichtigen",
+      "statement": "PISA und MILOFFICE tauschen ab H-15 beim Start von MILOFFICE und während des Dienstes täglich Daten aus. Änderungen werden nachts synchronisiert.",
+      "scope": "Bestehender PISA/MILOFFICE-Datenaustausch; keine Schnittstellenzusage an den Planer", "tags": ["import", "MILO", "aktuell", "Synchronisation"]
+    },
+    {
+      "id": "PISA-TIME-001", "topic": "Termine", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [76],
+      "title": "H bezieht sich auf den ADF",
+      "statement": "H ist das Einrückdatum des ADF, nicht das Einrückdatum des KVK. H-Abstände der Vorbereitung sind Wochenabstände.",
+      "scope": "ADF-Terminfolge", "tags": ["Frist", "deadline", "KVK", "WK"]
+    },
+    {
+      "id": "PISA-TIME-002", "topic": "Termine", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [76,77,82,104,105],
+      "title": "Vorbereitungstermine",
+      "statement": "Personalplanung H-25 bis H-22; DVS-Stellungnahmen H-22 bis H-14; Liste/Personalausgleich H-15, Rücksendung H-14; Einrückungsplanung H-12 bis Ende H-10; Zustellung MB/Kontrolle an Kdt H-8; Papier-MB an Post spätestens H-7, Zustellung spätestens H-6.",
+      "scope": "Referenzterminfolge gemäss PAT; konkrete Termine in PISA und Sonderfälle prüfen", "tags": ["Frist", "deadline", "ADF"]
+    },
+    {
+      "id": "PISA-STAFF-001", "topic": "Personalausgleich", "status": "documented", "automation": "manual", "evidence": "text", "pages": [82],
+      "title": "Personalausgleich über Vormerke",
+      "statement": "Der gemeldete Personalausgleich wird durch KF als Anpassung der DVM für den vorgesehenen Dienst verarbeitet. Dies ist keine endgültige Umteilung. Ein Vermerk nicht aufgeboten ist laut PAT nicht zulässig.",
+      "scope": "Personalausgleich vor dem ADF", "tags": ["Formation", "MILO", "DVM", "KF"]
+    },
+    {
+      "id": "PISA-FLOW-001", "topic": "Ordentliche Planung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [44,82,84,85,88,101],
+      "title": "Details vor Zuteilung und Genehmigung",
+      "statement": "Unter Planung (Det & MB) werden zuerst Detailangaben MB mit EC/Bemerkungen erfasst. Danach werden im Register Detachemente die AdA zugewiesen. Abschliessend erfolgt Überprüfung/Genehmigung.",
+      "scope": "Ordentliche ADF-Planung", "tags": ["Workflow", "Marschbefehle", "Erfassung"]
+    },
+    {
+      "id": "PISA-EC-001", "topic": "Einrückcode", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [85],
+      "title": "EC besteht aus zwei zugelassenen Zeichen",
+      "statement": "Jeder EC muss aus genau zwei Zeichen bestehen. Die PAT nennt Ziffern 0-9, Buchstaben A-Z/a-z und die unten hinterlegten Sonderzeichen. Nicht aufgeführte Zeichen wie Unterstrich, Umlaute, Schrägstriche oder Punkt sind nicht erlaubt. Die angegebene Kombinationszahl widerspricht der Liste, siehe PISA-CONFLICT-002.",
+      "scope": "Detailangaben MB; produktive Sonderzeichenliste vor Rollout bestätigen", "tags": ["Einsatzcode", "Einrückcode", "Zeichen", "validation"],
+      "parameters": {"length": 2, "digits": "0123456789", "letters": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", "special_characters": ["£","!","#","$","*","+","-",":","=","?","@","[","]","^","{","}","~"]},
+      "related": ["PISA-CONFLICT-002", "PISA-UNKNOWN-002"]
+    },
+    {
+      "id": "PISA-EC-002", "topic": "Einrückcode", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [85],
+      "title": "Keine Codes nur durch Gross-/Kleinschreibung unterscheiden",
+      "statement": "Ein bereits als Hauptdetachement erfasster Code Z1 darf nicht als z1 erneut als Haupt- oder Zusatz-MB verwendet werden; PISA unterscheidet diese Schreibweisen nicht.",
+      "scope": "Zusammengehörige Haupt-/Zusatzdetachementsplanung; genaue globale Eindeutigkeitsgrenze unbekannt", "tags": ["Duplikat", "case", "Einrückcode"], "related": ["PISA-UNKNOWN-002"]
+    },
+    {
+      "id": "PISA-FIELDS-001", "topic": "MB-Felder", "status": "documented", "automation": "candidate", "evidence": "screenshot", "pages": [85,86,87,97],
+      "title": "Felder der Detailangaben MB",
+      "statement": "Die visuell geprüfte Tabelle zeigt EC, Einrückdatum, Einrückzeit, Einrückort, Treffpunkt, Anzug, Entl Datum, Entlassungsort, Bemerkung. Sterne sind bei EC, Einrückdatum, Einrückort, Treffpunkt, Anzug, Entl Datum und Entlassungsort sichtbar. Eine Entlassungszeit ist in dieser Tabelle nicht gezeigt.",
+      "scope": "Formularbeobachtung der PAT-Screenshots; keine vollständige technische Feldspezifikation", "tags": ["Anzug", "Uniform", "Pflichtfelder", "Entlassungsdatum", "Entlassungsort"]
+    },
+    {
+      "id": "PISA-REM-001", "topic": "Bemerkungen", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [87],
+      "title": "Bemerkung maximal 240 Zeichen",
+      "statement": "Pro Bemerkung sind maximal 240 Zeichen inklusive Leerzeichen erlaubt. Bemerkungen können Detachementen zugeordnet werden.",
+      "scope": "Bemerkungstext, nicht pauschal jede Überschrift oder jedes Freitextfeld", "tags": ["Text", "Limit", "remarks"], "parameters": {"max_characters": 240}
+    },
+    {
+      "id": "PISA-MB-001", "topic": "Zusatz-MB", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [85,88,89],
+      "title": "Haupt-MB und höchstens fünf Zusatz-MB",
+      "statement": "Zusätzliche Marschbefehle werden über weitere Detachementsnummern miteinander verknüpft. Der WK-MB muss das Hauptdetachement sein. Maximal fünf Zusatz-MB pro Detachement; Auswahl über die Lupe.",
+      "scope": "Verknüpfte Aufgebote; nicht mit Beilagen verwechseln", "tags": ["Hauptmarschbefehl", "Zusatzmarschbefehl", "Zusatz Marschbefehl", "WK"], "parameters": {"max_additional_orders": 5}
+    },
+    {
+      "id": "PISA-MB-002", "topic": "Zusatz-MB", "status": "documented", "automation": "manual", "evidence": "text", "pages": [86,88,93],
+      "title": "Freitag-Repetitorium vor WK am Montag",
+      "statement": "Im konkreten Fahrerrepetitorium-Beispiel mit nur Freitag im KVK und WK ab Montag sind zwei MB vorgesehen; Samstag und Sonntag werden weder angerechnet noch besoldet. Der WK-EC ist Hauptdetachement, das Repetitorium Zusatz-MB.",
+      "scope": "Genau dieses PAT-Beispiel; keine allgemeine Soldberechnung aus Kalenderlücken", "tags": ["Fahrer", "Repetitorium", "Wochenende", "Freitag"]
+    },
+    {
+      "id": "PISA-ASSIGN-001", "topic": "Zuteilung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [89,90,91,92],
+      "title": "Personal anhand DVM auswählen",
+      "statement": "Personal hinzufügen zeigt AdA mit DVM für die eigene Formation, einschliesslich fremder AdA mit Dienst in dieser Formation. Manuell oder mittels Filtern/Checkbox auswählen und mit OK bestätigen; wiederholen, bis das Detachement vollständig ist.",
+      "scope": "PISA-Personalauswahl, nicht ein beliebiger lokaler Personenpool", "tags": ["Gast WK", "Führerausweis", "Filter", "Zuweisung"]
+    },
+    {
+      "id": "PISA-ASSIGN-002", "topic": "Zuteilung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [92,101,103],
+      "title": "Vollständigkeit vor Genehmigung",
+      "statement": "PISA meldet nicht einem Detachement zugewiesene AdA. Die Planung kann erst genehmigt werden, wenn sämtliche AdA einem Det bzw. EC zugewiesen sind. Die Zuordnung wird in der Übersicht als PI Det angezeigt.",
+      "scope": "Der von PISA zu prüfende Planungsbestand. Dispensierte in der Onlineansicht und lokale Sichtfilter erlauben keine ungeprüfte Ableitung dieses Bestands.",
+      "tags": ["unzugeteilt", "Vollständigkeit", "Genehmigung", "MILO"], "related": ["PISA-DATA-002"]
+    },
+    {
+      "id": "PISA-GUEST-001", "topic": "Gast-WK", "status": "documented", "automation": "manual", "evidence": "text", "pages": [92],
+      "title": "Regulären Gast-WK-Vormerk erstellt KF",
+      "statement": "KF erstellt die Gast-WK-Segmente/Vormerke. Erst nach deren Eröffnung stehen sie in der Personalplanung zur Einplanung mit dem zutreffenden EC zur Verfügung.",
+      "scope": "Ordentliche, noch offene Planung", "tags": ["Gast WK", "DVM", "fremd", "Kontrollführer"]
+    },
+    {
+      "id": "PISA-GUEST-002", "topic": "Gast-WK", "status": "documented", "automation": "manual", "evidence": "text", "pages": [92],
+      "title": "Kurzfristiger Gast-WK nach Freigabe",
+      "statement": "Ist die Detachementsplanung bereits abgeschlossen/freigegeben, muss der Vormerk inklusive EC direkt durch KF erstellt werden.",
+      "scope": "Gast-WK nach Planungsfreigabe; spezieller als allgemeine Änderungsregel auf S. 102", "tags": ["Gast WK", "Freigabe", "KF"], "related": ["PISA-RELEASE-002"]
+    },
+    {
+      "id": "PISA-FRACTION-001", "topic": "Fraktionierter Dienst", "status": "documented", "automation": "manual", "evidence": "text", "pages": [95],
+      "title": "Durchgehender Dienst mit persönlichen Urlauben",
+      "statement": "Im Beispiel eines durchgehenden Dienstes mit mehreren persönlichen Urlauben ist ein EC vorgesehen; persönliche Urlaube sind in MILOFFICE zu erfassen. Abreise-/Rückreisetag und ein überspanntes Wochenende werden gemäss dem Beispiel angerechnet.",
+      "scope": "Persönliche Urlaube innerhalb desselben Dienstes; nicht befohlene einzelne Dienstabschnitte", "tags": ["Urlaub", "Fraktionen", "Wochenende", "MILO"]
+    },
+    {
+      "id": "PISA-FRACTION-002", "topic": "Fraktionierter Dienst", "status": "documented", "automation": "manual", "evidence": "text", "pages": [96,97,98],
+      "title": "Befohlene Fraktionen separat aufbieten",
+      "statement": "Für die im Beispiel durch Bat Kdt/Stabschef ausdrücklich befohlenen drei Dienstabschnitte sind drei EC vorgesehen. Nur die befohlenen Tage zählen; Wochenenden dazwischen nicht. Der letzte Dienst der WK-Periode ist der Haupt-MB, frühere Dienste sind Zusatz-MB. Auf Kp-Stufe zuerst mit KF absprechen.",
+      "scope": "Befohlene Fraktionen innerhalb einer Dienstleistung; Beispiel hat drei Abschnitte", "tags": ["Fraktionen", "Hauptmarschbefehl", "Zusatzmarschbefehl", "Wochenende"]
+    },
+    {
+      "id": "PISA-DAYS-001", "topic": "Diensttage", "status": "documented", "automation": "manual", "evidence": "text", "pages": [99],
+      "title": "Resttage sind keine automatische Aufgebotsverkürzung",
+      "statement": "Bei weniger als 19 Resttagen empfiehlt die PAT dringend, für den gesamten Dienstzeitraum aufzubieten, damit Änderungen, persönliche Urlaube oder Differenzen zum Dienstbüchlein berücksichtigt werden können.",
+      "scope": "Empfehlung für das Aufgebot; keine Verpflichtung zu zusätzlichen anrechenbaren Diensttagen", "tags": ["Resttage", "Dienstpflicht", "Entlassung"]
+    },
+    {
+      "id": "PISA-DAYS-002", "topic": "Diensttage", "status": "documented", "automation": "manual", "evidence": "text", "pages": [93,94],
+      "title": "Wochenende zwischen zwei Ausbildungsdiensten",
+      "statement": "S. 93-94 unterscheiden einen einzigen Ausbildungstag vor dem Wochenende (Wochenende nicht anrechenbar, auch nicht wegen eines folgenden Feiertags) von mehr als einem Tag vor dem Wochenende (Wochenende und unmittelbar angrenzende Feiertage laut Beispiel anrechenbar).",
+      "scope": "Zwischen zwei Ausbildungsdiensten gemäss PAT; MB-Anzahl wegen Quellenkonflikt gesondert klären", "tags": ["Sold", "Wochenende", "KVK", "Feiertag"], "related": ["PISA-CONFLICT-001"]
+    },
+    {
+      "id": "PISA-RELEASE-001", "topic": "Genehmigung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [101,102],
+      "title": "Genehmigung und Verarbeitung unterscheiden",
+      "statement": "Nach Auslösen der Genehmigung startet ein Prozess in der Verarbeitungsübersicht, zunächst eventuell In Warteschlange. Erfolgreiche Übermittlung der Detailangaben/EC wird protokolliert; KF erhält automatisch eine Meldung.",
+      "scope": "PISA-Prozessstatus; lokale Vorbereitung erzeugt keinen Nachweis", "tags": ["Status", "Freigabe", "Warteschlange", "Übertragung"]
+    },
+    {
+      "id": "PISA-RELEASE-002", "topic": "Genehmigung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [102],
+      "title": "Allgemeine Änderungsgrenze: MB-Auslösung durch KF",
+      "statement": "Planungsdaten können gemäss S. 102 bis zur Auslösung der MB durch die Kontrollführung angepasst werden. Danach können Anpassungen und neue/zusätzliche MB nur durch die verantwortlichen KF ausgeführt werden.",
+      "scope": "Allgemeine ordentliche Planung; Gast-WK und DBem-50-Sonderfälle separat beachten", "tags": ["Änderung", "gesperrt", "Freigabe", "KF"], "related": ["PISA-GUEST-002", "PISA-SPECIAL-002"]
+    },
+    {
+      "id": "PISA-DELIVERY-001", "topic": "Versand", "status": "documented", "automation": "manual", "evidence": "text", "pages": [104,105],
+      "title": "MB-Kontrolle und AW416",
+      "statement": "Kdt kontrolliert Richtigkeit und Vollständigkeit der MB. Ein DIMILAR-Kreuz in AW416 bedeutet Übermittlung des MB über DIM, ohne Kreuz Papier. Die vom BBL erzeugte Papier-AW416 zeigt diese Spalte nicht; entsprechende Auswertung im Einheitsarchiv verwenden.",
+      "scope": "Kanal-/Übermittlungsnachweis, kein Lesebeleg des AdA", "tags": ["413", "416", "DIMILAR", "Kontrolle", "Archiv"]
+    },
+    {
+      "id": "PISA-ATT-001", "topic": "Beilagen", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [142,143,145,146],
+      "title": "Technische Beilagengrenzen",
+      "statement": "Beilagen müssen PDFs im A4-Hochformat sein. Dateinamen maximal 64 Zeichen inklusive Leerzeichen; je Upload ein Dokument und je EC maximal fünf Beilagen. Upload eines bereits vorhandenen Dateinamens führt laut Beispiel zur Fehlermeldung.",
+      "scope": "MB-Beilagen; unbekannte zusätzliche Grössen-/Dateilimits nicht erfinden", "tags": ["Anhang", "PDF", "A4", "Portrait", "Dateiname"],
+      "parameters": {"max_filename_characters": 64, "max_attachments_per_ec": 5, "format": "PDF", "paper": "A4", "orientation": "portrait", "files_per_upload": 1}
+    },
+    {
+      "id": "PISA-ATT-002", "topic": "Beilagen", "status": "documented", "automation": "candidate", "evidence": "text", "pages": [100,144,145,147],
+      "title": "Beilagen werden pro EC und Jahr zugeordnet",
+      "statement": "Ein Dokument wird einmal hochgeladen und kann mehreren EC zugeordnet werden. Ordentliche und ausserordentliche Planung verwenden die Dokumente desselben Jahres. Im Folgejahr müssen sie erneut hochgeladen werden.",
+      "scope": "Datei und Zuordnung getrennt betrachten", "tags": ["Anhang", "reuse", "Jahr", "AO"]
+    },
+    {
+      "id": "PISA-ATT-003", "topic": "Beilagen", "status": "documented", "automation": "manual", "evidence": "text", "pages": [100,147,148],
+      "title": "Archiv, Sichtbarkeit und Übermittlung",
+      "statement": "MBF-Beilagen werden zwölf Monate im Einheitsarchiv aufbewahrt. KF-Änderungen erzeugen für Kdt keine Meldung/visuellen Hinweis. Die Übermittlung an DIM kann Stunden dauern. Im DIM erscheinen Beilagen unter Ergänzende Unterlagen; DIM-Wallet stellt keinen Download bereit.",
+      "scope": "Nicht aus lokalem Speicherstatus auf DIM-Verfügbarkeit schliessen", "tags": ["Archiv", "MBF", "DIM", "Wallet", "Verzögerung"]
+    },
+    {
+      "id": "PISA-ATT-004", "topic": "Beilagen", "status": "documented", "automation": "manual", "evidence": "text", "pages": [147],
+      "title": "Klassifizierung elektronischer Beilagen",
+      "statement": "Die PAT erlaubt elektronische MB-Beilagen bis zur Klassifizierungsstufe Intern; höher schutzbedürftige, insbesondere vertrauliche Inhalte dürfen so nicht versendet werden.",
+      "scope": "Inhaltsprüfung durch verantwortliche Person; kein automatisch aus Dateiformat bestimmbarer Wert", "tags": ["Intern", "vertraulich", "Versand"]
+    },
+    {
+      "id": "PISA-AO-001", "topic": "Ausserordentliche Planung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [129,130,131,132,133,134,135,136,137,138,139,140],
+      "title": "AO-Arbeitsfolge",
+      "statement": "Eintrag einmal pro Dienstleistungsjahr erstellen. Bemerkungen/Details erfassen und unter Management freigeben; Personal hinzufügen; Dienstvormerke erstellen und Verarbeitung abwarten; Marschbefehle erstellen und herunterladen.",
+      "scope": "Eigener AO-Ablauf, keine identische Freigabe wie ordentliche Planung", "tags": ["AO", "URE", "URB", "Workflow"]
+    },
+    {
+      "id": "PISA-AO-002", "topic": "Ausserordentliche Planung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [132,137],
+      "title": "AO-Dienstart und Jahresdienst unterscheiden",
+      "statement": "Rap/Erk setzt Ktrl DP 904 und erscheint in MILOFFICE als VDT. Ausb D setzt Ktrl DP 001 und ist für Jahresdienste ohne ADF im Aufgebotstableau vorgesehen. Die auf S. 137 beschriebene Checkbox ist bei AO-Tagen neben regulären Aufgebotsdaten nicht zu aktivieren, bei Jahres-ADF ohne reguläre Aufgebotsdaten hingegen schon.",
+      "scope": "AO; Checkbox-Beschriftung/aktuellen UI-Zustand vor Umsetzung im Original prüfen", "tags": ["904", "001", "Rapport", "Erkundung", "VDT", "Jahresdienst"]
+    },
+    {
+      "id": "PISA-AO-003", "topic": "Ausserordentliche Planung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [141],
+      "title": "Ordentliche/AO-Planung nicht überlappen",
+      "statement": "AO darf nicht während regulärer Aufgebotsdaten definiert werden; ordentliche und AO-Planung dürfen sich nicht überschneiden. Bei vorverlegtem KVK ausserhalb des beschriebenen Bereichs +/- 1 Woche des WK ist AO zu verwenden. Aufgebote kurz nach regulärem WK erfolgen über KF.",
+      "scope": "Exakte Grenztage und die Dauer von kurz nach sind nicht technisch spezifiziert", "tags": ["AO", "KVK", "Überschneidung", "KF"]
+    },
+    {
+      "id": "PISA-AO-004", "topic": "Gast-WK", "status": "documented", "automation": "manual", "evidence": "text", "pages": [142],
+      "title": "Gast-WK in AO über KF",
+      "statement": "Für Gast-WK im Rahmen der AO entsteht vorgängig kein regulärer BATCH-Vormerk; der AdA erscheint deshalb nicht in der regulären Personalplanung/Bestandesliste. KF muss explizit und manuell aufbieten.",
+      "scope": "Gast-WK in ausserordentlicher Planung", "tags": ["Gast WK", "AO", "DVM", "fehlt", "KF"]
+    },
+    {
+      "id": "PISA-SPECIAL-001", "topic": "Sonderfälle", "status": "documented", "automation": "manual", "evidence": "text", "pages": [76,82],
+      "title": "Mehrere Jahresabschnitte und Jahreswechsel mit KF klären",
+      "statement": "Für Jahresdienstleistungen in mehreren Abschnitten/Einzeltagen mit mehreren Aufgeboten sind ergänzende Weisungen beim KF einzuholen. KVK im Vorjahr mit WK im Folgejahr ist vor Bildung der Einrückungsdetachemente mit KF abzusprechen.",
+      "scope": "Besondere Dienstorganisation", "tags": ["Jahreswechsel", "KVK", "Fraktionen", "KF"]
+    },
+    {
+      "id": "PISA-SPECIAL-002", "topic": "Sonderfälle", "status": "documented", "automation": "manual", "evidence": "text", "pages": [149,150,151],
+      "title": "DBem 50, GADB und freiwillige Dienste",
+      "statement": "Bei DBem 50 und noch offener S1-Planung eröffnet KF OF WESEN mit Einverständnis den Vormerk, setzt aber keinen EC und löst keinen MB aus; S1 ordnet zu. Bei bereits abgeschlossener/genehmigter Planung setzt KF OF WESEN EC und löst MB aus. GADB-Aufgebote erfolgen ausschliesslich über KF OF WESEN. Freiwillige Dienste benötigen vorgängige Klärung/Bewilligung; Vormerke werden in der Regel durch KF erfasst.",
+      "scope": "Erweiterte S1-/KF-Sonderfälle; nicht auf alle AdA verallgemeinern", "tags": ["DBem 50", "GADB", "freiwillig", "S1", "KF"]
+    },
+    {
+      "id": "PISA-PSP-001", "topic": "Personalplanung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [39,40,64,65,66,67,68],
+      "title": "PSP-Anforderung und tatsächliche PSP getrennt",
+      "statement": "PISA zeigt Mindest-PSP der Funktion, Anforderung für die Dienstleistung und PSP des AdA getrennt. Kdt kann für reguläre Funktionen dienstbezogen herunterstufen oder auf Standard zurücksetzen, nicht über den Standard erhöhen. Zusatzfunktionen haben laut S. 68 keine Einschränkung bei der Stufenwahl. Abgelaufene/ungenügende PSP wird angezeigt.",
+      "scope": "Keine automatische Herabstufung oder Erteilung einer PSP durch den Planer", "tags": ["PSP", "Funktion", "Gast WK"]
+    },
+    {
+      "id": "PISA-DVS-001", "topic": "Personalplanung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [77,78,80,81],
+      "title": "DVS-Stellungnahme ist kein Entscheid",
+      "statement": "Kdt gibt eine Empfehlung ab; bei Ablehnungsempfehlung ist eine Begründung erforderlich. KF entscheidet und informiert. Versäumte Stellungnahmen werden geschlossen. Die Übersicht der Stellungnahmen zeigt nur DIMILAR-Gesuche, keine postalisch eingegangenen.",
+      "scope": "Status eines Gesuchs nicht mit einem abgeschlossenen Dispensentscheid verwechseln", "tags": ["DVS", "Dienstverschiebung", "Dispensation", "Frist"]
+    },
+    {
+      "id": "PISA-MOB-001", "topic": "Mobilmachung", "status": "documented", "automation": "manual", "evidence": "text", "pages": [125,126,127,128],
+      "title": "Mobilmachungsdetachemente sind eine andere Planung",
+      "statement": "BERA unterscheidet CAPO, Det und Gros. CAPO wird auf Einheitsstufe mit TRE, auf Stabsstufe mit DUE markiert. Gros erhält weder Mobilmachungsdetachement noch CAPO-Zuweisung.",
+      "scope": "Mobilmachung; nicht als EC-/MB-Regel der regulären ADF-Planung verwenden", "tags": ["BERA", "CAPO", "TRE", "DUE", "Gros"]
+    },
+    {
+      "id": "PISA-SERVICE-001", "topic": "Während des Dienstes", "status": "documented", "automation": "manual", "evidence": "text", "pages": [106,110,112],
+      "title": "Nachbearbeitung in MILOFFICE/PISA",
+      "statement": "Nicht eingerückte AdA in MILOFFICE entsprechend erfassen und KF melden. Diensttage-Differenzen zum DB durch KF klären. Ersatz-MB können nach Versand-Auslösung über die Infofunktion der Einrückungspflichtigen heruntergeladen werden. Abschlussdaten/Qualifikationen spätestens am letzten Diensttag erfassen; MILOFFICE schliesst ohne Aktion nach 48 Stunden automatisch ab.",
+      "scope": "Anschlussprozesse; ein MB-Nachdruck ist keine Änderung des Aufgebots", "tags": ["Ersatzmarschbefehl", "Entlassung", "Dienstabschluss", "DB"]
+    },
+    {
+      "id": "PISA-RESP-001", "topic": "Zuständigkeit", "status": "documented", "automation": "manual", "evidence": "text", "pages": [9,104],
+      "title": "Kdt-Verantwortung und KF-Verbindung",
+      "statement": "Kdt verantwortet Richtigkeit/Vollständigkeit der Aufgebote. Koordination, Meldeweg und Belegfluss zur Kontrollführung laufen über die zuständigen KF. Die PAT beschreibt den Datenaustausch Trp Kdt/KF über militärische E-Mail und Outlook-Verschlüsselung.",
+      "scope": "Beschreibung des offiziellen Verfahrens, kein Auftrag zur Übermittlung durch das Oracle", "tags": ["Kontrollführer", "Verantwortung", "Übertragung"]
+    },
+    {
+      "id": "PISA-CONFLICT-001", "topic": "Quellenkonflikte", "status": "conflict", "automation": "blocked", "evidence": "text", "pages": [85,93,94],
+      "title": "KVK plus WK: ein MB oder getrennte EC?",
+      "statement": "S. 85 sagt allgemein, für KVK und nachfolgenden WK sei nur ein MB auszustellen. S. 93 verlangt für unterschiedliche Dienstleistungen KVK/ADF immer unterschiedliche EC; S. 94 beschreibt separate EC. Die PAT löst diesen Widerspruch nicht eindeutig auf.",
+      "scope": "Keine automatische allgemeine MB-Anzahl für KVK/WK ableiten",
+      "resolution": "Fallbezogene KF-Bestätigung bzw. berichtigte Quelle einholen und separat dokumentieren.",
+      "tags": ["KVK", "WK", "MB", "Widerspruch", "zusammenlegen"]
+    },
+    {
+      "id": "PISA-CONFLICT-002", "topic": "Quellenkonflikte", "status": "conflict", "automation": "blocked", "evidence": "text", "pages": [85],
+      "title": "6084 Kombinationen passen nicht zur sichtbaren Zeichenliste",
+      "statement": "S. 85 nennt 6084 Kombinationen; die explizite Liste enthält 10 Ziffern, 52 Buchstaben und 17 Sonderzeichen, also 79 Zeichen und rechnerisch 6241 Zweierkombinationen. Gleichzeitig verbietet die Quelle Gross-/Kleinschreibungsduplikate. Eine belastbare Anzahl eindeutiger nutzbarer EC folgt daraus nicht.",
+      "scope": "Kombinationszahl, Sonderzeichenliste und Eindeutigkeitsmodell",
+      "resolution": "Keine Kapazitäts- oder Codegeneratorlogik auf die Zahl 6084 stützen; Zeichenliste produktiv bestätigen.",
+      "tags": ["EC", "6084", "6241", "Zeichen", "Widerspruch"], "related": ["PISA-EC-001", "PISA-EC-002"]
+    },
+    {
+      "id": "PISA-CONFLICT-003", "topic": "Quellenkonflikte", "status": "conflict", "automation": "blocked", "evidence": "text", "pages": [144,145,147],
+      "title": "Beilage entfernen versus Archiv löschen",
+      "statement": "S. 144 beschreibt das Entfernen markierter Beilagen-Zuordnungen, S. 145 erlaubt Löschen aus dem Archiv nur über KF, während S. 147 allgemein von überschreib-/löschbaren Beilagen spricht. Die Reichweite dieser letzten Aussage ist nicht eindeutig.",
+      "scope": "EC-Zuordnung, hochgeladene Datei und Archiveintrag unterscheiden",
+      "resolution": "Keine Löschberechtigung für Archivdateien aus der allgemeinen Aussage auf S. 147 ableiten; in PISA/KF klären.",
+      "tags": ["Beilage", "Löschen", "Archiv", "Widerspruch"]
+    },
+    {
+      "id": "PISA-UNKNOWN-001", "topic": "Systemgrenzen", "status": "unknown", "automation": "blocked", "evidence": "source_gap", "pages": [45,82,83,84,85,88,101,102,129,132,138,139],
+      "title": "Kein belegtes Importformat für externe MB-Planer",
+      "statement": "Die betrachteten MB-Abläufe beschreiben manuelle PISA-Erfassung und einen bestehenden MILOFFICE-Datenaustausch, aber keinen API-Vertrag und kein CSV-/Excel-Importformat für diesen Planer. Daraus folgt nicht, dass eine solche Schnittstelle grundsätzlich unmöglich wäre.",
+      "scope": "Begrenzung des aus dieser PAT belegbaren Integrationsumfangs", "tags": ["API", "Excel", "CSV", "Import", "Export", "Integration"]
+    },
+    {
+      "id": "PISA-UNKNOWN-002", "topic": "Systemgrenzen", "status": "unknown", "automation": "blocked", "evidence": "source_gap", "pages": [85,86,87,100,132,142,147],
+      "title": "Nicht spezifizierte Feld- und Gültigkeitsgrenzen",
+      "statement": "Der genaue EC-Namensraum über Formation/Jahr/ordentliche und AO-Planung hinweg ist nicht spezifiziert. Ebenso fehlen vollständige Dropdown-Wertelisten, weitere Feldlängen, eine MB-Beilagen-Dateigrössengrenze und die technische Unicode-Zählweise für Zeichenlimits.",
+      "scope": "Keine fehlenden Werte aus Screenshots oder Beispielcodes erfinden", "tags": ["EC", "Anzug", "Feldlänge", "Dateigrösse", "Unicode", "Eindeutigkeit"]
+    }
+  ],
+  "scenarios": [
+    {"id": "CASE-01", "question": "Darf ein EC nur aus einer Ziffer bestehen?", "expected": "Nein, genau zwei Zeichen. Eine führende Null als Text erhalten.", "rule_ids": ["PISA-EC-001"], "disposition": "answer"},
+    {"id": "CASE-02", "question": "Z1 ist Haupt-EC, z1 soll Zusatz-EC werden.", "expected": "Nicht zulässig wegen fehlender Unterscheidung der Gross-/Kleinschreibung.", "rule_ids": ["PISA-EC-002"], "disposition": "answer"},
+    {"id": "CASE-03", "question": "Darf eine Bemerkung 241 Zeichen inklusive Leerzeichen enthalten?", "expected": "Nein, maximal 240 Zeichen pro Bemerkung.", "rule_ids": ["PISA-REM-001"], "disposition": "answer"},
+    {"id": "CASE-04", "question": "Fahrerrepetitorium Freitag, WK ab Montag?", "expected": "Laut konkretem Beispiel zwei MB: WK als Haupt-MB, Repetitorium als Zusatz-MB; Wochenende dort nicht anrechenbar.", "rule_ids": ["PISA-MB-001", "PISA-MB-002"], "disposition": "answer"},
+    {"id": "CASE-05", "question": "KVK Donnerstag/Freitag und WK ab Montag automatisch zusammenfassen?", "expected": "Keine automatische Zusammenfassung. Konflikt zwischen S. 85 und S. 93-94 nennen und KF-Klärung festhalten.", "rule_ids": ["PISA-CONFLICT-001", "PISA-DAYS-002"], "disposition": "manual_review"},
+    {"id": "CASE-06", "question": "Drei befohlene Dienstabschnitte in einer WK-Periode auf Kp-Stufe?", "expected": "Nach KF-Absprache je Abschnitt EC, letzte Fraktion Haupt-MB, vorherige Zusatz-MB; nicht als persönliche Urlaube modellieren.", "rule_ids": ["PISA-FRACTION-002"], "disposition": "manual_review"},
+    {"id": "CASE-07", "question": "Dieselben Kalenderlücken entstehen durch persönlichen Urlaub im durchgehenden Dienst.", "expected": "Anderer Sachverhalt: laut Beispiel ein EC, persönliche Urlaube in MILOFFICE. Lücken allein entscheiden nicht.", "rule_ids": ["PISA-FRACTION-001", "PISA-FRACTION-002"], "disposition": "answer"},
+    {"id": "CASE-08", "question": "Gast-WK kommt nach Planungsfreigabe hinzu.", "expected": "KF erstellt Vormerk inklusive EC.", "rule_ids": ["PISA-GUEST-002"], "disposition": "manual_review"},
+    {"id": "CASE-09", "question": "Alle sichtbaren MILO-Personen sind zugeteilt. Ist PISA vollständig?", "expected": "Nicht belegt. PISA-Planungsbestand, DVM/Gast-WK/DVS und Synchronisationsstand abgleichen; PISA-Prüfung erforderlich.", "rule_ids": ["PISA-DATA-001", "PISA-DATA-002", "PISA-DATA-004", "PISA-ASSIGN-002"], "disposition": "manual_review"},
+    {"id": "CASE-10", "question": "Sechs PDF-Beilagen im Querformat an einen EC hängen?", "expected": "Nein: maximal fünf Beilagen, A4 Hochformat. Die Zusatz-MB-Grenze ist eine andere Regel.", "rule_ids": ["PISA-ATT-001", "PISA-MB-001"], "disposition": "answer"},
+    {"id": "CASE-11", "question": "DIMILAR akzeptiert: MB sicher erhalten?", "expected": "Nur Kanalwahl belegt. AW416 kann Übermittlung via DIM belegen; keine persönliche Kenntnisnahme ableiten.", "rule_ids": ["PISA-DATA-003", "PISA-DELIVERY-001"], "disposition": "answer"},
+    {"id": "CASE-12", "question": "Welche Excel-Spalten kann PISA automatisch importieren?", "expected": "Aus der PAT nicht belegt. Erfassungshilfe vorbereiten und Schnittstellenvertrag separat klären.", "rule_ids": ["PISA-UNKNOWN-001"], "disposition": "unknown"}
+  ]
+}

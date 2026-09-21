@@ -8,3 +8,8 @@ project-data/
 *.xlsx
 *.xls
 google-kontakte*.csv
+
+# Lokale PDF-Auswertung; Originalhandbuch und Seitenbilder nicht versionieren.
+tmp/pdfs/
+__pycache__/
+test-results/

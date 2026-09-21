@@ -25,6 +25,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Build and verify offline app
+        run: |
+          python3 tools/build_app.py
+          node tests/planner-model.cjs
+          python3 -m unittest discover -s tests -p 'test_*.py'
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
