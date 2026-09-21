@@ -269,6 +269,45 @@ dialog .df{padding:10px 14px;border-top:1px solid var(--line2);display:flex;gap:
 .privacy-note{margin-top:7px;padding:6px 8px;border-left:3px solid var(--sel);background:#EDF3F7;color:#3F5665;font-size:10.5px}
 @media(max-width:1000px){.person-workbench{grid-template-columns:1fr}.person-roster{border-right:0;border-bottom:1px solid var(--line)}.person-roster-list{max-height:230px}.dossier-grid{grid-template-columns:1fr}.overview-table{max-height:none}}
 @media(max-width:680px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.overview-command{align-items:flex-start;flex-direction:column}.overview-command .stamp{text-align:left}.assignment-card{grid-template-columns:1fr 72px}.fact-grid{grid-template-columns:1fr}.overview-toolbar .searchbox{min-width:100%}}
+
+/* ---------- Startseite ---------- */
+.welcome{max-width:1180px;margin:18px auto 40px}
+.welcome-hero{
+  display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:0;
+  border:1px solid #19261B;border-top:5px solid var(--khaki);background:#fff;box-shadow:0 8px 30px rgba(30,42,31,.12)
+}
+.welcome-copy{padding:clamp(26px,5vw,58px);background:linear-gradient(135deg,#17231A 0%,#2E432D 100%);color:#F5F4EE}
+.welcome-kicker{font-family:var(--ff-mono);font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:#D9C990}
+.welcome-copy h1{max-width:720px;margin:12px 0 18px;font-size:clamp(31px,5vw,58px);line-height:.98;letter-spacing:-.025em}
+.welcome-copy p{max-width:700px;margin:0;color:#DCE2D8;font-size:16px;line-height:1.65}
+.welcome-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:27px}
+.welcome-actions .btn{padding:9px 16px;font-weight:700}
+.welcome-actions .btn.secondary{border-color:#899783;background:transparent;color:#fff}
+.welcome-actions .btn.secondary:hover{background:rgba(255,255,255,.09)}
+.welcome-trust{display:flex;flex-direction:column;justify-content:center;padding:30px;background:#F3F1E8}
+.welcome-trust h2{font-size:15px;letter-spacing:.09em;text-transform:uppercase}
+.trust-point{display:grid;grid-template-columns:35px 1fr;gap:11px;padding:16px 0;border-bottom:1px solid #D6D4C9}
+.trust-point:last-child{border-bottom:0}
+.trust-icon{display:grid;place-items:center;width:31px;height:31px;border-radius:50%;background:var(--olive);color:#fff;font-family:var(--ff-mono);font-weight:700}
+.trust-point b{display:block;margin-bottom:3px}
+.trust-point span{color:var(--ink3);font-size:12px;line-height:1.5}
+.welcome-section{margin-top:22px}
+.welcome-section>h2{text-align:center;font-size:21px;margin-bottom:5px}
+.welcome-lead{text-align:center;max-width:760px;margin:0 auto 18px;color:var(--ink3);line-height:1.6}
+.welcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.welcome-card{padding:20px;border:1px solid var(--line);border-top:4px solid var(--olive);background:rgba(255,255,255,.94)}
+.welcome-card .number{font-family:var(--ff-mono);font-size:11px;color:var(--signal);font-weight:700}
+.welcome-card h3{margin:6px 0 9px;font-size:17px}
+.welcome-card p{margin:0;color:var(--ink3);line-height:1.55}
+.welcome-privacy{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;margin-top:22px;padding:25px;border:1px solid var(--line);background:#fff}
+.welcome-privacy h2{font-size:22px;margin-bottom:9px}
+.welcome-privacy p{margin:0;color:var(--ink3);line-height:1.6}
+.privacy-facts{display:grid;gap:7px}
+.privacy-fact{padding:10px 12px;border-left:4px solid var(--ok);background:#EFF4EE;line-height:1.45}
+.privacy-fact b{display:block}
+.privacy-fact span{font-size:12px;color:var(--ink3)}
+.source-link{color:#184F75;font-weight:700}
+@media(max-width:850px){.welcome-hero,.welcome-privacy{grid-template-columns:1fr}.welcome-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -284,7 +323,8 @@ dialog .df{padding:10px 14px;border-top:1px solid var(--line2);display:flex;gap:
     <button class="btn sm danger" id="btnReset">Zurücksetzen</button>
   </div>
   <nav class="tabs" id="tabs">
-    <button data-v="daten" aria-current="true">1 · Daten</button>
+    <button data-v="home" aria-current="true">Start</button>
+    <button data-v="daten">1 · Daten</button>
     <button data-v="det">2 · Detachemente <span class="pill" id="pDet">0</span></button>
     <button data-v="plan">3 · Planungstisch <span class="pill" id="pOpen">0 offen</span></button>
     <button data-v="pruef">4 · Prüfung <span class="pill" id="pIss">0</span></button>
@@ -293,7 +333,8 @@ dialog .df{padding:10px 14px;border-top:1px solid var(--line2);display:flex;gap:
   </nav>
 </header>
 <main>
-  <div class="view on" id="v-daten"></div>
+  <div class="view on" id="v-home"></div>
+  <div class="view" id="v-daten"></div>
   <div class="view" id="v-det"></div>
   <div class="view" id="v-plan"></div>
   <div class="view" id="v-pruef"></div>
@@ -343,7 +384,7 @@ const GRADE_ORDER = ['Br', 'Oberst', 'Oberstlt', 'Maj', 'Hptm', 'Oblt', 'Lt', 'A
 
 let S = leerZustand();
 let UI = {
-  view: 'daten', sel: new Set(), poolSort: 'grad', pf: null, bf: null,
+  view: 'home', sel: new Set(), poolSort: 'grad', pf: null, bf: null,
   lastCard: null, dragIds: null, kartenScope: 'milo', kartenBadge: true, kartenSort: 'grad', mapsOffen: false,
   overTab: 'liste', overQ: '', personQ: '', overSelected: null
 };
@@ -1797,6 +1838,52 @@ function exportBundle() {
 }
 
 /* ---------- Navigation und Start ---------- */
+function viewHome() {
+  $('#v-home').innerHTML = `<div class="welcome">
+    <section class="welcome-hero">
+      <div class="welcome-copy">
+        <div class="welcome-kicker">Detachementsplanung im Browser</div>
+        <h1>Vom Personalbestand zum einsatzbereiten Detachement.</h1>
+        <p>Der Detachementsplaner unterstützt Führungs- und Planungspersonal dabei, Personaldaten zu importieren, Detachemente zusammenzustellen, Zuteilungskonflikte zu erkennen und übersichtliche Einsatzlisten zu erstellen – ohne Tabellen zwischen verschiedenen Werkzeugen abzugleichen.</p>
+        <div class="welcome-actions">
+          <button class="btn primary" id="welcomeStart">Neue Planung starten</button>
+          <button class="btn secondary" id="welcomeLoad">Bestehendes Projekt laden</button>
+        </div>
+      </div>
+      <aside class="welcome-trust" aria-label="Datenschutz auf einen Blick">
+        <h2>Ihre Daten bleiben bei Ihnen</h2>
+        <div class="trust-point"><span class="trust-icon">1</span><div><b>Nur im Browser</b><span>Die Anwendung läuft vollständig auf Ihrem Gerät.</span></div></div>
+        <div class="trust-point"><span class="trust-icon">2</span><div><b>Keine Übertragung</b><span>Importierte Personendaten werden an keinen Server gesendet.</span></div></div>
+        <div class="trust-point"><span class="trust-icon">3</span><div><b>Offener Quellcode</b><span>Die Funktionsweise kann unabhängig eingesehen und überprüft werden.</span></div></div>
+      </aside>
+    </section>
+
+    <section class="welcome-section">
+      <h2>Ein klarer Ablauf für die Detachementsplanung</h2>
+      <p class="welcome-lead">Die Anwendung führt von bestehenden Personallisten bis zur kontrollierten und exportierbaren Einsatzplanung.</p>
+      <div class="welcome-grid">
+        <article class="welcome-card"><span class="number">01 · IMPORTIEREN</span><h3>Personaldaten zusammenführen</h3><p>Bestehende Excel- und Projektdateien einlesen, Felder zuordnen und die für die Planung relevanten Personen übersichtlich aufbereiten.</p></article>
+        <article class="welcome-card"><span class="number">02 · PLANEN</span><h3>Detachemente besetzen</h3><p>Personen nach Funktion, Grad und Führerausweisen auswählen und per Planungstisch den benötigten Detachementen zuteilen.</p></article>
+        <article class="welcome-card"><span class="number">03 · PRÜFEN</span><h3>Konflikte früh erkennen</h3><p>Offene Zuteilungen, zeitliche Überschneidungen und fehlende Anforderungen erkennen, bevor die Planung eingesetzt wird.</p></article>
+      </div>
+    </section>
+
+    <section class="welcome-privacy">
+      <div>
+        <div class="welcome-kicker" style="color:var(--olive)">Datenschutz & Transparenz</div>
+        <h2>Wo werden die Daten gespeichert?</h2>
+        <p>Der aktuelle Planungsstand wird im lokalen Speicher dieses Browsers (<code>localStorage</code>) abgelegt. Er bleibt damit im verwendeten Browserprofil auf diesem Gerät. Erst wenn Sie selbst <b>Projekt sichern</b> oder <b>Als Datei teilen</b> wählen, wird eine Datei auf Ihr Gerät geschrieben, die Sie eigenständig weitergeben können.</p>
+      </div>
+      <div class="privacy-facts">
+        <div class="privacy-fact"><b>Keine Datenbank, kein Benutzerkonto</b><span>Es gibt keinen Anwendungsserver, der Ihre Personaldaten entgegennimmt oder speichert.</span></div>
+        <div class="privacy-fact"><b>Importe werden lokal verarbeitet</b><span>Ausgewählte Dateien werden durch JavaScript direkt in Ihrem Browser gelesen.</span></div>
+        <div class="privacy-fact"><b>Open Source und überprüfbar</b><span>Der vollständige Quellcode ist öffentlich auf <a class="source-link" href="https://github.com/bubavanhalen/detachementsplaner-fdt" target="_blank" rel="noopener noreferrer">GitHub einsehbar</a>. Damit kann nachvollzogen werden, was die Anwendung mit den Daten macht.</span></div>
+      </div>
+    </section>
+  </div>`;
+  $('#welcomeStart').onclick = () => go('daten');
+  $('#welcomeLoad').onclick = () => $('#btnImport').click();
+}
 function go(v) { UI.view = v; render(); window.scrollTo(0, 0); }
 function zaehler() {
   const offen = personen().filter(p => !zugeteilt(p.id)).length;
@@ -1811,7 +1898,7 @@ function render() {
   _konfCache = null;
   $$('#tabs button').forEach(b => b.setAttribute('aria-current', b.dataset.v === UI.view));
   $$('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + UI.view));
-  ({ daten: viewDaten, det: viewDet, plan: viewPlan, pruef: viewPruef, uebersicht: viewUeber, karten: viewKarten }[UI.view] || viewDaten)();
+  ({ home: viewHome, daten: viewDaten, det: viewDet, plan: viewPlan, pruef: viewPruef, uebersicht: viewUeber, karten: viewKarten }[UI.view] || viewHome)();
   zaehler();
 }
 
