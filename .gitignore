@@ -13,3 +13,9 @@ google-kontakte*.csv
 tmp/pdfs/
 __pycache__/
 test-results/
+
+# Tooling and generated builds
+node_modules/
+dist/
+coverage/
+.vite/

@@ -1,0 +1,467 @@
+.planning-page {
+  padding: 24px 28px 12px;
+  max-width: none;
+}
+.planning-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.planning-heading h1 {
+  font-size: 2rem;
+  margin: 5px 0;
+}
+.planning-heading p:last-child {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.planning-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 12px;
+  background: #fffefa;
+  border: 1px solid var(--line);
+  border-radius: 12px 12px 0 0;
+}
+.toolbar-count {
+  background: #e9eddf;
+  border-radius: 5px;
+  padding: 2px 7px;
+}
+.toolbar-status {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-left: 4px;
+  flex: 1;
+}
+.toolbar-status strong {
+  color: #a53232;
+}
+.history-buttons {
+  display: flex;
+  gap: 4px;
+}
+.history-buttons button {
+  font-size: 20px;
+  min-width: 38px;
+  padding: 4px;
+}
+.board-global-issues {
+  padding: 9px 16px;
+  border: 1px solid var(--line);
+  border-top: 0;
+  background: #eeefdf;
+  font-size: 0.83rem;
+}
+.board-global-issues summary {
+  cursor: pointer;
+}
+.board-global-issues > div {
+  max-height: 180px;
+  overflow: auto;
+  padding: 10px 0;
+}
+.board-global-issues :where(p + p) {
+  margin-top: 5px;
+}
+.planning-workspace {
+  position: relative;
+  min-height: 380px;
+  height: calc(100dvh - 310px);
+}
+.planning-canvas {
+  position: relative;
+  height: 100%;
+  min-height: 380px;
+  border: 1px solid var(--line);
+  border-top: 0;
+  background: #f1f2eb;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}
+.planning-canvas .react-flow__node-detachment {
+  width: 326px;
+}
+.canvas-card {
+  background: #fffefa;
+  border: 1px solid #d3d9ce;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px #2035260c;
+  overflow: visible;
+  color: var(--ink);
+  transition:
+    box-shadow 160ms,
+    border-color 160ms;
+}
+.canvas-card.is-selected,
+.canvas-card.is-source {
+  border-color: #587447;
+  box-shadow:
+    0 0 0 2px #58744733,
+    0 7px 22px #20352616;
+}
+.card-grip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e9eddf;
+  border-radius: 11px 11px 0 0;
+  padding: 9px 15px;
+  cursor: grab;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #57644e;
+  user-select: none;
+}
+.card-grip:active {
+  cursor: grabbing;
+}
+.card-grip > span:first-child {
+  font-size: 22px;
+  line-height: 1;
+}
+.drag-hint {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+.canvas-card-body {
+  padding: 17px;
+}
+.card-identity {
+  display: flex;
+  gap: 7px;
+  align-items: start;
+}
+.card-identity label {
+  gap: 3px;
+  display: flex;
+  flex-direction: column;
+}
+.card-identity :where(label > span) {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.inline-name {
+  flex: 1;
+  min-width: 0;
+}
+.inline-ec {
+  width: 48px;
+}
+.card-identity input {
+  width: 100%;
+  padding: 6px 4px;
+  border: 1px solid transparent;
+  border-bottom-color: #e5e9df;
+  border-radius: 4px;
+  background: transparent;
+  min-height: 36px;
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--ink);
+}
+.card-identity input:hover {
+  background: #f4f5ef;
+}
+.card-identity input:focus {
+  outline: 2px solid #658447;
+  background: #fff;
+}
+.inline-ec input {
+  font-size: 13px;
+  background: #f0f2e8;
+  text-align: center;
+}
+.canvas-count {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 17px 0;
+  font-size: 12px;
+  color: #63715e;
+}
+.canvas-count strong {
+  font-size: 31px;
+  line-height: 1;
+  font-weight: 600;
+  color: #273e25;
+}
+.canvas-count small {
+  font-size: 11px;
+}
+.canvas-people {
+  width: 100%;
+  justify-content: space-between;
+  font-size: 12px;
+  background: #435e36;
+}
+.card-health {
+  display: flex;
+  gap: 9px;
+  width: 100%;
+  align-items: center;
+  justify-content: start;
+  margin: 14px 0 8px;
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 11px;
+  border-radius: 6px;
+  min-height: 52px;
+  background: #f2f3e9;
+  color: #68724e;
+  font-weight: 600;
+}
+.card-health:hover {
+  background: #e8ebdc;
+}
+.card-health > span:first-child {
+  font-size: 16px;
+}
+.card-health > span:last-child {
+  margin-left: auto;
+}
+.card-health small {
+  font-size: 10px;
+  font-weight: 400;
+  margin-top: 3px;
+  line-height: 1.4;
+  color: inherit;
+}
+.card-health.conflict {
+  background: #fbece7;
+  color: #9a3830;
+}
+.card-health.ready {
+  background: #e9f2e6;
+  color: #406338;
+}
+.card-inline-error {
+  font-size: 11px;
+  color: #a02c27;
+  margin: 8px 0;
+}
+.card-quick-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.card-quick-actions button {
+  background: transparent;
+  color: #506246;
+  font-size: 11px;
+  padding: 7px;
+  min-height: 32px;
+}
+.card-quick-actions button:hover {
+  background: #edf0e5;
+}
+.card-remove {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  background: transparent;
+  color: #52624b;
+  font-size: 24px;
+  line-height: 1;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.card-remove:hover {
+  color: #9a3830;
+  background: #fbece7;
+}
+.connection-target {
+  width: 100%;
+  margin: 8px 0;
+  background: #d9e7c7;
+  color: #2d4824;
+  border: 1px dashed #62814c;
+  font-size: 11px;
+}
+.connection-target:hover {
+  background: #c8dcb1;
+}
+.card-position {
+  border-top: 1px solid #eef0e8;
+  margin-top: 4px;
+  padding-top: 7px;
+}
+.card-position summary {
+  font-size: 10px;
+  color: #798071;
+  cursor: pointer;
+}
+.card-position > div {
+  display: flex;
+  gap: 4px;
+  padding-top: 5px;
+}
+.card-position button {
+  min-width: 38px;
+  min-height: 32px;
+  padding: 3px;
+  background: #edf0e5;
+  color: #435636;
+}
+.planning-canvas .react-flow__handle {
+  width: 14px;
+  height: 28px;
+  border-radius: 7px;
+  border: 3px solid #f1f2eb;
+  background: #7d916c;
+}
+.planning-canvas .react-flow__handle:hover {
+  background: #405e2e;
+}
+.planning-canvas .react-flow__edge.selected path {
+  stroke-width: 3.5;
+}
+.planning-canvas .react-flow__edge {
+  animation: connection-appear 180ms ease-out;
+}
+@keyframes connection-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.planning-canvas .react-flow__controls {
+  bottom: 38px;
+  box-shadow: 0 1px 8px #20352619;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.planning-canvas .react-flow__controls-button {
+  background: #fffefa;
+  color: #435636;
+  border: 0;
+  border-bottom: 1px solid #e0e5d9;
+  min-height: 32px;
+  width: 32px;
+  padding: 7px;
+  border-radius: 0;
+}
+.canvas-instruction {
+  position: absolute;
+  left: 58px;
+  bottom: 15px;
+  font-size: 10px;
+  color: #7b8373;
+  pointer-events: none;
+  right: 20px;
+}
+.canvas-empty {
+  position: absolute;
+  top: 24%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: min(90%, 400px);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 17px;
+  padding: 30px;
+  background: #fffefac9;
+  border: 1px solid #dce2d3;
+  border-radius: 15px;
+}
+.canvas-empty > span {
+  color: #839371;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+}
+.canvas-empty p,
+.canvas-empty a {
+  font-size: 13px;
+}
+.connect-instruction {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 14px;
+  background: #263d2c;
+  color: #fff;
+  padding: 10px 13px;
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  box-shadow: 0 3px 20px #22362622;
+}
+.connect-instruction button {
+  margin-left: auto;
+  font-size: 11px;
+  min-height: 30px;
+  padding: 6px;
+}
+.board-issue-list {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+}
+.board-issue {
+  padding: 12px;
+  border: 1px solid #e1e5d7;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.board-issue p {
+  margin: 5px 0;
+}
+.board-issue.conflict {
+  border-color: #ecc2b6;
+  background: #fff6f1;
+}
+.board-issue strong {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+@media (max-width: 1150px) {
+  .planning-page {
+    padding: 18px 16px 10px;
+  }
+}
+@media (max-width: 1000px) {
+  .planning-heading {
+    align-items: start;
+  }
+  .planning-heading h1 {
+    font-size: 1.6rem;
+  }
+  .toolbar-status {
+    flex-basis: 100%;
+  }
+  .planning-canvas {
+    height: 620px;
+  }
+  .planning-heading .button {
+    font-size: 11px;
+  }
+  .canvas-instruction {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .canvas-card {
+    transition: none;
+  }
+  .planning-canvas .react-flow__edge {
+    animation: none;
+  }
+}

@@ -1,5 +1,7 @@
 # PISA-Oracle
 
+> **VERBINDLICH: Alle Nutzerdateien, Projekt-/Personendaten und erzeugten Ausgaben bleiben offline auf dem Gerät. Keine Uploads, kein Datenhosting und keine Weitergabe durch Logs, Tool-Ausgaben oder externe Dienste.** Die vollständige Vorgabe steht im [Projekt-README](../../README.md#verbindliche-grenze-alle-nutzerdaten-bleiben-offline) und in [AGENTS.md](../../AGENTS.md). Das Originalhandbuch wird lokal gelesen und nicht als Repository-, Support- oder CI-Artefakt veröffentlicht. Diagnoseausgaben mit echten Datei-/Personeninhalten dürfen nicht an Dritte gelangen.
+
 Dieses Oracle hilft, die Einrückungsplanung vollständig vorzubereiten und anschliessend in PISA zu erfassen. Es hält belegte Aussagen, ungelöste Quellenkonflikte und Vorschläge für den Detachementsplaner getrennt. Fachbegriffe bleiben auf Deutsch, damit die Übertragung in die PISA-Oberfläche eindeutig bleibt.
 
 ## Quelle und Verlässlichkeit
