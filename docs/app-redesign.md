@@ -1,5 +1,17 @@
 # Dienstleistung vorbereiten, danach nachschlagen
 
+## Aktuelle React/TanStack-Neugestaltung
+
+Die Umsetzung wurde nach der gemeinsamen Workflow-Abstimmung ausdrücklich freigegeben und in parallelen Arbeitspaketen umgesetzt. Die folgenden Entscheidungen ersetzen die weiter unten als historische Referenz beschriebene Oberfläche. Aktuelle Start- und Testbefehle stehen im README.
+
+- **Verbindlich offline:** Alle importierten Dateien, Projekt-/Personendaten, Archive und Ausgaben bleiben auf dem Gerät. Keine Uploads, kein Datenhosting, keine Weitergabe durch Logs oder externe Dienste. Es gelten die vollständigen Grenzen in [AGENTS.md](../AGENTS.md) und im [README](../README.md#verbindliche-grenze-alle-nutzerdaten-bleiben-offline).
+- **Eine Planungsseite:** Detachemente erscheinen direkt als frei verschiebbare Karten mit inline bearbeitbarem Namen und EC (anfangs optional). Personen werden in einem überlagernden Flyout mit kombinierbaren Filtern ausgewählt, ohne Ausschnitt oder Zoom der Planung zu verändern. Das X im Kartenkopf entfernt die Gruppe nach Bestätigung und erhält die Personen. Verbindungen erscheinen als gerichtete Linien. Konflikte und noch fehlende Angaben sind direkt auf den betroffenen Karten sichtbar; Detailangaben werden erst bei Bedarf ergänzt.
+- **Planung und PISA-Darstellung:** Die Planung behält die fachlichen Gruppen. Zusätzliche Hauptgruppen für verschiedene Zusatz-MB-Kombinationen entstehen in der abgeleiteten PISA-Erfassungshilfe. Gemeinsame Daten und Orte werden einmal gepflegt. Die Vorschau orientiert sich an den PAT-Formularen und zeigt die tatsächlich je EC zu erfassenden Personen.
+- **KVK/WK-Quellenkonflikt:** Beide Strukturen aus PAT S. 85 bzw. S. 93–94 unterstützen. Pro Dienstleistung wird die KF-bestätigte Variante festgehalten. Bis dahin trägt die PISA-Vorschau den Status **Aufgebotsart noch bestätigen**. Kein automatischer Entscheid allein aufgrund durchgehender Dienstzeit oder Kalenderdaten. Die Zustimmung betrifft diese Behandlung des Konflikts, nicht eine der Varianten als Standard.
+- **Technische Richtung:** React, TypeScript 7 oder neuer als stabile Version, Vite und TanStack Table; getestete Planungsregeln getrennt von der Oberfläche, alte JSON-Dateien weiterhin ladbar, Offline-Ausgabe erhalten. MIT-Lizenz ist gewählt.
+
+## Bisheriger Stand als Referenz
+
 Die Neugestaltung folgt zwei Nutzerentscheidungen: Die Vorbereitung des nächsten Dienstes führt den Arbeitsablauf; Detachemente sind primär Einrückungsgruppen für PISA. Das Archiv ist der zweite Zustand derselben Dienstleistung.
 
 ## Arbeitsmodell

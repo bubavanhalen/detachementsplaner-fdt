@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      tooling:
+        dependency-type: development
+      react-and-tanstack:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react*'
+          - '@tanstack/*'
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
