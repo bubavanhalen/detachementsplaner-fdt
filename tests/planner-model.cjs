@@ -66,7 +66,7 @@ test('connecting a populated special creates only its main cohort and empties di
  context.outputFixture=read('S');run('S=projektNormalisieren(outputFixture)');assert.equal(run('pisaPersonnel(S.dets[1]).length'),0);assert.equal(run('groupPeople(S.dets[1]).length'),1);
 });
 test('invalid special connection is atomic and archive mutations are blocked',()=>{
- reset();let before=run('JSON.stringify(S)');assert.throws(()=>run('connectSpecial("d2","d1")'),/Mehrfachzuteilungen/);assert.equal(run('JSON.stringify(S)'),before);
+ reset();run('S.dets.push(neuesDet({id:"d3",name:"Other main"}));S.assign.d3=["p1"];');let before=run('JSON.stringify(S)');assert.throws(()=>run('connectSpecial("d2","d1")'),/Other main/);assert.equal(run('JSON.stringify(S)'),before);
  run('assignMain("p1","d2");archiveCurrent();');before=run('JSON.stringify(S)');run('connectSpecial("d2","d1");assignRemaining("d1");');assert.equal(run('JSON.stringify(S)'),before);
 });
 test('PISA export contains only direct main personnel, no duplicate Zusatz rows',()=>{
@@ -115,4 +115,18 @@ test('contact download exports the selected subset and refuses empty or oversize
  assert.throws(()=>run('exportContacts()'),/auswählen/);run(`contactState().selected.add('p2');exportContacts();`);assert.ok(exported.name.startsWith('Google_Kontakte_'));assert.equal(context.XLSX.utils.sheet_to_json(context.XLSX.read(Buffer.from(exported.content,'utf8'),{type:'buffer',raw:true}).Sheets.Sheet1).length,1);
  run(`S.persons=Array.from({length:3001},(_,i)=>({id:'many'+i,name:'Test '+i,lics:[]}));UI.contacts=null;S.persons.forEach(p=>contactState().selected.add(p.id));`);assert.throws(()=>run('exportContacts()'),/3000/);
 });
-console.log('30 planner integrity regressions passed.');
+test('legacy main plus special assignments are resolved exactly once by connecting them',()=>{
+ reset();run(`S.assign.d1.push('p2');S.persons[0].planning={status:'included',reason:'Keep'};var overlapPlan=specialConnectionPlan('d2','d1');`);
+ assert.deepEqual(read('overlapPlan.overlapping'),['p1']);assert.deepEqual(read('specialConnectionIssues("d2","d1")'),[]);
+ run("var overlapGroup=connectSpecial('d2','d1');");assert.deepEqual(read('S.assign.d1'),['p2']);assert.deepEqual(read('S.assign.d2'),[]);assert.deepEqual(read('S.assign[overlapGroup.id]'),['p1']);assert.equal(run('directGroups("p1").length'),1);assert.equal(run('groupPeople(S.dets[1]).length'),1);assert.equal(run('S.persons[0].planning.reason'),'Keep');
+});
+test('connection diagnostics name every blocker and do not mutate ambiguous or excluded people',()=>{
+ reset();run(`S.dets.push(neuesDet({id:'other',name:'Other main'}));S.assign.other=['p1'];S.assign.d2.push('missing');S.persons[0].planning={status:'excluded',reason:'Not attending'};`);
+ const before=run('JSON.stringify(S)'),issues=read('specialConnectionIssues("d2","d1")');assert.equal(issues.length,2);assert.ok(issues[0].label.includes('Alex Muster'));assert.ok(issues[0].reason.includes('Other main'));assert.ok(issues[0].reason.includes('Not attending'));assert.equal(issues[1].missing,true);
+ assert.throws(()=>run('connectSpecial("d2","d1")'),/Alex Muster/);assert.equal(run('JSON.stringify(S)'),before);
+});
+test('removing stale special references preserves all real people and other assignments',()=>{
+ reset();run(`S.assign.d2.push('missing');S.assign.d1.push('missing');removeMissingSpecialReferences('d2');`);assert.deepEqual(read('S.assign.d2'),['p1']);assert.deepEqual(read('S.assign.d1'),['p1','missing']);assert.equal(run('S.persons.length'),2);
+ run(`S.assign.d2.push('missing');archiveCurrent();`);const before=run('JSON.stringify(S)');run('removeMissingSpecialReferences("d2")');assert.equal(run('JSON.stringify(S)'),before);
+});
+console.log('33 planner integrity regressions passed.');

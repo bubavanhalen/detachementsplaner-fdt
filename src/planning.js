@@ -56,8 +56,25 @@ function specialConnectionPlan(specialId,mainId){
   if(special.zusatzIds.length||main.zusatzIds.length||S.dets.some(g=>g.zusatzIds.includes(specialId)||g.zusatzIds.includes(mainId)))throw Error('Bitte zwei noch nicht verknüpfte Detachemente wählen. Bestehende Verknüpfungen können separat geändert werden.');
   const ids=[...new Set(S.assign[specialId]||[])];
   if(!ids.length)throw Error('Teile dem Spezialdetachement zuerst Personen zu.');
-  if(ids.some(id=>!pById(id)||directGroups(id).length!==1||participation(pById(id))==='excluded'))throw Error('Bitte zuerst fehlende Personen, Mehrfachzuteilungen oder ausgeschlossene Personen im Spezialdetachement klären.');
-  return {special,main,ids,name:main.name+' · '+special.name};
+  const issues=specialConnectionIssues(specialId,mainId);
+  if(issues.length)throw Error('Zuteilungen klären: '+issues.map(issue=>issue.label+' — '+issue.reason).join('; '));
+  const overlapping=ids.filter(id=>(S.assign[mainId]||[]).includes(id));
+  return {special,main,ids,overlapping,name:main.name+' · '+special.name};
+}
+function specialConnectionIssues(specialId,mainId){
+  return [...new Set(S.assign[specialId]||[])].flatMap(id=>{
+    const p=pById(id);
+    if(!p)return [{id,label:'Fehlender Personendatensatz ('+id+')',reason:'Die Zuteilung verweist auf eine Person, die im Bestand fehlt.',missing:true}];
+    const other=directGroups(id).filter(d=>d.id!==specialId&&d.id!==mainId),reasons=[];
+    if(other.length)reasons.push('Weitere direkte Zuteilung: '+other.map(d=>d.name).join(', '));
+    if(participation(p)==='excluded')reasons.push('Als «Nicht einplanen» markiert'+(p.planning?.reason?': '+p.planning.reason:'.'));
+    return reasons.length?[{id,label:[p.grad,p.name].filter(Boolean).join(' '),reason:reasons.join(' · '),missing:false}]:[];
+  });
+}
+function removeMissingSpecialReferences(id){
+  if(istArchiv())return;
+  if(!detById(id))throw Error('Detachement nicht gefunden.');
+  S.assign[id]=(S.assign[id]||[]).filter(pid=>!!pById(pid));
 }
 function connectSpecial(specialId,mainId){
   if(istArchiv())return;
@@ -67,8 +84,23 @@ function connectSpecial(specialId,mainId){
 }
 function connectionDialog(id){
   if(!writable())return;const special=detById(id),mains=S.dets.filter(d=>d.id!==id&&!d.zusatzIds.length&&!S.dets.some(g=>g.zusatzIds.includes(d.id)));
-  modal('Spezialdetachement verbinden',`<p><b>${esc(special.name)}</b> wird zum Zusatzmarschbefehl. Zu welchem Hauptaufgebot gehören seine ${(S.assign[id]||[]).length} ${S.assign[id]?.length===1?'Person':'Personen'} anschliessend?</p><label class="field"><span>Hauptdetachement</span><select id="connectionMain" aria-label="Hauptdetachement"><option value="">Bitte wählen</option>${mains.map(d=>`<option value="${esc(d.id)}">${esc(d.name)}</option>`).join('')}</select></label><div id="connectionPreview"><p class="muted">Wähle beispielsweise das WK-Hauptdetachement.</p></div>`,[{t:'Abbrechen'},{t:'Verbindung erstellen',primary:true,fn:()=>{connectSpecial(id,$('#connectionMain').value);afterChange();}}]);
-  $('#connectionMain').onchange=()=>{try{const plan=specialConnectionPlan(id,$('#connectionMain').value);$('#connectionPreview').innerHTML=`<div class="notice info"><b>Das entsteht automatisch:</b><ul><li>«${esc(special.name)}»: Zusatz-MB, keine direkt zugeteilten Personen.</li><li>«${esc(plan.name)}»: neues Hauptdetachement mit ${plan.ids.length} ${plan.ids.length===1?'Person':'Personen'} und dem Zusatz «${esc(special.name)}».</li><li>«${esc(plan.main.name)}»: seine bisherigen Personen behalten nur ihr Hauptaufgebot.</li></ul><p>Die Hauptangaben werden kopiert. Den eigenen EC für das neue Hauptdetachement ergänzt du in Schritt 3.</p></div><p>${plan.ids.map(pid=>esc(pById(pid).name)).join(' · ')}</p>`;}catch(e){$('#connectionPreview').textContent=e.message;}};
+  modal('Spezialdetachement verbinden',`<p><b>${esc(special.name)}</b> wird zum Zusatzmarschbefehl. Zu welchem Hauptaufgebot gehören seine ${pisaPersonnel(special).length} ${pisaPersonnel(special).length===1?'Person':'Personen'} anschliessend?</p><label class="field"><span>Hauptdetachement</span><select id="connectionMain" aria-label="Hauptdetachement"><option value="">Bitte wählen</option>${mains.map(d=>`<option value="${esc(d.id)}">${esc(d.name)}</option>`).join('')}</select></label><div id="connectionPreview" aria-live="polite"><p class="muted">Wähle beispielsweise das WK-Hauptdetachement.</p></div>`,[{t:'Abbrechen'},{t:'Verbindung erstellen',id:'connectionSubmit',disabled:true,primary:true,fn:()=>{connectSpecial(id,$('#connectionMain').value);afterChange();}}]);
+  $('#connectionMain').onchange=()=>{
+    const mainId=$('#connectionMain').value,preview=$('#connectionPreview');$('#connectionSubmit').disabled=true;$('#dialogError').hidden=true;
+    if(!mainId){preview.innerHTML='<p class="muted">Wähle das zugehörige Hauptdetachement.</p>';return;}
+    const issues=specialConnectionIssues(id,mainId);
+    if(issues.length){
+      preview.innerHTML=`<div class="notice"><b>${issues.length} ${issues.length===1?'Personenzuteilung braucht':'Personenzuteilungen brauchen'} eine Klärung.</b><p>Personen dürfen bereits im gewählten Hauptdetachement stehen. Die folgenden Einträge betreffen weitere Zuteilungen, fehlende Datensätze oder ausgeschlossene Personen:</p><ul class="connection-issues">${issues.map(issue=>`<li><b>${esc(issue.label)}</b><p>${esc(issue.reason)}</p>${issue.missing?'<small>Prüfe den Bestand anhand deiner ursprünglichen Projektdatei. Ein fehlender Datensatz kann nicht aufgeboten werden.</small>':`<button class="button" data-connection-person="${esc(issue.id)}">Person und Zuteilung prüfen</button>`}</li>`).join('')}</ul>${issues.some(issue=>issue.missing)?'<p>Falls diese Verweise veraltet sind, kannst du sie aus diesem Spezialdetachement entfernen. Vorhandene Personen bleiben erhalten.</p><button class="button" id="removeMissingConnectionRefs">Fehlende Verweise aus diesem Detachement entfernen</button>':''}</div>`;
+      $$('[data-connection-person]').forEach(button=>button.onclick=()=>{$('#dlg').close();openPerson(button.dataset.connectionPerson);});
+      if($('#removeMissingConnectionRefs'))$('#removeMissingConnectionRefs').onclick=()=>{if(!writable())return;removeMissingSpecialReferences(id);afterChange();$('#connectionMain').onchange();};
+      return;
+    }
+    try{
+      const plan=specialConnectionPlan(id,mainId);
+      preview.innerHTML=`<div class="notice info"><b>Das entsteht automatisch:</b><ul><li>«${esc(special.name)}»: Zusatz-MB, keine direkt zugeteilten Personen.</li><li>«${esc(plan.name)}»: neues Hauptdetachement mit ${plan.ids.length} ${plan.ids.length===1?'Person':'Personen'} und dem Zusatz «${esc(special.name)}».</li><li>«${esc(plan.main.name)}»: die übrigen Personen behalten nur ihr Hauptaufgebot.</li></ul>${plan.overlapping.length?`<p><b>${plan.overlapping.length} bereits in beiden Detachementen zugeteilt:</b> ${plan.overlapping.map(pid=>esc(pById(pid).name)).join(' · ')}. Diese Personen werden einmal ins neue Hauptdetachement mit Zusatz übernommen und aus den bisherigen direkten Zuteilungen entfernt.</p>`:''}<p>Die Hauptangaben werden kopiert. Den eigenen EC für das neue Hauptdetachement ergänzt du in Schritt 3.</p></div><p>${plan.ids.map(pid=>esc(pById(pid).name)).join(' · ')}</p>`;
+      $('#connectionSubmit').disabled=false;
+    }catch(e){preview.textContent=e.message;}
+  };
 }
 function pisaPersonnel(d){return S.persons.filter(p=>(S.assign[d.id]||[]).includes(p.id));}
 function pisaPersonnelText(d){const people=pisaPersonnel(d);return people.length?people.map(p=>[p.grad,p.name,p.pnr||'',d.ec,d.zusatzIds.map(id=>detById(id)?.ec||'EC offen').join(', ')].join('\t')).join('\n'):'Keine Personen bei diesem EC hinzufügen. Zusatz-MB beim zugehörigen Hauptdetachement verknüpfen.';}
