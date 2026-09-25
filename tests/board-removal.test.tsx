@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { HistoryButtons } from '../src/components/HistoryButtons';
 import { createDetachment, createProject } from '../src/model';
 import PlanningPage from '../src/pages/PlanningPage';
 import { projectStore, replaceProject } from '../src/store';
@@ -29,6 +30,15 @@ beforeEach(() => {
   });
 });
 
+type User = ReturnType<typeof userEvent.setup>;
+
+async function openCardMenu(user: User, name: string) {
+  const trigger = await screen.findByRole('button', { name: `Aktionen für ${name}` });
+  await user.click(trigger);
+  const menu = screen.getByRole('menu', { name: `Aktionen für ${name}` });
+  return { trigger, menu };
+}
+
 function fixture() {
   const project = createProject();
   project.dets = [
@@ -55,26 +65,32 @@ function fixture() {
 }
 
 describe('confirmed card removal with wholly fictional data', () => {
-  it('places an accessible X in each header and leaves the project intact on cancellation', async () => {
+  it('places an accessible action menu in each header and leaves the project intact on cancellation', async () => {
     const user = userEvent.setup();
     replaceProject(fixture());
     const before = structuredClone(projectStore.get());
     render(<PlanningPage />);
     const card = await screen.findByRole('article', { name: 'Detachement Fiktiv KVK' });
-    const remove = within(card).getByRole('button', { name: 'Fiktiv KVK entfernen' });
-    expect(remove.closest('.card-grip')).not.toBeNull();
-    expect(remove).toHaveClass('nodrag', 'nopan');
-    expect(remove).toHaveTextContent('×');
-    expect(screen.getAllByRole('button', { name: /Fiktiv .* entfernen/ })).toHaveLength(2);
-    await user.click(remove);
+    const trigger = within(card).getByRole('button', { name: 'Aktionen für Fiktiv KVK' });
+    expect(trigger.closest('.card-grip')).not.toBeNull();
+    expect(trigger.closest('.nodrag.nopan')).not.toBeNull();
+    expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+    expect(screen.getAllByRole('button', { name: /^Aktionen für Fiktiv / })).toHaveLength(2);
+    const openRemoval = async () => {
+      await user.click(trigger);
+      await user.click(
+        within(screen.getByRole('menu')).getByRole('menuitem', { name: 'Detachement entfernen …' }),
+      );
+    };
+    await openRemoval();
     const dialog = screen.getByRole('dialog', { name: 'Detachement entfernen?' });
     expect(dialog).toHaveTextContent('Die Personen bleiben erhalten');
     expect(projectStore.get()).toEqual(before);
     await user.click(within(dialog).getByRole('button', { name: 'Abbrechen' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(projectStore.get()).toEqual(before);
-    expect(remove).toHaveFocus();
-    await user.click(remove);
+    expect(trigger).toHaveFocus();
+    await openRemoval();
     fireEvent(screen.getByRole('dialog'), new Event('cancel', { bubbles: true }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(projectStore.get()).toEqual(before);
@@ -84,8 +100,14 @@ describe('confirmed card removal with wholly fictional data', () => {
     const user = userEvent.setup();
     replaceProject(fixture());
     const before = structuredClone(projectStore.get());
-    render(<PlanningPage />);
-    await user.click(await screen.findByRole('button', { name: 'Fiktiv KVK entfernen' }));
+    render(
+      <>
+        <HistoryButtons />
+        <PlanningPage />
+      </>,
+    );
+    const { menu } = await openCardMenu(user, 'Fiktiv KVK');
+    await user.click(within(menu).getByRole('menuitem', { name: 'Detachement entfernen …' }));
     await user.click(
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Detachement entfernen' }),
     );
@@ -99,15 +121,19 @@ describe('confirmed card removal with wholly fictional data', () => {
     expect(projectStore.get()).toEqual(before);
   });
 
-  it('disables every removal button in an archive', async () => {
+  it('disables every removal action in an archive', async () => {
     const user = userEvent.setup();
     const project = fixture();
     project.archive = { id: 'fiction-archive', at: '2030-01-01' };
     replaceProject(project);
     render(<PlanningPage />);
-    for (const button of await screen.findAllByRole('button', { name: /Fiktiv .* entfernen/ })) {
+    for (const name of ['Fiktiv KVK', 'Fiktiv WK']) {
+      const { menu } = await openCardMenu(user, name);
+      const button = within(menu).getByRole('menuitem', { name: 'Detachement entfernen …' });
       expect(button).toBeDisabled();
       await user.click(button);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.keyboard('{Escape}');
     }
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(projectStore.get().dets).toHaveLength(2);
@@ -117,7 +143,8 @@ describe('confirmed card removal with wholly fictional data', () => {
     const user = userEvent.setup();
     replaceProject(fixture());
     render(<PlanningPage />);
-    await user.click(await screen.findByRole('button', { name: 'Fiktiv KVK entfernen' }));
+    const { menu } = await openCardMenu(user, 'Fiktiv KVK');
+    await user.click(within(menu).getByRole('menuitem', { name: 'Detachement entfernen …' }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     const replacement = fixture();
     act(() => replaceProject(replacement));

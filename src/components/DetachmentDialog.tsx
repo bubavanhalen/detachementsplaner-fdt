@@ -1,21 +1,25 @@
 import { useForm } from '@tanstack/react-form';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { createDetachment } from '../model';
 import type { Detachment } from '../model/types';
-import { changeProject } from '../store';
+import { changeProject, useProject } from '../store';
+import { Icon } from './Icon';
 import { ErrorBox, errorText, Modal } from './Modal';
 import { PlanningPanel } from './PlanningPanel';
 
-const detailFields = [
-  ['datum', 'Einrücken · Datum', 'date'],
-  ['von', 'Zeit', 'time'],
-  ['ort', 'Einrückungsort', 'text'],
-  ['treffpunkt', 'Treffpunkt', 'text'],
-  ['anzug', 'Anzug', 'text'],
-  ['bisDatum', 'Entlassung · Datum', 'date'],
-  ['entlassungsort', 'Entlassungsort', 'text'],
-  ['bem', 'Bemerkungen', 'text'],
+const startFields = [
+  ['datum', 'Einrücken · Datum', 'date', ''],
+  ['von', 'Zeit', 'time', ''],
+  ['ort', 'Einrückungsort', 'text', 'z. B. Kaserne Beispiel'],
+  ['treffpunkt', 'Treffpunkt', 'text', 'z. B. Haupteingang'],
+  ['anzug', 'Anzug', 'text', 'z. B. Tenue B'],
 ] as const;
+const endFields = [
+  ['bisDatum', 'Entlassung · Datum', 'date', ''],
+  ['entlassungsort', 'Entlassungsort', 'text', ''],
+  ['bem', 'Bemerkungen', 'text', ''],
+] as const;
+type FieldName = (typeof startFields)[number][0] | (typeof endFields)[number][0];
 
 export function DetachmentDialog({
   group,
@@ -27,8 +31,14 @@ export function DetachmentDialog({
   presentation?: 'dialog' | 'panel';
 }) {
   const Surface = presentation === 'panel' ? PlanningPanel : Modal;
+  const project = useProject();
+  const formId = useId();
   const [error, setError] = useState('');
   const [initial] = useState(() => group ?? createDetachment());
+  // Other cards with details can serve as a template for shared places and times.
+  const templates = project.dets.filter(
+    (item) => item.id !== initial.id && (item.ort || item.datum || item.anzug),
+  );
   const form = useForm({
     defaultValues: {
       name: initial.name,
@@ -47,6 +57,8 @@ export function DetachmentDialog({
       setError('');
       try {
         if (!value.name.trim()) throw new Error('Bitte einen Namen für das Detachement eingeben.');
+        if (value.datum && value.bisDatum && value.bisDatum < value.datum)
+          throw new Error('Die Entlassung liegt vor dem Einrücken. Bitte die Daten prüfen.');
         changeProject((draft) => {
           const saved = {
             ...initial,
@@ -78,26 +90,54 @@ export function DetachmentDialog({
       }
     },
   });
+  const field = (name: FieldName, label: string, type: string, placeholder: string) => (
+    <form.Field key={name} name={name}>
+      {(item) => (
+        <label className={`field ${name === 'bem' ? 'span-all' : ''}`}>
+          {label}
+          <input
+            type={type}
+            value={item.state.value}
+            placeholder={placeholder}
+            onChange={(event) => item.handleChange(event.target.value)}
+          />
+        </label>
+      )}
+    </form.Field>
+  );
   return (
-    <Surface title={group ? `${group.name} · Angaben` : 'Neues Detachement'} onClose={onClose}>
+    <Surface
+      title={group ? `${group.name} · Angaben` : 'Neues Detachement'}
+      description="Für die Planung genügt der Name. Die übrigen Angaben braucht es für PISA."
+      onClose={onClose}
+      footer={
+        <>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>
+            Abbrechen
+          </button>
+          <button type="submit" form={formId} className="btn btn-primary">
+            {group ? 'Änderungen speichern' : 'Detachement erstellen'}
+          </button>
+        </>
+      }
+    >
       <form
+        id={formId}
+        className="stack"
         onSubmit={(event) => {
           event.preventDefault();
           void form.handleSubmit();
         }}
       >
         <ErrorBox message={error} />
-        <p className="muted">
-          Zuerst die Gruppe erstellen. Einrückungsangaben kannst du später ergänzen.
-        </p>
-        <div className="form-grid">
+        <div className="form-grid detachment-identity">
           <form.Field name="name">
-            {(field) => (
-              <label className="span-2">
+            {(item) => (
+              <label className="field">
                 Name
                 <input
-                  value={field.state.value}
-                  onChange={(event) => field.handleChange(event.target.value)}
+                  value={item.state.value}
+                  onChange={(event) => item.handleChange(event.target.value)}
                   placeholder="z. B. KVK Fahrer"
                   required
                 />
@@ -105,44 +145,66 @@ export function DetachmentDialog({
             )}
           </form.Field>
           <form.Field name="ec">
-            {(field) => (
-              <label>
-                EC <span className="muted">optional</span>
+            {(item) => (
+              <label className="field">
+                <span>
+                  EC <span className="optional">· 2 Zeichen</span>
+                </span>
                 <input
-                  value={field.state.value}
-                  onChange={(event) => field.handleChange(event.target.value)}
+                  value={item.state.value}
+                  onChange={(event) => item.handleChange(event.target.value.toUpperCase())}
                   maxLength={2}
-                  placeholder="z. B. K1"
+                  placeholder="K1"
+                  className="mono"
                 />
               </label>
             )}
           </form.Field>
         </div>
-        <details className="details-panel" open={Boolean(group)}>
-          <summary>Einrücken und Entlassung</summary>
+        {templates.length > 0 && (
+          <label className="field">
+            <span>
+              Angaben übernehmen von <span className="optional">· optional</span>
+            </span>
+            <select
+              value=""
+              onChange={(event) => {
+                const source = templates.find((item) => item.id === event.target.value);
+                if (!source) return;
+                for (const [name] of [...startFields, ...endFields])
+                  if (name !== 'bem' && source[name]) form.setFieldValue(name, source[name]);
+              }}
+            >
+              <option value="">Andere Karte wählen …</option>
+              {templates.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                  {item.ort ? ` · ${item.ort}` : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <fieldset className="field-group">
+          <legend>
+            <Icon name="calendar" size={15} /> Einrücken
+          </legend>
           <div className="form-grid">
-            {detailFields.map(([name, label, type]) => (
-              <form.Field key={name} name={name}>
-                {(field) => (
-                  <label>
-                    {label}
-                    <input
-                      type={type}
-                      value={field.state.value}
-                      onChange={(event) => field.handleChange(event.target.value)}
-                    />
-                  </label>
-                )}
-              </form.Field>
-            ))}
+            {startFields.map(([name, label, type, placeholder]) =>
+              field(name, label, type, placeholder),
+            )}
           </div>
-        </details>
-        <div className="form-actions">
-          <button type="button" className="button-secondary" onClick={onClose}>
-            Abbrechen
-          </button>
-          <button type="submit">{group ? 'Änderungen speichern' : 'Detachement erstellen'}</button>
-        </div>
+        </fieldset>
+        <fieldset className="field-group">
+          <legend>
+            <Icon name="flag" size={15} /> Entlassung
+          </legend>
+          <div className="form-grid">
+            {endFields.map(([name, label, type, placeholder]) =>
+              field(name, label, type, placeholder),
+            )}
+          </div>
+        </fieldset>
       </form>
     </Surface>
   );

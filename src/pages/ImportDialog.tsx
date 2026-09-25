@@ -1,6 +1,7 @@
 // biome-ignore-all lint/suspicious/noArrayIndexKey: This immutable preview is keyed by physical workbook row/column coordinates, including duplicate headings.
 import { useState } from 'react';
-import { Modal } from '../components/Modal';
+import { Icon } from '../components/Icon';
+import { ErrorBox, Modal } from '../components/Modal';
 import {
   findHeader,
   guessMapping,
@@ -11,7 +12,7 @@ import {
 import { localError } from '../io/text';
 import { sheetRows, type XLSX } from '../io/workbook';
 import type { Source } from '../model/types';
-import { changeProject, notify } from '../store';
+import { changeProject, notifyUndoable } from '../store';
 
 export function ImportDialog({
   workbook,
@@ -22,7 +23,7 @@ export function ImportDialog({
   workbook: XLSX.WorkBook;
   source: Source;
   filename: string;
-  onClose: () => void;
+  onClose: (imported: boolean) => void;
 }) {
   const [sheet, setSheet] = useState(workbook.SheetNames[0] || '');
   const rows = sheetRows(workbook, sheet);
@@ -31,10 +32,16 @@ export function ImportDialog({
   const [allowNames, setAllowNames] = useState(false),
     [error, setError] = useState('');
   const headers = rows[header] || [];
+  const dataRows = rows.slice(header + 1).filter((row) => row.some(Boolean)).length;
+  const mapped = Object.keys(mapping).length;
   const selectHeader = (next: number, currentRows = rows) => {
     setHeader(next);
     setMapping(guessMapping(currentRows[next] || []));
   };
+  const sample = (index: number | undefined) =>
+    index === undefined
+      ? ''
+      : (rows.slice(header + 1).find((row) => String(row[index] ?? '').trim())?.[index] ?? '');
   const submit = () => {
     try {
       let count = 0;
@@ -42,37 +49,43 @@ export function ImportDialog({
         const result = importRows(draft, source, rows, header, mapping, filename, allowNames);
         count = result.added + result.updated;
       });
-      notify(`${count} Datensätze lokal übernommen. Neue Personen können jetzt verteilt werden.`);
-      onClose();
+      notifyUndoable(`${count} Datensätze lokal übernommen. Jetzt Personen verteilen.`);
+      onClose(true);
     } catch (failure) {
       setError(localError(failure));
     }
   };
   return (
     <Modal
-      title={`${source === 'pisa' ? 'PISA' : 'MILOFFICE'} · Spalten zuordnen`}
-      onClose={onClose}
+      title={`${source === 'pisa' ? 'PISA' : 'MILOFFICE'}-Liste übernehmen`}
+      description={
+        <>
+          <Icon name="file" size={14} className="inline-icon" /> {filename} · wird nur auf diesem
+          Gerät gelesen
+        </>
+      }
+      onClose={() => onClose(false)}
       wide
       footer={
         <>
-          <button type="button" className="button" onClick={onClose}>
+          <span className="spacer muted">
+            {dataRows} Zeilen · {mapped} von {IMPORT_FIELDS.length} Feldern zugeordnet
+          </span>
+          <button type="button" className="btn btn-ghost" onClick={() => onClose(false)}>
             Abbrechen
           </button>
-          <button type="button" className="button primary" onClick={submit}>
-            Personen übernehmen
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={mapping.name === undefined}
+            onClick={submit}
+          >
+            <Icon name="check" size={16} /> Personen übernehmen
           </button>
         </>
       }
     >
-      <p className="muted">
-        Die Datei wird ausschliesslich auf diesem Gerät verarbeitet. Prüfe die Zuordnung vor dem
-        Übernehmen.
-      </p>
-      {error && (
-        <div role="alert" className="notice warning">
-          {error}
-        </div>
-      )}
+      <ErrorBox message={error} />
       <div className="form-grid">
         <label className="field">
           Tabellenblatt
@@ -91,7 +104,7 @@ export function ImportDialog({
           </select>
         </label>
         <label className="field">
-          Kopfzeile
+          Kopfzeile <span className="hint">Zeile mit den Spaltennamen</span>
           <input
             type="number"
             min="1"
@@ -101,57 +114,71 @@ export function ImportDialog({
           />
         </label>
       </div>
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              {headers.map((name, i) => (
-                <th key={`${i}-${name}`}>{name || `Spalte ${i + 1}`}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.slice(header + 1, header + 4).map((row, i) => (
-              <tr key={`preview-${header + i}`}>
-                {headers.map((name, j) => (
-                  <td key={`${j}-${name}`}>{String(row[j] ?? '').slice(0, 60)}</td>
+      <div className="import-preview card">
+        <div className="table-scroll">
+          <table className="table">
+            <thead>
+              <tr>
+                {headers.map((name, i) => (
+                  <th key={`${i}-${name}`}>{name || `Spalte ${i + 1}`}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="form-grid">
-        {IMPORT_FIELDS.map((field) => (
-          <label className="field" key={field.key}>
-            {field.label}
-            {field.key === 'name' ? ' *' : ''}
-            <select
-              value={mapping[field.key] ?? -1}
-              onChange={(event) => {
-                const next = { ...mapping };
-                const index = Number(event.target.value);
-                if (index < 0) delete next[field.key];
-                else next[field.key] = index;
-                setMapping(next);
-              }}
-            >
-              <option value={-1}>Nicht zuordnen</option>
-              {headers.map((name, i) => (
-                <option key={`${i}-${name}`} value={i}>
-                  {name || `Spalte ${i + 1}`}
-                </option>
+            </thead>
+            <tbody>
+              {rows.slice(header + 1, header + 4).map((row, i) => (
+                <tr key={`preview-${header + i}`}>
+                  {headers.map((name, j) => (
+                    <td key={`${j}-${name}`}>{String(row[j] ?? '').slice(0, 60)}</td>
+                  ))}
+                </tr>
               ))}
-            </select>
-          </label>
-        ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 className="import-heading">Spalten zuordnen</h3>
+        <div className="import-mapping">
+          {IMPORT_FIELDS.map((field) => {
+            const value = mapping[field.key];
+            return (
+              <label
+                className={`import-row ${value === undefined ? '' : 'is-mapped'}`}
+                key={field.key}
+              >
+                <span className="import-label">
+                  {field.label}
+                  {field.key === 'name' ? ' *' : ''}
+                </span>
+                <select
+                  value={value ?? -1}
+                  onChange={(event) => {
+                    const next = { ...mapping };
+                    const index = Number(event.target.value);
+                    if (index < 0) delete next[field.key];
+                    else next[field.key] = index;
+                    setMapping(next);
+                  }}
+                >
+                  <option value={-1}>Nicht zuordnen</option>
+                  {headers.map((name, i) => (
+                    <option key={`${i}-${name}`} value={i}>
+                      {name || `Spalte ${i + 1}`}
+                    </option>
+                  ))}
+                </select>
+                <span className="import-sample truncate">{String(sample(value)).slice(0, 40)}</span>
+              </label>
+            );
+          })}
+        </div>
       </div>
       <label className="check">
         <input
           type="checkbox"
           checked={allowNames}
           onChange={(event) => setAllowNames(event.target.checked)}
-        />{' '}
+        />
         Zusätzlich eindeutige Namen abgleichen; Identität anschliessend prüfen.
       </label>
       <p className="muted">

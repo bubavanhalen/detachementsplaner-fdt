@@ -1,13 +1,16 @@
 import { type ReactNode, useEffect, useId, useRef } from 'react';
+import { Icon } from './Icon';
 
 export function Modal({
   title,
+  description,
   onClose,
   children,
   footer,
   wide = false,
 }: {
   title: string;
+  description?: ReactNode;
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
@@ -21,7 +24,7 @@ export function Modal({
     node?.showModal();
     return () => {
       node?.close();
-      if (previous instanceof HTMLElement) previous.focus();
+      if (previous instanceof HTMLElement) previous.focus({ preventScroll: true });
     };
   }, []);
   return (
@@ -29,17 +32,28 @@ export function Modal({
       ref={dialog}
       className={`modal ${wide ? 'modal-wide' : ''}`}
       aria-labelledby={heading}
-      onCancel={onClose}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onMouseDown={(event) => {
+        // A click on the backdrop (the dialog element itself) closes, like Escape.
+        if (event.target === dialog.current) onClose();
+      }}
     >
       <header className="modal-header">
-        <h2 id={heading}>{title}</h2>
+        <div>
+          <h2 id={heading}>{title}</h2>
+          {description && <p>{description}</p>}
+        </div>
         <button
           type="button"
-          className="icon-button"
+          className="btn btn-ghost btn-icon btn-sm"
           aria-label="Dialog schliessen"
+          title="Schliessen (Esc)"
           onClick={onClose}
         >
-          ×
+          <Icon name="x" />
         </button>
       </header>
       <div className="modal-body">{children}</div>
@@ -54,8 +68,9 @@ export function ErrorBox({ message }: { message: string }) {
     if (message) ref.current?.focus();
   }, [message]);
   return message ? (
-    <div className="notice notice-error" role="alert" tabIndex={-1} ref={ref}>
-      {message}
+    <div className="error-box" role="alert" tabIndex={-1} ref={ref}>
+      <Icon name="alert" />
+      <span>{message}</span>
     </div>
   ) : null;
 }

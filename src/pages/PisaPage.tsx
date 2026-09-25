@@ -1,18 +1,24 @@
 import { Link } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { CopyButton } from '../components/CopyButton';
 import { type DataColumn, DataTable } from '../components/DataTable';
 import { DetachmentDialog } from '../components/DetachmentDialog';
+import { Icon } from '../components/Icon';
 import { ErrorBox, errorText, Modal } from '../components/Modal';
+import { displayDate } from '../io/text';
 import { derivePisa, entrySignature, projectSignature, validateProject, validEc } from '../model';
-import type { OrderMode, Person, PisaEntry } from '../model/types';
+import type { OrderMode, Person, PisaEntry, Project } from '../model/types';
 import { changeProject, notify, useProject } from '../store';
+import { isTyping, openOverlay } from '../ui';
+import { policyConfirmed, policyRequired } from '../workflow';
+import './pages.css';
 
 const personColumns: DataColumn<Person>[] = [
   {
     id: 'number',
-    header: 'Personennummer',
+    header: 'Versicherten-Nr.',
     value: (person) => person.pnr ?? '',
-    cell: (person) => person.pnr || '—',
+    cell: (person) => <span className="mono">{person.pnr || '—'}</span>,
   },
   {
     id: 'rank',
@@ -32,13 +38,30 @@ const personColumns: DataColumn<Person>[] = [
     value: (person) => person.funktion,
     cell: (person) => person.funktion || '—',
   },
+  {
+    id: 'copy',
+    header: '',
+    cell: (person) => (
+      <CopyButton value={person.pnr ?? ''} label={`Versicherten-Nr. von ${person.name} kopieren`} />
+    ),
+  },
 ];
+
+function kindLabel(entry: PisaEntry, confirmed: boolean): string {
+  if (!confirmed) return 'Entwurf · Aufgebotsart offen';
+  return entry.kind === 'additional'
+    ? 'Zusatzmarschbefehl'
+    : entry.extraIds.length
+      ? 'Haupt-MB mit Zusatz-MB'
+      : 'Hauptmarschbefehl';
+}
 
 export default function PisaPage() {
   const project = useProject();
   const entries = derivePisa(project);
   const issues = validateProject(project);
   const [selectedId, setSelectedId] = useState('');
+  const [view, setView] = useState<'steps' | 'overview'>('steps');
   const [policyOpen, setPolicyOpen] = useState(false);
   const [editDetails, setEditDetails] = useState(false);
   const [codeEntry, setCodeEntry] = useState<PisaEntry | null>(null);
@@ -46,357 +69,435 @@ export default function PisaPage() {
   const [error, setError] = useState('');
   const selected = entries.find((entry) => entry.id === selectedId) ?? entries[0];
   const archived = Boolean(project.archive);
-  const policyRequired = project.connections.length > 0;
-  const confirmed =
-    !policyRequired ||
-    (project.orderPolicy.mode !== 'unconfirmed' &&
-      Boolean(project.orderPolicy.confirmedBy && project.orderPolicy.confirmedAt));
+  const required = policyRequired(project);
+  const confirmed = policyConfirmed(project);
   const verified = project.pisa.verified?.signature === projectSignature(project);
+  const isChecked = (entry: PisaEntry) =>
+    project.pisa.entered[entry.id]?.signature === entrySignature(project, entry);
+  const checkedCount = entries.filter(isChecked).length;
   const mutate = (callback: Parameters<typeof changeProject>[0]) => {
     setError('');
     try {
       changeProject(callback);
+      return true;
     } catch (caught) {
       setError(errorText(caught));
+      return false;
     }
   };
-  const copy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      notify('Lokal in die Zwischenablage kopiert.');
-    } catch {
-      setError(
-        'Kopieren ist hier nicht verfügbar. Bitte die Angaben direkt in der Ansicht markieren und kopieren.',
+  const selectedPeople = selected
+    ? project.persons.filter((person) => selected.personIds.includes(person.id))
+    : [];
+
+  // J/K or arrow keys step through the checklist.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey || event.altKey || isTyping(event.target)) return;
+      if (document.querySelector('dialog[open]') || !entries.length) return;
+      const step = event.key === 'j' ? 1 : event.key === 'k' ? -1 : 0;
+      if (!step) return;
+      event.preventDefault();
+      const index = entries.findIndex((entry) => entry.id === selected?.id);
+      const next = entries[Math.max(0, Math.min(entries.length - 1, index + step))];
+      if (next) setSelectedId(next.id);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [entries, selected?.id]);
+
+  const markChecked = (entry: PisaEntry) => {
+    if (
+      mutate((draft) => {
+        draft.pisa.entered[entry.id] = {
+          at: new Date().toISOString(),
+          signature: entrySignature(draft, entry),
+        };
+      })
+    ) {
+      // Continue with the next open entry to keep the flow going.
+      const index = entries.findIndex((item) => item.id === entry.id);
+      const next = [...entries.slice(index + 1), ...entries.slice(0, index)].find(
+        (item) => !isChecked(item) && item.id !== entry.id,
+      );
+      if (next) setSelectedId(next.id);
+      notify(
+        next
+          ? `EC ${entry.ec || '—'} abgeglichen. Weiter mit ${next.ec || next.name}.`
+          : `EC ${entry.ec || '—'} abgeglichen. Alle Einträge sind markiert.`,
+        { tone: 'success' },
       );
     }
   };
-  const checkedCount = entries.filter(
-    (entry) => project.pisa.entered[entry.id]?.signature === entrySignature(project, entry),
-  ).length;
+
   return (
-    <main className="page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">02 / PISA vorbereiten</p>
-          <h1>So wird daraus ein Aufgebot.</h1>
-          <p>
-            Detailangaben und Personenzuteilung in PISA nachbilden, dann lokal als abgeglichen
-            markieren.
-          </p>
-        </div>
-        <span className={`status-pill ${verified ? 'is-good' : ''}`}>
-          {verified ? 'Plan abgeglichen' : `${checkedCount} / ${entries.length} EC abgeglichen`}
-        </span>
-      </header>
-      {policyRequired && (
-        <>
-          <div className={`notice ${confirmed ? '' : 'notice-warning'}`}>
-            <div>
-              <strong>
-                {confirmed
-                  ? `Aufgebotsart: ${project.orderPolicy.mode === 'separate' ? 'Separate KVK-/WK-MB' : 'Durchgehender MB'}`
-                  : 'Aufgebotsart noch bestätigen'}
-              </strong>
+    <div className="page page-wide">
+      {required && (
+        <div className={`callout ${confirmed ? 'callout-success' : 'callout-warning'}`}>
+          <Icon name={confirmed ? 'checkCircle' : 'info'} />
+          <div className="callout-body">
+            <strong>
+              {confirmed
+                ? `Aufgebotsart: ${project.orderPolicy.mode === 'separate' ? 'Separate KVK-/WK-MB' : 'Durchgehender MB'}`
+                : 'Aufgebotsart noch bestätigen'}
+            </strong>
+            {confirmed
+              ? `KF-Bestätigung erfasst: ${project.orderPolicy.confirmedBy}`
+              : 'Der PAT beschreibt unterschiedliche KVK-/WK-Strukturen. Die Vorschau bleibt ein Entwurf, bis die KF-Auskunft für diesen Dienst erfasst ist.'}
+            <details className="inline-details">
+              <summary>Warum braucht es diese Bestätigung?</summary>
               <p>
-                {confirmed
-                  ? `KF-Bestätigung erfasst: ${project.orderPolicy.confirmedBy}`
-                  : 'Der PAT beschreibt unterschiedliche KVK-/WK-Strukturen. Die Vorschau bleibt ein Entwurf, bis die KF-Auskunft für diesen Dienst erfasst ist.'}
+                PAT S. 85 beschreibt einen MB für KVK und den anschliessenden WK. S. 93–94 verlangen
+                separate ECs. Die App leitet daraus keinen Standard ab. Deine verbundenen
+                Planungskarten bleiben gleich; nur die PISA-Struktur folgt der bestätigten
+                Aufgebotsart.
               </p>
-            </div>
+            </details>
+          </div>
+          <div className="callout-actions">
             <button
               type="button"
-              className="button-secondary"
+              className={`btn btn-sm ${confirmed ? '' : 'btn-primary'}`}
               disabled={archived}
               onClick={() => setPolicyOpen(true)}
             >
               {confirmed ? 'Auskunft bearbeiten' : 'KF-Auskunft erfassen'}
             </button>
           </div>
-          <details className="details-panel">
-            <summary>Warum braucht es diese Bestätigung?</summary>
-            <p>
-              PAT S. 85 beschreibt einen MB für KVK und den anschliessenden WK. S. 93–94 verlangen
-              separate ECs. Die App leitet daraus keinen Standard ab. Deine verbundenen
-              Planungskarten bleiben gleich; nur die PISA-Struktur folgt der bestätigten
-              Aufgebotsart.
-            </p>
-          </details>
-        </>
+        </div>
       )}
       <ErrorBox message={error} />
-      {issues.length > 0 && (
-        <details className="validation-list" open>
-          <summary>{issues.length} Punkte vor dem abschliessenden Abgleich</summary>
-          <ul>
-            {issues.map((issue) => {
-              const person = project.persons.find((item) => item.id === issue.personId);
-              const group = project.dets.find((item) => item.id === issue.groupId);
-              const label = person
-                ? [person.grad, person.name].filter(Boolean).join(' ')
-                : group?.name;
-              return (
-                <li key={`${issue.code}-${issue.personId ?? issue.groupId ?? ''}-${issue.message}`}>
-                  {label && (
-                    <>
-                      <Link to={person ? '/persons' : '/'}>{label}</Link>:{' '}
-                    </>
-                  )}
-                  {issue.message}
-                </li>
-              );
-            })}
-          </ul>
-          <Link to="/">Zur Planung →</Link>
-        </details>
-      )}
+      {issues.length > 0 && <IssueSummary project={project} issues={issues} />}
+
       {!entries.length ? (
-        <section className="empty-state">
+        <section className="card empty">
+          <span className="empty-icon">
+            <Icon name="send" />
+          </span>
           <h2>Hier erscheinen deine PISA-Einträge.</h2>
           <p>Erstelle zuerst Detachemente und teile Personen zu.</p>
-          <Link className="button" to="/">
-            Planung öffnen
-          </Link>
+          <div className="actions">
+            <Link className="btn btn-primary" to="/">
+              Planung öffnen
+            </Link>
+          </div>
         </section>
       ) : (
-        <>
-          <section className="pisa-window">
-            <header>
-              <div>
-                <span className="eyebrow">Schritt 1 · Nach PAT-Feldfolge</span>
-                <h2>Detailangaben MB</h2>
-              </div>
-              <span className="badge">Lokale Vorschau</span>
-            </header>
-            <p className="pisa-instruction">
-              {confirmed
-                ? 'Jede Zeile entspricht einem EC in PISA. Eine Zeile auswählen, um Zusatz-MB und Personen zu sehen. Gemeinsame Angaben werden aus deinen Planungskarten übernommen.'
-                : 'Entwurf deiner Planungskarten. Anzahl und Struktur der PISA-Einträge entstehen erst nach der KF-Bestätigung. Noch nicht in PISA übertragen.'}
-            </p>
-            <div className="table-scroll">
-              <table className="pisa-table">
-                <thead>
-                  <tr>
-                    <th>EC</th>
-                    <th>Bezeichnung</th>
-                    <th>
-                      Einrücken
-                      <br />
-                      Datum / Zeit
-                    </th>
-                    <th>Ort / Treffpunkt</th>
-                    <th>Anzug</th>
-                    <th>
-                      Entlassung
-                      <br />
-                      Datum
-                    </th>
-                    <th>Entlassungsort</th>
-                    <th>Bemerkungen</th>
-                    <th>Personen</th>
-                    <th>Abgleich</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((entry) => {
-                    const checked =
-                      project.pisa.entered[entry.id]?.signature === entrySignature(project, entry);
-                    return (
-                      <tr
-                        className={selected?.id === entry.id ? 'selected-row' : ''}
-                        key={entry.id}
-                      >
-                        <td>
-                          <button
-                            type="button"
-                            className="ec-button"
-                            onClick={() => setSelectedId(entry.id)}
-                            aria-pressed={selected?.id === entry.id}
-                          >
-                            {entry.ec || 'EC?'}
-                          </button>
-                        </td>
-                        <td>
-                          <strong>{entry.name}</strong>
-                          <small>
-                            {!confirmed
-                              ? 'Entwurf · Aufgebotsart offen'
-                              : entry.kind === 'additional'
-                                ? 'Zusatzmarschbefehl'
-                                : entry.extraIds.length
-                                  ? 'Haupt-MB mit Zusatz-MB'
-                                  : 'Hauptmarschbefehl'}
-                            {entry.generated ? ' · abgeleitet' : ''}
-                          </small>
-                        </td>
-                        <td>
-                          {entry.details.datum || '—'}
-                          <small>{entry.details.von || '—'}</small>
-                        </td>
-                        <td>
-                          {entry.details.ort || '—'}
-                          <small>{entry.details.treffpunkt}</small>
-                        </td>
-                        <td>{entry.details.anzug || '—'}</td>
-                        <td>{entry.details.bisDatum || '—'}</td>
-                        <td>{entry.details.entlassungsort || '—'}</td>
-                        <td>{entry.details.bem || '—'}</td>
-                        <td>{confirmed ? entry.personIds.length : '—'}</td>
-                        <td>{checked ? '✓ Abgeglichen' : 'Offen'}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </section>
-          {selected && (
-            <section className="pisa-window">
-              <header>
-                <div>
-                  <span className="eyebrow">Schritt 2 · Gewählter EC {selected.ec || '—'}</span>
-                  <h2>Detachemente · {selected.name}</h2>
-                </div>
-                <div className="button-row">
-                  <button
-                    type="button"
-                    className="button-secondary"
-                    disabled={archived}
-                    onClick={() => {
-                      setCode(selected.ec);
-                      setCodeEntry(selected);
-                    }}
-                  >
-                    EC bearbeiten
-                  </button>
-                  <button
-                    type="button"
-                    className="button-secondary"
-                    disabled={archived}
-                    onClick={() => setEditDetails(true)}
-                  >
-                    Angaben bearbeiten
-                  </button>
-                </div>
-              </header>
-              <div className="pisa-entry-meta">
-                <div>
-                  <span className="field-caption">Einrücken</span>
-                  <strong>
-                    {[selected.details.datum, selected.details.von, selected.details.ort]
-                      .filter(Boolean)
-                      .join(' · ') || 'Noch offen'}
-                  </strong>
-                </div>
-                <div>
-                  <span className="field-caption">Entlassung</span>
-                  <strong>
-                    {[selected.details.bisDatum, selected.details.entlassungsort]
-                      .filter(Boolean)
-                      .join(' · ') || 'Noch offen'}
-                  </strong>
-                </div>
-                <div>
-                  <span className="field-caption">Zusatzmarschbefehle</span>
-                  <strong>
-                    {!confirmed
-                      ? 'Zuordnung erst nach KF-Bestätigung'
-                      : selected.extraIds.length
-                        ? selected.extraIds
-                            .map((id) => {
-                              const entry = entries.find((item) => item.id === id);
-                              return entry
-                                ? `${entry.ec || 'EC?'} · ${entry.name}`
-                                : 'Fehlender Zusatz-MB';
-                            })
-                            .join(', ')
-                        : 'Keine'}
-                  </strong>
-                </div>
-              </div>
-              <div className="pisa-instruction">
+        <div className="pisa-layout">
+          <aside className="pisa-rail">
+            <div className="card pisa-progress">
+              <div className="row">
                 <strong>
-                  {!confirmed
-                    ? 'Personenzuteilung erst nach KF-Bestätigung.'
-                    : selected.kind === 'additional'
-                      ? 'Hier keine Personen direkt zuteilen.'
-                      : `${selected.personIds.length} Personen diesem EC direkt zuteilen.`}
+                  {verified
+                    ? 'Plan abgeglichen'
+                    : `${checkedCount} / ${entries.length} EC abgeglichen`}
                 </strong>
-                <p>
-                  {!confirmed
-                    ? 'Diese Planungskarte ist noch kein fertiger PISA-Eintrag. Nach bestätigter Aufgebotsart erscheinen hier die genauen Empfänger und Zusatz-MB.'
-                    : selected.kind === 'additional'
-                      ? 'Die Empfänger werden über den Hauptmarschbefehl bestimmt, der diesen Zusatz-MB enthält.'
-                      : selected.extraIds.length
-                        ? 'Zuerst die aufgeführten Zusatz-MB verknüpfen, dann genau diese Personen zum Haupt-MB hinzufügen.'
-                        : 'Diese Personen erhalten den Hauptmarschbefehl ohne Zusatz-MB.'}
-                </p>
+                {verified && <span className="badge badge-success">Fertig</span>}
               </div>
-              {confirmed && selected.personIds.length > 0 && (
-                <DataTable
-                  data={project.persons.filter((person) => selected.personIds.includes(person.id))}
-                  columns={personColumns}
-                  getRowId={(person) => person.id}
-                />
-              )}
-              <footer className="pisa-footer">
-                <button
-                  type="button"
-                  className="button-secondary"
-                  onClick={() =>
-                    void copy(
-                      project.persons
-                        .filter((person) => selected.personIds.includes(person.id))
-                        .map((person) => [person.pnr ?? '', person.grad, person.name].join('\t'))
-                        .join('\n'),
-                    )
-                  }
-                  disabled={!confirmed || !selected.personIds.length}
-                >
-                  Personenliste kopieren
-                </button>
-                <button
-                  type="button"
-                  disabled={archived || !confirmed || issues.length > 0}
-                  onClick={() =>
-                    mutate((draft) => {
-                      draft.pisa.entered[selected.id] = {
-                        at: new Date().toISOString(),
-                        signature: entrySignature(draft, selected),
-                      };
-                    })
-                  }
-                >
-                  EC {selected.ec || '—'} als abgeglichen markieren
-                </button>
-              </footer>
-            </section>
-          )}
-          <div className="next-step">
-            <div>
-              <strong>Alle Einträge in PISA kontrolliert?</strong>
-              <p>
+              <div
+                className="progress"
+                role="progressbar"
+                aria-label="Abgleich"
+                aria-valuemin={0}
+                aria-valuemax={entries.length}
+                aria-valuenow={checkedCount}
+              >
+                <span style={{ width: `${(checkedCount / entries.length) * 100}%` }} />
+              </div>
+              <button
+                type="button"
+                className={`btn btn-sm ${checkedCount === entries.length && !verified ? 'btn-primary' : ''}`}
+                disabled={
+                  archived ||
+                  !confirmed ||
+                  issues.length > 0 ||
+                  checkedCount !== entries.length ||
+                  verified
+                }
+                onClick={() =>
+                  mutate((draft) => {
+                    draft.pisa.verified = {
+                      at: new Date().toISOString(),
+                      signature: projectSignature(draft),
+                    };
+                  }) && notify('Plan abschliessend abgeglichen.', { tone: 'success' })
+                }
+              >
+                <Icon name="checkCircle" size={15} /> Plan abschliessend abgleichen
+              </button>
+              <p className="muted small-note">
                 Änderungen an der Planung heben den betreffenden Abgleich automatisch auf. Es werden
                 keine Daten an PISA gesendet.
               </p>
             </div>
-            <button
-              type="button"
-              disabled={
-                archived || !confirmed || issues.length > 0 || checkedCount !== entries.length
-              }
-              onClick={() =>
-                mutate((draft) => {
-                  draft.pisa.verified = {
-                    at: new Date().toISOString(),
-                    signature: projectSignature(draft),
-                  };
-                })
-              }
-            >
-              Plan abschliessend abgleichen
-            </button>
-          </div>
-        </>
+            <div className="card">
+              <div className="rail-head">
+                <div className="segmented" role="tablist" aria-label="Ansicht">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={view === 'steps'}
+                    onClick={() => setView('steps')}
+                  >
+                    Schrittweise
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={view === 'overview'}
+                    onClick={() => setView('overview')}
+                  >
+                    Übersicht
+                  </button>
+                </div>
+                <span className="muted rail-hint" title="Mit J und K durch die Einträge">
+                  <span className="kbd">J</span>
+                  <span className="kbd">K</span>
+                </span>
+              </div>
+              <ul className="entry-list" aria-label="PISA-Einträge">
+                {entries.map((entry) => (
+                  <li key={entry.id}>
+                    <button
+                      type="button"
+                      className={`entry-item ${entry.kind === 'additional' && confirmed ? 'is-extra' : ''}`}
+                      aria-pressed={selected?.id === entry.id}
+                      onClick={() => {
+                        setSelectedId(entry.id);
+                        setView('steps');
+                      }}
+                    >
+                      <span className={`ec ${entry.ec ? '' : 'is-missing'}`}>
+                        {entry.ec || 'EC?'}
+                      </span>
+                      <span className="grow">
+                        <span className="truncate">{entry.name}</span>
+                        <small>
+                          {kindLabel(entry, confirmed)}
+                          {entry.generated ? ' · abgeleitet' : ''}
+                        </small>
+                      </span>
+                      <span
+                        className={`entry-check ${isChecked(entry) ? 'is-done' : ''}`}
+                        title={isChecked(entry) ? 'Abgeglichen' : 'Offen'}
+                      >
+                        <Icon name="check" />
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
+
+          {view === 'overview' ? (
+            <section className="card">
+              <header className="card-head">
+                <h2>Alle Einträge · nach PAT-Feldfolge</h2>
+                <span className="badge">Lokale Vorschau</span>
+              </header>
+              <div className="table-scroll">
+                <table className="table overview-table">
+                  <thead>
+                    <tr>
+                      <th>EC</th>
+                      <th>Bezeichnung</th>
+                      <th>Einrücken</th>
+                      <th>Ort / Treffpunkt</th>
+                      <th>Anzug</th>
+                      <th>Entlassung</th>
+                      <th>Entlassungsort</th>
+                      <th>Bemerkungen</th>
+                      <th>Pers.</th>
+                      <th>Abgleich</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entries.map((entry) => (
+                      // The EC list in the rail is the keyboard path; a row click is a shortcut.
+                      <tr
+                        key={entry.id}
+                        onClick={() => {
+                          setSelectedId(entry.id);
+                          setView('steps');
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <td>
+                          <span className={`ec ${entry.ec ? '' : 'is-missing'}`}>
+                            {entry.ec || '—'}
+                          </span>
+                        </td>
+                        <td className="wrap">
+                          <strong>{entry.name}</strong>
+                          <small>{kindLabel(entry, confirmed)}</small>
+                        </td>
+                        <td>
+                          {entry.details.datum ? displayDate(entry.details.datum) : '—'}
+                          <small>{entry.details.von || '—'}</small>
+                        </td>
+                        <td className="wrap">
+                          {entry.details.ort || '—'}
+                          <small>{entry.details.treffpunkt}</small>
+                        </td>
+                        <td>{entry.details.anzug || '—'}</td>
+                        <td>
+                          {entry.details.bisDatum ? displayDate(entry.details.bisDatum) : '—'}
+                        </td>
+                        <td>{entry.details.entlassungsort || '—'}</td>
+                        <td className="wrap">{entry.details.bem || '—'}</td>
+                        <td className="num">{confirmed ? entry.personIds.length : '—'}</td>
+                        <td>
+                          {isChecked(entry) ? (
+                            <span className="badge badge-success">
+                              <Icon name="check" /> Abgeglichen
+                            </span>
+                          ) : (
+                            <span className="badge">Offen</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ) : (
+            selected && (
+              <section className="card pisa-detail" aria-label={`EC ${selected.ec || '—'}`}>
+                <header className="pisa-detail-head">
+                  <span className={`ec ${selected.ec ? '' : 'is-missing'}`}>
+                    {selected.ec || '—'}
+                  </span>
+                  <div className="grow">
+                    <h2>{selected.name}</h2>
+                    <p>
+                      {kindLabel(selected, confirmed)}
+                      {selected.generated ? ' · abgeleitet' : ''}
+                    </p>
+                  </div>
+                  <div className="row">
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      disabled={archived}
+                      onClick={() => {
+                        setCode(selected.ec);
+                        setCodeEntry(selected);
+                      }}
+                    >
+                      EC bearbeiten
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      disabled={archived}
+                      onClick={() => setEditDetails(true)}
+                    >
+                      <Icon name="edit" size={15} /> Angaben bearbeiten
+                    </button>
+                  </div>
+                </header>
+                <div className="pisa-instruction">
+                  <Icon name={confirmed ? 'info' : 'alert'} />
+                  <div>
+                    <strong>
+                      {!confirmed
+                        ? 'Personenzuteilung erst nach KF-Bestätigung.'
+                        : selected.kind === 'additional'
+                          ? 'Hier keine Personen direkt zuteilen.'
+                          : `${selected.personIds.length} Personen diesem EC direkt zuteilen.`}
+                    </strong>
+                    <p>
+                      {!confirmed
+                        ? 'Diese Planungskarte ist noch kein fertiger PISA-Eintrag. Nach bestätigter Aufgebotsart erscheinen hier die genauen Empfänger und Zusatz-MB.'
+                        : selected.kind === 'additional'
+                          ? 'Die Empfänger werden über den Hauptmarschbefehl bestimmt, der diesen Zusatz-MB enthält.'
+                          : selected.extraIds.length
+                            ? 'Zuerst die aufgeführten Zusatz-MB verknüpfen, dann genau diese Personen zum Haupt-MB hinzufügen.'
+                            : 'Diese Personen erhalten den Hauptmarschbefehl ohne Zusatz-MB.'}
+                    </p>
+                  </div>
+                </div>
+                <FieldList entry={selected} entries={entries} confirmed={confirmed} />
+                {confirmed && selectedPeople.length > 0 && (
+                  <div className="pisa-people">
+                    <div className="section-title">
+                      <h3>Personen · {selectedPeople.length}</h3>
+                      <CopyButton
+                        className="btn btn-sm btn-ghost"
+                        label="Versicherten-Nummern kopieren"
+                        value={selectedPeople.map((person) => person.pnr ?? '').join('\n')}
+                      >
+                        Nummern kopieren
+                      </CopyButton>
+                    </div>
+                    <DataTable
+                      data={selectedPeople}
+                      columns={personColumns}
+                      getRowId={(person) => person.id}
+                      pageSize={50}
+                    />
+                  </div>
+                )}
+                <footer className="pisa-footer">
+                  <span className="spacer">
+                    <CopyButton
+                      className="btn btn-sm"
+                      label="Personenliste kopieren"
+                      value={
+                        confirmed
+                          ? selectedPeople
+                              .map((person) =>
+                                [person.pnr ?? '', person.grad, person.name].join('\t'),
+                              )
+                              .join('\n')
+                          : ''
+                      }
+                    >
+                      Personenliste kopieren
+                    </CopyButton>
+                  </span>
+                  {isChecked(selected) ? (
+                    <>
+                      <span className="badge badge-success">
+                        <Icon name="check" /> Abgeglichen
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-ghost"
+                        disabled={archived}
+                        onClick={() =>
+                          mutate((draft) => {
+                            delete draft.pisa.entered[selected.id];
+                          })
+                        }
+                      >
+                        Markierung aufheben
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      disabled={archived || !confirmed || issues.length > 0}
+                      title={
+                        issues.length
+                          ? 'Zuerst die offenen Punkte oben klären'
+                          : !confirmed
+                            ? 'Zuerst die Aufgebotsart bestätigen'
+                            : undefined
+                      }
+                      onClick={() => markChecked(selected)}
+                    >
+                      <Icon name="check" size={16} /> EC {selected.ec || '—'} als abgeglichen
+                      markieren
+                    </button>
+                  )}
+                </footer>
+              </section>
+            )
+          )}
+        </div>
       )}
       {policyOpen && <PolicyDialog onClose={() => setPolicyOpen(false)} />}
       {editDetails && selected && (
@@ -406,48 +507,165 @@ export default function PisaPage() {
         />
       )}
       {codeEntry && (
-        <Modal title="PISA-EC bearbeiten" onClose={() => setCodeEntry(null)}>
+        <Modal
+          title="PISA-EC bearbeiten"
+          description="Dieser Code erscheint in der PISA-Vorschau und bleibt für diesen Eintrag gespeichert."
+          onClose={() => setCodeEntry(null)}
+          footer={
+            <>
+              <button type="button" className="btn btn-ghost" onClick={() => setCodeEntry(null)}>
+                Abbrechen
+              </button>
+              <button
+                type="submit"
+                form="ec-form"
+                className="btn btn-primary"
+                disabled={!validEc(code)}
+              >
+                EC speichern
+              </button>
+            </>
+          }
+        >
           <ErrorBox message={error} />
-          <p>
-            Dieser Code erscheint in der PISA-Vorschau und bleibt für diesen Eintrag gespeichert.
-          </p>
-          <label>
-            EC
-            <input
-              value={code}
-              maxLength={2}
-              onChange={(event) => setCode(event.target.value.toUpperCase())}
-            />
-          </label>
-          <div className="form-actions">
-            <button type="button" className="button-secondary" onClick={() => setCodeEntry(null)}>
-              Abbrechen
-            </button>
-            <button
-              type="button"
-              disabled={!validEc(code)}
-              onClick={() => {
-                setError('');
-                try {
-                  changeProject((draft) => {
-                    if (codeEntry.generated) draft.generatedCodes[codeEntry.id] = code;
-                    else {
-                      const group = draft.dets.find((item) => item.id === codeEntry.sourceId);
-                      if (group) group.ec = code;
-                    }
-                  });
-                  setCodeEntry(null);
-                } catch (caught) {
-                  setError(errorText(caught));
-                }
-              }}
-            >
-              EC speichern
-            </button>
-          </div>
+          <form
+            id="ec-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!validEc(code)) return;
+              setError('');
+              try {
+                changeProject((draft) => {
+                  if (codeEntry.generated) draft.generatedCodes[codeEntry.id] = code;
+                  else {
+                    const group = draft.dets.find((item) => item.id === codeEntry.sourceId);
+                    if (group) group.ec = code;
+                  }
+                });
+                setCodeEntry(null);
+              } catch (caught) {
+                setError(errorText(caught));
+              }
+            }}
+          >
+            <div className="field">
+              <label htmlFor="ec-input">EC</label>
+              <input
+                id="ec-input"
+                value={code}
+                maxLength={2}
+                className="mono"
+                autoComplete="off"
+                aria-describedby="ec-hint"
+                onChange={(event) => setCode(event.target.value.toUpperCase())}
+              />
+              <span className="hint" id="ec-hint">
+                Genau zwei Zeichen, z. B. W2.
+              </span>
+            </div>
+          </form>
         </Modal>
       )}
-    </main>
+    </div>
+  );
+}
+
+function FieldList({
+  entry,
+  entries,
+  confirmed,
+}: {
+  entry: PisaEntry;
+  entries: PisaEntry[];
+  confirmed: boolean;
+}) {
+  const details = entry.details;
+  const extras = !confirmed
+    ? 'Zuordnung erst nach KF-Bestätigung'
+    : entry.extraIds.length
+      ? entry.extraIds
+          .map((id) => {
+            const extra = entries.find((item) => item.id === id);
+            return extra ? `${extra.ec || 'EC?'} · ${extra.name}` : 'Fehlender Zusatz-MB';
+          })
+          .join(', ')
+      : 'Keine';
+  const rows: [string, string, boolean][] = [
+    ['EC', entry.ec, true],
+    ['Bezeichnung', entry.name, true],
+    ['Einrücken · Datum', details.datum ? displayDate(details.datum) : '', true],
+    ['Einrücken · Zeit', details.von, true],
+    ['Einrückungsort', details.ort, true],
+    ['Treffpunkt', details.treffpunkt, true],
+    ['Anzug', details.anzug, true],
+    ['Entlassung · Datum', details.bisDatum ? displayDate(details.bisDatum) : '', true],
+    ['Entlassungsort', details.entlassungsort, true],
+    ['Bemerkungen', details.bem, false],
+    ['Zusatzmarschbefehle', extras, false],
+  ];
+  return (
+    <ul className="field-list" aria-label="Detailangaben MB nach PAT-Feldfolge">
+      {rows.map(([label, value, needed], index) => (
+        <li key={label}>
+          <span className="field-no">{index + 1}</span>
+          <span className="field-label">{label}</span>
+          <span className={`field-value ${!value && needed ? 'is-empty' : ''}`}>
+            {value || (needed ? 'Noch offen' : '—')}
+          </span>
+          <CopyButton value={value} label={`${label} kopieren`} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function IssueSummary({
+  project,
+  issues,
+}: {
+  project: Project;
+  issues: ReturnType<typeof validateProject>;
+}) {
+  return (
+    <details className="callout callout-warning issue-summary" open={issues.length <= 5}>
+      <summary>
+        <Icon name="alert" />
+        <strong>{issues.length} Punkte vor dem abschliessenden Abgleich</strong>
+      </summary>
+      <ul className="issue-list">
+        {issues.map((issue) => {
+          const person = project.persons.find((item) => item.id === issue.personId);
+          const group = project.dets.find((item) => item.id === issue.groupId);
+          const label = person ? [person.grad, person.name].filter(Boolean).join(' ') : group?.name;
+          return (
+            <li key={`${issue.code}-${issue.personId ?? issue.groupId ?? ''}-${issue.message}`}>
+              <span>
+                {label && (
+                  <>
+                    <Link
+                      to={person ? '/persons' : '/'}
+                      onClick={() =>
+                        person
+                          ? openOverlay({ peopleIntent: { personId: person.id } })
+                          : group &&
+                            openOverlay({ planningIntent: { kind: 'focus', id: group.id } })
+                      }
+                    >
+                      {label}
+                    </Link>
+                    :{' '}
+                  </>
+                )}
+                {issue.message}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+      <Link to="/" className="btn-link issue-summary-link">
+        Zur Planung <Icon name="arrowRight" size={14} />
+      </Link>
+    </details>
   );
 }
 
@@ -458,13 +676,41 @@ function PolicyDialog({ onClose }: { onClose: () => void }) {
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState('');
   return (
-    <Modal title="KF-Auskunft zur Aufgebotsart" onClose={onClose}>
+    <Modal
+      title="KF-Auskunft zur Aufgebotsart"
+      description="Die Auswahl gilt für diesen Dienst. Nur eine tatsächlich erhaltene Auskunft als bestätigt erfassen."
+      onClose={onClose}
+      footer={
+        <>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>
+            Abbrechen
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={mode !== 'unconfirmed' && (!checked || !confirmedBy.trim())}
+            onClick={() => {
+              try {
+                changeProject((draft) => {
+                  draft.orderPolicy = {
+                    mode,
+                    confirmedBy: mode === 'unconfirmed' ? '' : confirmedBy.trim(),
+                    confirmedAt: mode === 'unconfirmed' ? '' : new Date().toISOString(),
+                  };
+                });
+                onClose();
+              } catch (caught) {
+                setError(errorText(caught));
+              }
+            }}
+          >
+            Auswahl speichern
+          </button>
+        </>
+      }
+    >
       <ErrorBox message={error} />
-      <p>
-        Die Auswahl gilt für diesen Dienst. Nur eine tatsächlich erhaltene Auskunft als bestätigt
-        erfassen.
-      </p>
-      <div className="policy-options">
+      <div className="option-list">
         {(
           [
             [
@@ -484,7 +730,7 @@ function PolicyDialog({ onClose }: { onClose: () => void }) {
             ],
           ] as const
         ).map(([value, title, detail]) => (
-          <label className="policy-option" key={value}>
+          <label className="option-card" key={value}>
             <input
               type="radio"
               name="policy"
@@ -501,7 +747,7 @@ function PolicyDialog({ onClose }: { onClose: () => void }) {
       </div>
       {mode !== 'unconfirmed' && (
         <>
-          <label>
+          <label className="field">
             Bestätigung durch KF / Referenz
             <input
               value={confirmedBy}
@@ -509,7 +755,7 @@ function PolicyDialog({ onClose }: { onClose: () => void }) {
               placeholder="KF-Auskunft / Referenz"
             />
           </label>
-          <label className="check-label policy-confirm">
+          <label className="check">
             <input
               type="checkbox"
               checked={checked}
@@ -519,31 +765,6 @@ function PolicyDialog({ onClose }: { onClose: () => void }) {
           </label>
         </>
       )}
-      <div className="form-actions">
-        <button type="button" className="button-secondary" onClick={onClose}>
-          Abbrechen
-        </button>
-        <button
-          type="button"
-          disabled={mode !== 'unconfirmed' && (!checked || !confirmedBy.trim())}
-          onClick={() => {
-            try {
-              changeProject((draft) => {
-                draft.orderPolicy = {
-                  mode,
-                  confirmedBy: mode === 'unconfirmed' ? '' : confirmedBy.trim(),
-                  confirmedAt: mode === 'unconfirmed' ? '' : new Date().toISOString(),
-                };
-              });
-              onClose();
-            } catch (caught) {
-              setError(errorText(caught));
-            }
-          }}
-        >
-          Auswahl speichern
-        </button>
-      </div>
     </Modal>
   );
 }

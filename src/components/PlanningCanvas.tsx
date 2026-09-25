@@ -4,6 +4,7 @@ import {
   type Connection,
   Controls,
   type Edge,
+  MiniMap,
   type NodeChange,
   type OnNodeDrag,
   ReactFlow,
@@ -20,6 +21,7 @@ const ariaLabelConfig = {
   'controls.zoomIn.ariaLabel': 'Vergrössern',
   'controls.zoomOut.ariaLabel': 'Verkleinern',
   'controls.fitView.ariaLabel': 'Alle Detachemente anzeigen',
+  'minimap.ariaLabel': 'Übersichtskarte',
 };
 
 /** Pointer frames stay inside the graph; persist once after a completed gesture. */
@@ -31,6 +33,8 @@ export const PlanningCanvas = memo(function PlanningCanvas({
   onConnect,
   onInspect,
   onPaneClick,
+  onPaneDoubleClick,
+  minimap = false,
 }: {
   nodes: PlanningNode[];
   edges: Edge[];
@@ -39,6 +43,8 @@ export const PlanningCanvas = memo(function PlanningCanvas({
   onConnect: (connection: Connection) => void;
   onInspect: (id: string) => void;
   onPaneClick: () => void;
+  onPaneDoubleClick?: (point: { x: number; y: number }) => void;
+  minimap?: boolean;
 }) {
   const [nodes, setNodes] = useState(incoming);
   const nodesRef = useRef(nodes);
@@ -80,8 +86,17 @@ export const PlanningCanvas = memo(function PlanningCanvas({
     (_event: React.MouseEvent, edge: Edge) => onInspect(edge.source),
     [onInspect],
   );
+  const onDoubleClick = useCallback(
+    (event: React.MouseEvent) => {
+      if ((event.target as HTMLElement).classList.contains('react-flow__pane'))
+        onPaneDoubleClick?.({ x: event.clientX, y: event.clientY });
+    },
+    [onPaneDoubleClick],
+  );
   return (
     <ReactFlow<PlanningNode>
+      onDoubleClick={onDoubleClick}
+      zoomOnDoubleClick={false}
       nodes={nodes}
       edges={edges}
       nodeTypes={nodeTypes}
@@ -103,8 +118,18 @@ export const PlanningCanvas = memo(function PlanningCanvas({
       panOnScroll
       ariaLabelConfig={ariaLabelConfig}
     >
-      <Background gap={24} size={1} color="#cfd5c7" />
-      <Controls showInteractive={false} />
+      <Background gap={22} size={1.4} color="var(--canvas-dot)" />
+      <Controls showInteractive={false} showFitView={false} position="bottom-right" />
+      {minimap && (
+        <MiniMap
+          pannable
+          zoomable
+          position="top-right"
+          ariaLabel="Übersichtskarte"
+          nodeBorderRadius={10}
+          maskColor="rgb(120 130 124 / 0.12)"
+        />
+      )}
     </ReactFlow>
   );
 });
