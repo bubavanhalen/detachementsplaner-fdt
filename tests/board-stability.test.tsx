@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { HistoryButtons } from '../src/components/HistoryButtons';
 import { PROJECT_KEY } from '../src/io/storage';
 import { createDetachment, createProject } from '../src/model';
 import { getBoardPositions } from '../src/model/board';
@@ -90,7 +91,12 @@ describe('planning board stability with wholly fictional projects', () => {
     const user = userEvent.setup();
     replaceProject(fixture());
     const initial = structuredClone(projectStore.get());
-    render(<PlanningPage />);
+    render(
+      <>
+        <HistoryButtons />
+        <PlanningPage />
+      </>,
+    );
     const card = await screen.findByRole('article', { name: 'Detachement Fiktiv KVK' });
     await settleLayout();
     const grip = card.querySelector<HTMLElement>('.card-grip');

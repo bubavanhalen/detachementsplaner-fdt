@@ -1,5 +1,11 @@
 # Dienstleistung vorbereiten, danach nachschlagen
 
+## Oberfläche: geführter Ablauf in vier Schritten
+
+Die Oberfläche folgt dem Arbeitsziel statt einzelnen Datenbereichen: **Personen laden → Planen → In PISA übertragen → Sichern & archivieren**. Die Seitenleiste zeigt pro Schritt den abgeleiteten Stand (erledigt, offen, Handlungsbedarf); «Weiter» führt zum nächsten Schritt. Personen und Kontakte sind als Nachschlagewerkzeuge getrennt. Ein gemeinsames Designsystem (Tokens für Hell/Dunkel, eine Primärfarbe, einheitliche Knöpfe, Dialoge, Seitenbereiche und Meldungen) ersetzt die bisherigen Einzelstile.
+
+Unterstützende Bedienhilfen bleiben lokal: Befehlspalette (`Ctrl/⌘+K`) mit Suche über Personen und Detachemente, Tastenkürzel, Meldungen mit direktem «Rückgängig», Liste «Noch frei» mit Ziehen auf Karten und Mehrfachzuteilung, Kartenmenü (Duplizieren, Verbindung lösen, Position), Übernahme von Einrückungsangaben aus einer anderen Karte, Kopierknöpfe je PISA-Feld mit automatischem Weiterspringen, Übersichtstabelle, Dateien per Ziehen einlesen und Dunkelmodus. Oberflächeneinstellungen enthalten keine Projekt- oder Personendaten. Die KVK/WK-Behandlung (**Aufgebotsart noch bestätigen**) und die fachlichen Regeln sind unverändert.
+
 ## Aktuelle React/TanStack-Neugestaltung
 
 Die Umsetzung wurde nach der gemeinsamen Workflow-Abstimmung ausdrücklich freigegeben und in parallelen Arbeitspaketen umgesetzt. Die folgenden Entscheidungen ersetzen die weiter unten als historische Referenz beschriebene Oberfläche. Aktuelle Start- und Testbefehle stehen im README.

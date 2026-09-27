@@ -58,7 +58,7 @@ export function OutputStep({
   if (!assets.signature) hints.push('Ohne gespeicherte Unterschrift bleibt das Bild der Vorlage.');
   if (!tb.settings.kdtName.trim()) hints.push('Name Kdt fehlt (Schritt 1, Einstellungen).');
   if (!project.settings.eigeneEinheit.trim())
-    hints.push('Eigene Einheit fehlt (Dateien & Archiv → Dienstleistung bearbeiten).');
+    hints.push('Eigene Einheit fehlt (Projektmenü → Bezeichnung & Zeitraum).');
   const pdfAssets = { logos, signature };
 
   const exportFile = (label: string, action: () => Promise<void>) => {

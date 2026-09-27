@@ -23,7 +23,7 @@ export interface TbPdfOptions {
 }
 
 /** Neutral producer/creator: no library URLs, user names or machine details. */
-const APP_NAME = 'Detachementsplaner';
+const APP_NAME = 'WK Util Suite';
 
 /** 01_Mo.pdf … 07_So.pdf — weekday index, not the TB number. */
 export function pdfFileName(order: Pick<TbOrder, 'index' | 'day'>): string {

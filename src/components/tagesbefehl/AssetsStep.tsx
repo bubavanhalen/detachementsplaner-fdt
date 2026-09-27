@@ -211,7 +211,8 @@ export function AssetsStep({
           </Field>
           <p className="muted span-2 tb-hint">
             Eine Zeile pro Empfänger. <code>{'{Einheit}'}</code> wird durch die eigene Einheit
-            ersetzt ({unit ? `«${unit}»` : 'noch nicht erfasst — unter Dateien & Archiv'}).
+            ersetzt (
+            {unit ? `«${unit}»` : 'noch nicht erfasst — Projektmenü → Bezeichnung & Zeitraum'}).
           </p>
           <Field className="field span-2" label="Dienstleistung (Dateiname)">
             {(id) => (

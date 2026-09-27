@@ -1,4 +1,4 @@
-# Abgleich: Detachementsplaner und PISA
+# Abgleich: WK Util Suite und PISA
 
 Stand der ursprünglichen Codeprüfung: Commit `1623ac4`, Datei `index.html`. Die Lückentabelle unten beschreibt diesen Ausgangsstand und ist ein **Umsetzungsvorschlag**, keine zusätzliche PISA-Vorschrift.
 

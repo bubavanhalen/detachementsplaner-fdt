@@ -164,7 +164,7 @@ describe('PeoplePicker presentation compatibility', () => {
       name: 'Personen auswählen · Fiktives Spezialdetachement',
     });
     await user.click(within(panel).getByText('Grad', { selector: 'summary' }));
-    await user.click(within(panel).getByRole('checkbox', { name: 'Wm' }));
+    await user.click(within(panel).getByRole('checkbox', { name: /^Wm\d/ }));
     expect(within(panel).getByText('1 Treffer')).toBeInTheDocument();
     await user.click(within(panel).getByRole('button', { name: 'Alle Treffer auswählen' }));
     await user.click(within(panel).getByRole('button', { name: 'Filter zurücksetzen' }));

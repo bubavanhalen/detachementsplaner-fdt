@@ -176,8 +176,8 @@ describe('buildDayPdf', () => {
     const { doc } = await inspectPdf(await buildDayPdf(order, { logos: [] }, { now: NOW }));
     expect(doc.getTitle()).toBe('Tagesbefehl Nr 45 – Freitag, 14.03.2031');
     expect(doc.getAuthor()).toBe('Hptm Beispiel Hans');
-    expect(doc.getProducer()).toBe('Detachementsplaner');
-    expect(doc.getCreator()).toBe('Detachementsplaner');
+    expect(doc.getProducer()).toBe('WK Util Suite');
+    expect(doc.getCreator()).toBe('WK Util Suite');
     expect(doc.getCreationDate()?.toISOString()).toBe(NOW.toISOString());
     expect(doc.getModificationDate()).toBeUndefined();
     expect(doc.getSubject()).toBeUndefined();

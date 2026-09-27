@@ -236,9 +236,9 @@ describe('Tagesbefehle navigation and stepper', () => {
   it('is reachable from the main navigation', async () => {
     const user = userEvent.setup();
     projectStore.setState(() => createProject());
-    window.location.hash = '#/files';
+    window.location.hash = '#/persons';
     render(<App />);
-    await user.click(await screen.findByRole('link', { name: 'Tagesbefehle' }));
+    await user.click(await screen.findByRole('link', { name: /^Tagesbefehle/ }));
     expect(
       await screen.findByRole('heading', { name: 'Vom Wochenplan zum Tagesbefehl.' }),
     ).toBeInTheDocument();

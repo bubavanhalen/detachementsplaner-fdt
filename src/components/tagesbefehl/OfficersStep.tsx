@@ -63,8 +63,8 @@ export function OfficersStep({
         </p>
         {!project.settings.eigeneEinheit.trim() && (
           <p className="notice warning">
-            Eigene Einheit noch nicht erfasst (Dateien & Archiv → Dienstleistung bearbeiten). Bis
-            dahin werden alle Lt/Oblt vorgeschlagen.
+            Eigene Einheit noch nicht erfasst (Projektmenü → Bezeichnung & Zeitraum). Bis dahin
+            werden alle Lt/Oblt vorgeschlagen.
           </p>
         )}
         {tb.offiziere.length ? (

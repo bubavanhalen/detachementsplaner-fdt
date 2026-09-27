@@ -68,9 +68,9 @@ describe('planning interface with fictional people', () => {
     const close = vi.fn();
     render(<PeoplePicker project={project} group={project.dets[0]} onClose={close} />);
     await user.click(screen.getByText('Grad', { selector: 'summary' }));
-    await user.click(screen.getByRole('checkbox', { name: 'Wm' }));
+    await user.click(screen.getByRole('checkbox', { name: /^Wm\d/ }));
     await user.click(screen.getByText('Fahrausweis', { selector: 'summary' }));
-    await user.click(screen.getByRole('checkbox', { name: 'B' }));
+    await user.click(screen.getByRole('checkbox', { name: /^B\d/ }));
     expect(screen.getByText('1 Treffer')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Alle Treffer auswählen' }));
     await user.click(screen.getByRole('button', { name: 'Filter zurücksetzen' }));
@@ -126,7 +126,7 @@ describe('planning interface with fictional people', () => {
     const project = fixture();
     projectStore.setState(() => project);
     render(<PlanningPage />);
-    await user.click((await screen.findAllByRole('button', { name: 'Verbinden →' }))[0]);
+    await user.click((await screen.findAllByRole('button', { name: 'Verbinden' }))[0]);
     await user.click(screen.getByRole('button', { name: 'Hier anschliessend Dienst leisten' }));
     expect(projectStore.get().connections).toEqual([
       expect.objectContaining({ from: 'early', to: 'main' }),
@@ -157,7 +157,7 @@ describe('planning interface with fictional people', () => {
     await user.click(screen.getByRole('checkbox', { name: /Diese Aufgebotsart wurde/ }));
     await user.click(screen.getByRole('button', { name: 'Auswahl speichern' }));
     expect(projectStore.get().orderPolicy.mode).toBe('separate');
-    await user.click(screen.getByRole('button', { name: 'EC?' }));
+    await user.click(screen.getByRole('button', { name: /^EC\?/ }));
     await user.click(screen.getByRole('button', { name: 'EC bearbeiten' }));
     await user.type(screen.getByRole('textbox', { name: 'EC' }), 'W2');
     await user.click(screen.getByRole('button', { name: 'EC speichern' }));
