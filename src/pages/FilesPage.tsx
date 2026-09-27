@@ -5,6 +5,7 @@ import { Modal } from '../components/Modal';
 import { demoProject } from '../io/demo';
 import { bundleHtml, download, exportJson, exportName, exportWorkbook } from '../io/exports';
 import { readArchives } from '../io/storage';
+import { readTbAssets } from '../io/tagesbefehl/assets';
 import { localError, searchText } from '../io/text';
 import { readWorkbook, type XLSX } from '../io/workbook';
 import { createProject, normalizeProject, projectSignature } from '../model';
@@ -140,7 +141,7 @@ export default function FilesPage() {
               run(() =>
                 download(
                   exportName(project, 'html'),
-                  bundleHtml(offlineTemplate, project),
+                  bundleHtml(offlineTemplate, project, readTbAssets()),
                   'text/html',
                 ),
               )
@@ -160,7 +161,9 @@ export default function FilesPage() {
           </button>
         </div>
         <p className="muted">
-          Exporte enthalten private Daten. Ausschliesslich lokal speichern; niemals veröffentlichen.
+          Exporte enthalten private Daten. Die Offline-HTML enthält auch die lokal gespeicherte
+          Tagesbefehl-Vorlage und Unterschrift. Ausschliesslich lokal speichern; niemals
+          veröffentlichen.
         </p>
       </section>
       <section className="panel">

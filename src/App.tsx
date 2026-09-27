@@ -13,6 +13,7 @@ import FilesPage from './pages/FilesPage';
 import PeoplePage from './pages/PeoplePage';
 import PisaPage from './pages/PisaPage';
 import PlanningPage from './pages/PlanningPage';
+import TagesbefehlePage from './pages/TagesbefehlePage';
 import { notify, useFeedback, useProject } from './store';
 
 function Shell() {
@@ -39,6 +40,7 @@ function Shell() {
               { to: '/pisa', label: 'In PISA übernehmen' },
               { to: '/persons', label: 'Personen', count: project.persons.length },
               { to: '/contacts', label: 'Kontakt-CSV' },
+              { to: '/tagesbefehle', label: 'Tagesbefehle' },
               { to: '/files', label: 'Dateien & Archiv' },
             ] as const
           ).map((item) => (
@@ -114,6 +116,11 @@ const routes = [
   createRoute({ getParentRoute: () => rootRoute, path: '/pisa', component: PisaPage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/persons', component: PeoplePage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/contacts', component: ContactsPage }),
+  createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/tagesbefehle',
+    component: TagesbefehlePage,
+  }),
   createRoute({ getParentRoute: () => rootRoute, path: '/files', component: FilesPage }),
 ];
 export const router = createRouter({
