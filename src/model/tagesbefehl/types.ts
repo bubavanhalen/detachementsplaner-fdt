@@ -108,7 +108,7 @@ export interface TbWeek {
   notes: { wochenziele: string[]; bemerkungen: string[] };
   /** Per-day Tagesoffizier override (weekdays). */
   officers: Partial<Record<TbWeekday, TbOfficerOverride>>;
-  /** Weekend "Wochenend Wacht Of" lines per day, e.g. ["Wacht Of Kp 61/1", "Tel folgt"]. */
+  /** Weekend "Wochenend Wacht Of" lines per day, e.g. ["Wacht Of Kp 99/1", "Tel folgt"]. */
   wachtOf: Partial<Record<TbWeekday, string[]>>;
 }
 
@@ -193,6 +193,8 @@ export interface WapParseResult {
   days: TbWeekday[];
   entries: TbEntry[];
   groups: Partial<Record<TbWeekday, string[]>>;
+  /** Sub-column headers per day as written in the sheet (optional, for heading aliases). */
+  columns?: Partial<Record<TbWeekday, string[]>>;
   conflicts: TbConflict[];
   notes: { wochenziele: string[]; bemerkungen: string[] };
   /** Generic, data-free diagnostics (counts, detected layout) for the local UI. */
