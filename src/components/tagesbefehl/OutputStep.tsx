@@ -6,6 +6,7 @@ import { extractTemplateLogos, type TbTemplateLogo } from '../../io/tagesbefehl/
 import { buildTagesbefehlXlsx, xlsxFileName } from '../../io/tagesbefehl/xlsx';
 import { buildOrders, type TbAssets, type TbOrder, type TbWeek } from '../../model/tagesbefehl';
 import { notify } from '../../store';
+import { Icon } from '../Icon';
 import PrintView, { printOrders } from './PrintView';
 import type { TbStepProps } from './tbStore';
 import { openConflicts, weekConflicts } from './weekTools';
@@ -95,67 +96,80 @@ export function OutputStep({
 
   return (
     <div className="tb-output">
-      <section className="panel tb-screen-only" aria-labelledby="tb-output-title">
-        <span className="eyebrow">WOCHE {week.sheet}</span>
-        <h2 id="tb-output-title">Ausgabe</h2>
-        {missing.length > 0 && (
-          <div className="notice warning" role="alert">
-            <div>
-              <strong>Ausgabe noch nicht möglich</strong>
-              <ul>
-                {missing.map((item) => (
-                  <li key={item.text}>
-                    {item.text}{' '}
-                    <button type="button" className="text-button" onClick={() => onStep(item.step)}>
-                      Zu Schritt {item.step}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+      <section className="card tb-screen-only" aria-labelledby="tb-output-title">
+        <header className="card-head">
+          <h2 id="tb-output-title">
+            <Icon name="printer" /> Ausgabe
+          </h2>
+          <span className="badge badge-accent">Woche {week.sheet}</span>
+        </header>
+        <div className="card-body tb-card-stack">
+          {missing.length > 0 && (
+            <div className="callout callout-warning" role="alert">
+              <Icon name="alert" />
+              <div className="callout-body">
+                <strong>Ausgabe noch nicht möglich</strong>
+                <ul className="tb-missing">
+                  {missing.map((item) => (
+                    <li key={item.text}>
+                      {item.text}{' '}
+                      <button type="button" className="btn-link" onClick={() => onStep(item.step)}>
+                        Zu Schritt {item.step}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
-        )}
-        {open.length > 0 && (
-          <div className="notice warning">
-            <div>
-              <strong>
-                {open.length} {open.length === 1 ? 'Hinweis' : 'Hinweise'} offen · Ausgabe trotzdem
-                möglich
-              </strong>
-              <p>Vor dem Verteilen die Hinweise unter «Prüfen» kontrollieren.</p>
+          )}
+          {open.length > 0 && (
+            <div className="callout callout-warning">
+              <Icon name="info" />
+              <div className="callout-body">
+                <strong>
+                  {open.length} {open.length === 1 ? 'Hinweis' : 'Hinweise'} offen · Ausgabe
+                  trotzdem möglich
+                </strong>
+                <p>Vor dem Verteilen die Hinweise unter «Prüfen» kontrollieren.</p>
+              </div>
+              <div className="callout-actions">
+                <button type="button" className="btn btn-sm" onClick={() => onStep(3)}>
+                  Zu den Hinweisen
+                </button>
+              </div>
             </div>
-            <button type="button" className="button secondary" onClick={() => onStep(3)}>
-              Zu den Hinweisen
+          )}
+          {hints.length > 0 && (
+            <ul className="tb-hints muted">
+              {hints.map((hint) => (
+                <li key={hint}>{hint}</li>
+              ))}
+            </ul>
+          )}
+          <div className="toolbar">
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={blocked}
+              onClick={() => printOrders()}
+            >
+              <Icon name="printer" size={16} /> Alle drucken
+            </button>
+            <button type="button" className="btn" disabled={blocked} onClick={xlsx}>
+              <Icon name="sheet" size={16} />
+              {busy === 'xlsx' ? 'Wird erstellt …' : '.xlsx herunterladen'}
+            </button>
+            <button type="button" className="btn" disabled={blocked} onClick={zip}>
+              <Icon name="download" size={16} />
+              {busy === 'zip' ? 'Wird erstellt …' : 'PDF je Tag herunterladen'}
             </button>
           </div>
-        )}
-        {hints.length > 0 && (
-          <ul className="tb-hints muted">
-            {hints.map((hint) => (
-              <li key={hint}>{hint}</li>
-            ))}
-          </ul>
-        )}
-        <div className="toolbar">
-          <button
-            type="button"
-            className="button primary"
-            disabled={blocked}
-            onClick={() => printOrders()}
-          >
-            Alle drucken
-          </button>
-          <button type="button" className="button" disabled={blocked} onClick={xlsx}>
-            {busy === 'xlsx' ? 'Wird erstellt …' : '.xlsx herunterladen'}
-          </button>
-          <button type="button" className="button" disabled={blocked} onClick={zip}>
-            {busy === 'zip' ? 'Wird erstellt …' : 'PDF je Tag herunterladen'}
-          </button>
+          <p className="muted tb-hint">
+            Dateien: <span className="mono">{xlsxFileName(week.sheet, tb.settings)}</span> ·{' '}
+            <span className="mono">{pdfZipName(week.sheet, tb.settings)}</span>. Alles entsteht
+            lokal auf diesem Gerät und enthält private Daten.
+          </p>
         </div>
-        <p className="muted tb-hint">
-          Dateien: {xlsxFileName(week.sheet, tb.settings)} · {pdfZipName(week.sheet, tb.settings)}.
-          Alles entsteht lokal auf diesem Gerät und enthält private Daten.
-        </p>
       </section>
       {orders.length > 0 && (
         <section className="tb-print-area" aria-label="Druckansicht">
@@ -165,26 +179,27 @@ export function OutputStep({
             signatureUrl={signatureUrl}
             sheetActions={(order) => (
               <div className="tb-sheet-toolbar">
-                <span>
-                  <strong>{order.day}</strong> · {pdfFileName(order)}
+                <span className="tb-sheet-name">
+                  <strong>{order.day}</strong> · <span className="mono">{pdfFileName(order)}</span>
                   {order.date ? '' : ' · Datum offen'}
                 </span>
                 <button
                   type="button"
-                  className="button secondary"
+                  className="btn btn-sm"
                   aria-label={`${order.day} drucken`}
                   disabled={blocked}
                   onClick={() => printOrders(order.day)}
                 >
-                  Drucken
+                  <Icon name="printer" size={15} /> Drucken
                 </button>
                 <button
                   type="button"
-                  className="button secondary"
+                  className="btn btn-sm"
                   aria-label={`PDF ${pdfFileName(order)} herunterladen`}
                   disabled={blocked}
                   onClick={() => dayPdf(order)}
                 >
+                  <Icon name="download" size={15} />
                   {busy === `pdf-${order.day}` ? 'Wird erstellt …' : 'PDF'}
                 </button>
               </div>

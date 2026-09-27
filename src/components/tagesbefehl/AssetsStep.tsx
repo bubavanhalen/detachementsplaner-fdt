@@ -10,6 +10,7 @@ import { prepareSignature } from '../../io/tagesbefehl/signature';
 import { xlsxFileName } from '../../io/tagesbefehl/xlsx';
 import type { TbAssets } from '../../model/tagesbefehl';
 import { notify } from '../../store';
+import { Icon } from '../Icon';
 import { Modal } from '../Modal';
 import { Field, InlineLines, InlineText } from './fields';
 import { changeTb, type TbStepProps } from './tbStore';
@@ -89,76 +90,103 @@ export function AssetsStep({
 
   return (
     <div className="tb-step-grid">
-      <section className="panel" aria-labelledby="tb-assets-title">
-        <span className="eyebrow">EINMAL PRO GERÄT</span>
-        <h2 id="tb-assets-title">Vorlage & Unterschrift</h2>
-        <p className="muted">
-          Die offizielle Vorlage (.xlsx) und die Unterschrift (PNG) werden nur in dieser
-          Browserablage gespeichert und in die private Offline-HTML übernommen. Kein Upload.
-        </p>
-        <div className="tb-asset-list">
-          {(['template', 'signature'] as const).map((kind) => {
-            const asset = assets[kind];
-            return (
-              <div className="tb-asset" key={kind}>
-                <div>
-                  <strong>{ASSET_LABELS[kind]}</strong>
-                  <p className="muted" data-testid={`tb-asset-${kind}`}>
-                    {asset
-                      ? `${asset.name || 'Ohne Dateiname'} · gespeichert ${savedLabel(asset.savedAt)}`
-                      : 'Noch nicht gespeichert'}
-                  </p>
-                  {kind === 'signature' && asset && (
-                    <img
-                      className="tb-signature-preview"
-                      src={`data:image/png;base64,${asset.base64}`}
-                      alt="Gespeicherte Unterschrift"
+      <section className="card" aria-labelledby="tb-assets-title">
+        <header className="card-head">
+          <h2 id="tb-assets-title">
+            <Icon name="file" /> Vorlage & Unterschrift
+          </h2>
+          <span className="muted tb-head-note">Einmal pro Gerät</span>
+        </header>
+        <div className="card-body tb-card-stack">
+          <p className="muted">
+            Die offizielle Vorlage (.xlsx) und die Unterschrift (PNG) werden nur in dieser
+            Browserablage gespeichert und in die private Offline-HTML übernommen. Kein Upload.
+          </p>
+          <div className="tb-asset-list">
+            {(['template', 'signature'] as const).map((kind) => {
+              const asset = assets[kind];
+              return (
+                <div className={`tb-asset ${asset ? 'is-loaded' : ''}`} key={kind}>
+                  <span className="tb-asset-icon" aria-hidden="true">
+                    <Icon
+                      name={asset ? 'checkCircle' : kind === 'template' ? 'sheet' : 'edit'}
+                      size={20}
                     />
-                  )}
-                </div>
-                <div className="tb-asset-actions">
-                  <label className="button secondary tb-file-button">
-                    {asset ? `${ASSET_LABELS[kind]} ersetzen` : `${ASSET_LABELS[kind]} wählen`}
-                    <input
-                      className="tb-file-input"
-                      type="file"
-                      aria-label={
-                        kind === 'template' ? 'Vorlage (.xlsx) wählen' : 'Unterschrift (PNG) wählen'
-                      }
-                      accept={
-                        kind === 'template'
-                          ? '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                          : '.png,image/png'
-                      }
-                      onChange={receive(kind)}
-                    />
-                  </label>
-                  {asset && (
-                    <button
-                      type="button"
-                      className="button danger"
-                      onClick={() => setRemoving(kind)}
+                  </span>
+                  <div className="tb-asset-text">
+                    <strong>{ASSET_LABELS[kind]}</strong>
+                    <p className="tb-asset-status" data-testid={`tb-asset-${kind}`}>
+                      {asset
+                        ? `${asset.name || 'Ohne Dateiname'} · gespeichert ${savedLabel(asset.savedAt)}`
+                        : 'Noch nicht gespeichert'}
+                    </p>
+                    {kind === 'signature' && asset && (
+                      <img
+                        className="tb-signature-preview"
+                        src={`data:image/png;base64,${asset.base64}`}
+                        alt="Gespeicherte Unterschrift"
+                      />
+                    )}
+                  </div>
+                  <div className="tb-asset-actions">
+                    <label
+                      className={`btn btn-sm tb-file-button ${
+                        !asset && kind === 'template' ? 'btn-primary' : ''
+                      }`}
                     >
-                      Entfernen
-                    </button>
-                  )}
+                      <Icon name="upload" size={15} />
+                      {asset ? `${ASSET_LABELS[kind]} ersetzen` : `${ASSET_LABELS[kind]} wählen`}
+                      <input
+                        className="tb-file-input"
+                        type="file"
+                        aria-label={
+                          kind === 'template'
+                            ? 'Vorlage (.xlsx) wählen'
+                            : 'Unterschrift (PNG) wählen'
+                        }
+                        accept={
+                          kind === 'template'
+                            ? '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                            : '.png,image/png'
+                        }
+                        onChange={receive(kind)}
+                      />
+                    </label>
+                    {asset && (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-ghost tb-remove"
+                        onClick={() => setRemoving(kind)}
+                      >
+                        <Icon name="trash" size={15} /> Entfernen
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          {assets.template && assets.signature && (
+            <button
+              type="button"
+              className="btn-link tb-remove-all"
+              onClick={() => setRemoving('all')}
+            >
+              Beide von diesem Gerät entfernen
+            </button>
+          )}
         </div>
-        {assets.template && assets.signature && (
-          <button type="button" className="text-button" onClick={() => setRemoving('all')}>
-            Beide von diesem Gerät entfernen
-          </button>
-        )}
       </section>
 
-      <section className="panel" aria-labelledby="tb-settings-title">
-        <span className="eyebrow">ANGABEN IM TAGESBEFEHL</span>
-        <h2 id="tb-settings-title">Einstellungen</h2>
-        <div className="form-grid">
-          <Field className="field span-2" label="Landeskarte (LK)">
+      <section className="card" aria-labelledby="tb-settings-title">
+        <header className="card-head">
+          <h2 id="tb-settings-title">
+            <Icon name="edit" /> Einstellungen
+          </h2>
+          <span className="muted tb-head-note">Angaben im Tagesbefehl</span>
+        </header>
+        <div className="card-body form-grid">
+          <Field className="field span-all" label="Landeskarte (LK)">
             {(id) => (
               <InlineText
                 id={id}
@@ -209,12 +237,12 @@ export function AssetsStep({
               />
             )}
           </Field>
-          <p className="muted span-2 tb-hint">
+          <p className="muted span-all tb-hint">
             Eine Zeile pro Empfänger. <code>{'{Einheit}'}</code> wird durch die eigene Einheit
             ersetzt (
             {unit ? `«${unit}»` : 'noch nicht erfasst — Projektmenü → Bezeichnung & Zeitraum'}).
           </p>
-          <Field className="field span-2" label="Dienstleistung (Dateiname)">
+          <Field className="field span-all" label="Dienstleistung (Dateiname)">
             {(id) => (
               <>
                 <InlineText
@@ -223,7 +251,7 @@ export function AssetsStep({
                   disabled={archived}
                   onCommit={(value) => saveSetting('dienstleistung', value.trim())}
                 />
-                <small>Beispiel: {xlsxFileName('KVK', settings)}</small>
+                <small className="hint">Beispiel: {xlsxFileName('KVK', settings)}</small>
               </>
             )}
           </Field>
@@ -240,10 +268,10 @@ export function AssetsStep({
           onClose={() => setRemoving(null)}
           footer={
             <>
-              <button type="button" className="button secondary" onClick={() => setRemoving(null)}>
+              <button type="button" className="btn btn-ghost" onClick={() => setRemoving(null)}>
                 Abbrechen
               </button>
-              <button type="button" className="button danger" onClick={remove}>
+              <button type="button" className="btn btn-danger" onClick={remove}>
                 Entfernen
               </button>
             </>

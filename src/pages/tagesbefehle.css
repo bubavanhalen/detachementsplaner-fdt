@@ -1,117 +1,187 @@
-/* Tagesbefehle page. Unlayered like the other page styles; only tb-* selectors. */
-.tb-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
+/* Tagesbefehle page. Unlayered like the other page styles; only tb-* selectors.
+   Colours come from the theme.css tokens, so light and dark mode follow the app theme.
+   The paper replica (.tb-sheet, order-sheet.css) deliberately stays white with black text. */
+
+/* ─────────── Intro & context ─────────── */
+/* One column that never grows past the page, whatever the min-content of a step. */
+.tb-page {
+  grid-template-columns: minmax(0, 1fr);
+}
+.tb-context {
+  align-items: center;
+}
+.tb-week-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+  font-size: 0.9rem;
+  font-weight: 560;
+}
+.tb-week-select select {
+  width: auto;
+  min-width: 150px;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 400;
 }
 
+/* ─────────── Stepper (markers as in the sidebar workflow) ─────────── */
 .tb-stepper ol {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
+  gap: 4px;
+  padding: 4px;
   list-style: none;
-  padding: 0;
-  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--sunken);
 }
 .tb-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   height: 100%;
-  justify-content: flex-start;
+  min-height: 48px;
+  padding: 7px 10px;
+  border-radius: var(--radius);
+  color: var(--text-2);
   text-align: left;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--paper);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  font-weight: 600;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    box-shadow 0.12s;
 }
 .tb-step:hover {
-  background: #edf0e4;
+  background: var(--hover);
+  color: var(--text);
 }
-.tb-step small {
-  font-weight: 400;
+.tb-step[aria-current="step"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 1px var(--border);
 }
-.tb-step.is-active {
-  border-color: var(--olive);
-  background: #e6ecd8;
-  box-shadow: inset 0 -3px 0 var(--olive);
+.tb-step .icon {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.6;
 }
-.tb-step-number {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1px solid #b9c5aa;
-  background: white;
-  color: var(--olive);
-  font-size: 0.8rem;
+.tb-step-text {
+  display: grid;
+  min-width: 0;
+  line-height: 1.3;
 }
-.tb-step.is-done .tb-step-number {
-  background: var(--olive);
-  border-color: var(--olive);
-  color: white;
+.tb-step-text > span {
+  font-weight: 600;
 }
-
-.tb-context {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-.tb-week-select {
-  min-width: 200px;
-}
-.tb-context .history-buttons {
-  display: flex;
-  gap: 6px;
-  margin-left: auto;
+.tb-step-text > small {
+  color: var(--text-2);
+  font-size: 0.82rem;
 }
 
+/* ─────────── Shared step layout ─────────── */
 .tb-step-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr);
   gap: 18px;
   align-items: start;
 }
-.tb-subheading {
-  margin: 22px 0 10px;
+.tb-column {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 18px;
+  min-width: 0;
+}
+.tb-page .card-head {
+  flex-wrap: wrap;
+}
+.tb-head-note {
+  font-size: 0.88rem;
+}
+.tb-card-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 14px;
+}
+.tb-table-card {
+  overflow: hidden;
 }
 .tb-hint {
-  font-size: 0.8rem;
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
 }
 .tb-hint code {
-  background: var(--soft);
-  padding: 1px 4px;
-  border-radius: 3px;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: var(--sunken);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
 }
 .tb-warning-text {
-  color: #8a5a12;
+  color: var(--warning-text);
   font-weight: 600;
 }
+small.tb-warning-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.tb-field-stack {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
 .tb-suggestion {
-  align-self: flex-start;
-  font-size: 0.8rem;
+  justify-self: start;
+  font-size: 0.86rem;
+  text-align: left;
+}
+.tb-details > summary {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  font-weight: 560;
+}
+.tb-diagnostics {
+  margin-top: 6px;
+  padding-left: 18px;
+  font-size: 0.85rem;
+}
+.tb-row-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+.tb-row-actions > * + * {
+  margin-left: 2px;
+}
+.tb-remove:hover:not(:disabled) {
+  background: var(--danger-soft);
+  color: var(--danger-text);
+}
+.tb-icon-up {
+  transform: rotate(180deg);
 }
 
 /* File pickers: visually hidden input inside a button-styled label. */
 .tb-file-button {
   position: relative;
+  overflow: hidden;
   cursor: pointer;
 }
-.tb-file-button:focus-within {
-  outline: 3px solid #a07924;
-  outline-offset: 3px;
+.tb-file-button:has(.tb-file-input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.tb-file-button:has(.tb-file-input:disabled) {
+  opacity: 0.5;
+  box-shadow: none;
+  pointer-events: none;
 }
 .tb-file-input {
   position: absolute;
@@ -121,252 +191,326 @@
   opacity: 0;
   cursor: pointer;
 }
-.tb-file-input:disabled {
-  cursor: not-allowed;
+.tb-file-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--text-2);
+  font-size: 0.93rem;
+}
+.tb-file-name .icon {
+  color: var(--text-3);
 }
 
+/* ─────────── 1 · Vorlage & Unterschrift ─────────── */
 .tb-asset-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 16px 0 10px;
+  display: grid;
+  gap: 10px;
 }
 .tb-asset {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 14px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: white;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.tb-asset-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--sunken);
+  color: var(--text-2);
+}
+.tb-asset.is-loaded .tb-asset-icon {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.tb-asset-text {
+  flex: 1;
+  min-width: 0;
+}
+.tb-asset-status {
+  margin-top: 2px;
+  color: var(--text-3);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.tb-asset.is-loaded .tb-asset-status {
+  color: var(--success-text);
+  font-weight: 560;
 }
 .tb-asset-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
   justify-content: flex-end;
+  gap: 6px;
 }
+/* The signature is dark ink on a transparent PNG: show it on paper in both themes. */
 .tb-signature-preview {
   display: block;
   max-width: 220px;
   max-height: 70px;
   margin-top: 8px;
-  border: 1px dashed var(--line);
-  background: white;
+  padding: 4px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+.tb-remove-all {
+  justify-self: start;
+  font-size: 0.9rem;
 }
 
+/* ─────────── 2 · WAP laden ─────────── */
 .tb-parse-bar {
   align-items: flex-end;
 }
-.tb-diagnostics {
-  margin: 6px 0 0;
-  padding-left: 18px;
-  font-size: 0.8rem;
+.tb-parse-bar .field {
+  flex: 1 1 220px;
+  max-width: 340px;
+}
+.tb-source-cell {
+  min-width: 160px;
 }
 .tb-days {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
-  margin: 20px 0 0;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px 14px;
 }
-.tb-days legend {
-  padding: 0 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
+.tb-day-check {
+  align-items: flex-start;
 }
-
-.tb-row-actions {
-  white-space: nowrap;
-  text-align: right;
+.tb-day-check input {
+  margin-top: 2px;
 }
-.tb-row-actions > * + * {
-  margin-left: 4px;
+.tb-day-check small {
+  display: block;
+  color: var(--text-3);
 }
 
-/* Review */
+/* ─────────── 3 · Prüfen ─────────── */
 .tb-review {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
   gap: 18px;
   align-items: start;
 }
 .tb-review-main {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   min-width: 0;
 }
 .tb-review-side {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
   position: sticky;
-  top: 12px;
-  max-height: calc(100dvh - 24px);
+  top: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  max-height: calc(100dvh - var(--topbar-h) - 32px);
   overflow: auto;
 }
 .tb-day-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  justify-self: start;
+  max-width: 100%;
 }
-.tb-day-tab {
-  min-width: 58px;
-  background: var(--paper);
-  color: var(--ink);
-  border: 1px solid var(--line);
+.tb-day-tabs button {
+  justify-content: center;
+  min-width: 52px;
 }
-.tb-day-tab:hover {
-  background: #edf0e4;
-}
-.tb-day-tab.is-active {
-  background: var(--olive);
-  border-color: var(--olive);
-  color: white;
-}
-.tb-day-tab small {
-  display: inline;
-  color: inherit;
-  opacity: 0.75;
+.tb-day-tabs small {
+  color: var(--text-3);
+  font-size: 0.8rem;
+  font-weight: 450;
 }
 .tb-count {
-  display: inline-flex;
-  min-width: 20px;
-  justify-content: center;
-  border-radius: 10px;
-  padding: 0 6px;
-  background: #f0c96a;
-  color: #4b3508;
-  font-size: 0.72rem;
-}
-.tb-day-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-}
-.tb-day-panel h2 {
-  margin-bottom: 12px;
-}
-.tb-review-table table {
-  min-width: 860px;
-}
-.tb-review-table td {
-  padding: 4px 6px;
-  vertical-align: top;
-}
-.tb-review-table th {
-  padding: 8px 6px;
-}
-.tb-review-table input:not([type="checkbox"]),
-.tb-review-table select {
-  min-height: 34px;
-  padding: 4px 7px;
-  font-size: 0.86rem;
-}
-.tb-col-time {
-  width: 118px;
-}
-.tb-bucket th {
-  background: #eef1e6;
-  color: var(--ink);
-  font-size: 0.8rem;
-  letter-spacing: 0;
-  white-space: normal;
-}
-.tb-bucket td {
-  background: #eef1e6;
-}
-.tb-bucket-group th {
-  padding-left: 22px;
-  background: #f5f7ef;
-  font-weight: 600;
-}
-.tb-bucket-group td {
-  background: #f5f7ef;
-}
-.tb-review-table .tb-bucket .text-button {
-  min-height: 28px;
-  font-size: 0.78rem;
-}
-.tb-review-table .icon-button {
-  width: 30px;
-  height: 30px;
-  min-height: 30px;
-  font-size: 1rem;
-}
-.tb-row-warn td:first-child {
-  box-shadow: inset 3px 0 0 #d49a2a;
-}
-.tb-row-warn {
-  background: #fffaf0;
-}
-tr.is-target,
-tr.is-target:hover {
-  background: #fff1c9;
-}
-.tb-info {
-  font-style: italic;
-  font-family: Georgia, serif;
-}
-.tb-info.has-flags {
-  color: #8a5a12;
-}
-.tb-info.has-issues {
-  color: white;
-  background: #c98a1c;
-  font-style: normal;
-  font-family: inherit;
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--warning-soft);
+  color: var(--warning-text);
+  font-size: 0.75rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
-.tb-delete:hover {
-  color: #94392b;
-  background: #fae9e3;
+.tb-card-callout {
+  padding-bottom: 14px;
 }
-.tb-source-row td {
-  background: #fafbf6;
-  font-size: 0.8rem;
-  color: var(--muted);
+/* Fixed column widths for the entry table; «Tätigkeit» takes the remaining space. */
+.tb-col-time {
+  width: 112px;
 }
-.tb-source-row ul {
-  margin: 0;
-  padding-left: 18px;
+.tb-col-who {
+  width: 17%;
 }
-.tb-empty-row td {
-  font-size: 0.78rem;
-  padding: 6px 12px;
+.tb-col-where {
+  width: 14%;
 }
-.tb-group-form {
-  margin: 14px 0 0;
-  align-items: flex-end;
+.tb-col-section {
+  width: 19%;
+}
+.tb-col-actions {
+  width: 140px;
 }
 
-.tb-conflicts h2,
-.tb-notes h2 {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.05rem;
-  margin-bottom: 10px;
+/* Compact inline-edit tables (entries and default rules) */
+.tb-edit-table th,
+.tb-edit-table td {
+  padding: 5px 6px;
+  vertical-align: top;
 }
-.tb-conflicts h3,
+.tb-edit-table thead th {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.tb-edit-table tr > :first-child {
+  padding-left: 14px;
+}
+.tb-edit-table tr > :last-child {
+  padding-right: 12px;
+}
+.tb-edit-table input:not([type="checkbox"]),
+.tb-edit-table select {
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 0.92rem;
+}
+.tb-edit-table select {
+  padding-right: 26px;
+}
+.tb-review-table table {
+  min-width: 780px;
+  table-layout: fixed;
+}
+/* Row actions stay visible while the wide table scrolls sideways (opaque backgrounds). */
+.tb-review-table td.tb-row-actions {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+.tb-review-table .tb-bucket > th,
+.tb-review-table .tb-bucket > td {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  background: var(--sunken);
+  vertical-align: middle;
+}
+.tb-review-table .tb-bucket > th {
+  position: static;
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+}
+.tb-review-table .tb-bucket-group > th,
+.tb-review-table .tb-bucket-group > td {
+  background: var(--surface-2);
+}
+.tb-review-table .tb-bucket-group > th {
+  padding-left: 32px;
+  color: var(--text-2);
+  font-weight: 600;
+}
+.tb-review-table .tb-source-row > td {
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 0.86rem;
+}
+.tb-source-row ul {
+  padding-left: 18px;
+}
+.tb-review-table .tb-empty-row > td {
+  font-size: 0.86rem;
+}
+.tb-review-table .tb-row-warn > td {
+  background: var(--warning-soft);
+}
+.tb-review-table tr.is-target > td {
+  background: color-mix(in srgb, var(--warning) 22%, var(--surface));
+}
+.tb-review-table .tb-row-warn > td:first-child {
+  box-shadow: inset 3px 0 0 var(--warning);
+}
+.tb-review-table .tb-row-warn > td.tb-row-actions {
+  background: linear-gradient(var(--warning-soft), var(--warning-soft)), var(--surface);
+}
+.tb-review-table tr.is-target > td.tb-row-actions {
+  background: color-mix(in srgb, var(--warning) 22%, var(--surface));
+}
+.tb-review-table thead th:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+}
+.tb-info {
+  color: var(--text-3);
+}
+.tb-info.has-flags {
+  color: var(--warning-text);
+}
+.tb-info.has-issues {
+  background: var(--warning-soft);
+  color: var(--warning-text);
+}
+.tb-info.has-issues:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--warning) 24%, transparent);
+}
+.tb-info[aria-expanded="true"] {
+  background: var(--pressed);
+  color: var(--text);
+}
+.tb-group-form {
+  align-items: flex-end;
+  border-top: 1px solid var(--border);
+}
+
+/* Default rules (disclosure) */
+.tb-rules {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+.tb-rules > summary {
+  padding: 12px 16px;
+}
+.tb-rules > .disclosure-body {
+  padding: 0 16px 16px;
+}
+.tb-rules-table {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tb-rules-table table {
+  min-width: 720px;
+}
+
+/* Side panel: conflicts and notes */
+.tb-conflict-day h3,
 .tb-notes h3 {
-  font-size: 0.85rem;
-  margin: 12px 0 6px;
+  margin-bottom: 6px;
+  color: var(--text-3);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
-.tb-conflicts ul,
-.tb-notes ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
+.tb-conflicts ul {
+  display: grid;
   gap: 6px;
+  list-style: none;
 }
 .tb-conflict {
   display: flex;
@@ -374,101 +518,122 @@ tr.is-target:hover {
   gap: 6px;
 }
 .tb-conflict-link {
+  display: grid;
   flex: 1 1 auto;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
   gap: 2px;
-  min-height: 0;
-  padding: 7px 9px;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--warning) 28%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--warning-soft);
+  color: var(--text);
+  font-size: 0.88rem;
   text-align: left;
-  background: #fff8e8;
-  color: var(--ink);
-  border: 1px solid #ecd9a8;
-  font-weight: 500;
-  font-size: 0.8rem;
+  overflow-wrap: anywhere;
 }
 .tb-conflict-link:hover {
-  background: #fdefc9;
+  border-color: var(--warning);
 }
 .tb-conflict-link small {
-  color: #8a5a12;
+  color: var(--warning-text);
+  font-size: 0.72rem;
   font-weight: 700;
-  font-size: 0.68rem;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .tb-check {
-  min-height: 32px;
-  padding: 5px 9px;
-  font-size: 0.75rem;
+  flex: none;
 }
-.tb-checked {
-  margin-top: 12px;
-  font-size: 0.82rem;
+.tb-checked > ul {
+  margin-top: 8px;
 }
 .tb-checked .tb-conflict-link {
-  background: #f4f5ef;
-  border-color: var(--line);
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+.tb-checked .tb-conflict-link:hover {
+  border-color: var(--border-strong);
+}
+.tb-checked .tb-conflict-link small {
+  color: var(--text-3);
+}
+.tb-notes ul {
+  display: grid;
+  list-style: none;
 }
 .tb-note {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 8px;
-  font-size: 0.82rem;
   padding: 6px 0;
-  border-bottom: 1px solid #eceee6;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.tb-note:last-child {
+  border-bottom: 0;
+}
+.tb-note > span {
+  min-width: 0;
+  padding-top: 3px;
+  overflow-wrap: anywhere;
 }
 .tb-note-take {
-  flex-shrink: 0;
-  min-height: 28px;
-  font-size: 0.75rem;
-}
-.tb-rules summary {
-  font-size: 0.95rem;
-}
-.tb-rules > p {
-  margin: 10px 0;
-  font-size: 0.82rem;
-}
-.tb-rules td {
-  padding: 4px 6px;
-}
-.tb-rules input:not([type="checkbox"]),
-.tb-rules select {
-  min-height: 34px;
-  padding: 4px 7px;
-  font-size: 0.85rem;
-}
-.tb-rules-actions {
-  margin: 12px 0 0;
+  flex: none;
 }
 
-/* Officers */
+/* ─────────── 4 · Tagesoffiziere ─────────── */
 .tb-rotation {
-  margin: 14px 0;
-  padding-left: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 .tb-rotation li {
-  padding: 6px 8px;
-  border-radius: 6px;
-}
-.tb-rotation-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 7px 8px 7px 10px;
+  border-bottom: 1px solid var(--border);
 }
-.tb-rotation-row > span:first-child {
-  display: flex;
-  flex-direction: column;
+.tb-rotation li:last-child {
+  border-bottom: 0;
 }
 .tb-rotation li.is-start {
-  background: #eef2e2;
+  background: var(--accent-softer);
+}
+.tb-rotation-no {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--sunken);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.tb-rotation li.is-start .tb-rotation-no {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.tb-rotation-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.tb-rotation .tb-rotation-text small {
+  color: var(--text-3);
+}
+.tb-rotation .tb-row-actions {
+  display: inline-flex;
+}
+.tb-add-officer {
+  align-items: flex-end;
 }
 .tb-officer-days {
   display: grid;
@@ -476,77 +641,126 @@ tr.is-target:hover {
   gap: 12px;
 }
 .tb-officer-day {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: white;
-}
-.tb-officer-day h3 {
-  font-size: 0.95rem;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
 }
 .tb-officer-day textarea {
   min-height: 60px;
 }
 .tb-officer-preview {
-  font-size: 0.82rem;
-  color: var(--muted);
-  border-top: 1px solid #eceee6;
-  padding-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 0.88rem;
+}
+.tb-officer-preview.is-open {
+  color: var(--warning-text);
+}
+.tb-empty-compact {
+  padding: 32px 20px;
 }
 
-/* Output */
+/* ─────────── 5 · Ausgabe ─────────── */
 .tb-output {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
+  min-width: 0;
 }
-.tb-output .notice ul {
-  margin: 6px 0 0;
+.tb-missing {
+  margin-top: 4px;
   padding-left: 18px;
 }
 .tb-hints {
-  margin: 6px 0 14px;
   padding-left: 18px;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
 }
+/* A desk behind the white paper sheets; the sheets themselves never follow the theme. */
 .tb-print-area {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--sunken);
   overflow: auto;
+}
+.tb-print-area .tb-print-root {
+  align-items: safe center;
 }
 .tb-sheet-toolbar {
   display: flex;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin: 0 0 8px;
-  font-size: 0.85rem;
+  color: var(--text-2);
+  font-size: 0.9rem;
 }
-.tb-sheet-toolbar > span {
+.tb-sheet-name {
   margin-right: auto;
 }
-.tb-sheet-toolbar .button {
-  min-height: 32px;
-  padding: 5px 12px;
+.tb-sheet-name strong {
+  color: var(--text);
+}
+/* When the A4 sheets are wider than the desk, the per-sheet actions stay in view. */
+@media screen {
+  .tb-print-area .tb-print-root {
+    container-type: inline-size;
+  }
+  .tb-print-area .tb-sheet-actions {
+    justify-content: flex-start;
+  }
+  .tb-print-area .tb-sheet-toolbar {
+    position: sticky;
+    left: 0;
+    max-width: 100cqw;
+  }
+}
+/* Callout actions move below the text when the card gets narrow. */
+.tb-page .callout {
+  flex-wrap: wrap;
+}
+.tb-page .callout-body {
+  flex: 1 1 200px;
 }
 
+/* ─────────── Responsive ─────────── */
 @media (max-width: 1100px) {
   .tb-step-grid,
   .tb-review {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .tb-review-side {
     position: static;
     max-height: none;
+    overflow: visible;
   }
 }
 @media (max-width: 760px) {
   .tb-stepper ol {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .tb-asset {
-    flex-direction: column;
+    flex-wrap: wrap;
+  }
+  .tb-asset-actions {
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+  /* On phones the whole row scrolls; a pinned action column would hide the fields.
+     The header cell stays sticky (top only) so it keeps containing its hidden label. */
+  .tb-review-table thead th:last-child {
+    right: auto;
+  }
+  .tb-review-table tr > td.tb-row-actions {
+    position: static;
+  }
+  .tb-print-area {
+    padding: 10px;
   }
 }
 
@@ -559,6 +773,9 @@ tr.is-target:hover {
     max-width: none;
   }
   .tb-print-area {
+    padding: 0;
+    border: 0;
+    background: none;
     overflow: visible;
   }
   .tb-sheet-toolbar {

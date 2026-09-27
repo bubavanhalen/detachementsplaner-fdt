@@ -11,6 +11,7 @@ import {
   type WapParseResult,
 } from '../../model/tagesbefehl';
 import { notify } from '../../store';
+import { Icon } from '../Icon';
 import { Modal } from '../Modal';
 import { InlineNumber } from './fields';
 import { changeTb, changeWeek, type TbStepProps } from './tbStore';
@@ -114,82 +115,105 @@ export function WapStep({
 
   return (
     <div className="tb-step-grid">
-      <section className="panel" aria-labelledby="tb-wap-title">
-        <span className="eyebrow">KP-WAP EINLESEN</span>
-        <h2 id="tb-wap-title">WAP laden</h2>
-        <p className="muted">
-          Die Datei wird nur lokal gelesen. Pro Tabellenblatt entsteht eine Woche; geprüfte Wochen
-          bleiben im Projekt gespeichert.
-        </p>
-        <div className="toolbar">
-          <label className="button secondary tb-file-button">
-            {file ? 'Andere Datei wählen' : 'Kp-WAP (.xlsx) wählen'}
-            <input
-              className="tb-file-input"
-              type="file"
-              aria-label="Kp-WAP (.xlsx) wählen"
-              accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              disabled={archived}
-              onChange={pick}
-            />
-          </label>
-          {file && <span className="muted">{file.name}</span>}
-        </div>
-        {file && (
-          <div className="toolbar tb-parse-bar">
-            <label className="field">
-              Tabellenblatt
-              <select value={sheet} onChange={(event) => setSheet(event.target.value)}>
-                {file.sheets.map((name) => (
-                  <option key={name} value={name}>
-                    {tb.wochen[name] ? `${name} (bereits geladen)` : name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              className="button primary"
-              disabled={archived || busy || !sheet}
-              onClick={() => (tb.wochen[sheet] ? setConfirm(true) : void parse())}
-            >
-              {busy ? 'Wird eingelesen …' : 'Einlesen'}
-            </button>
-          </div>
-        )}
-        {report && (
-          <div
-            className={`notice ${report.entries ? 'success' : 'warning'}`}
-            role={report.entries ? 'status' : 'alert'}
-          >
-            <div>
-              <strong>
-                {report.entries
-                  ? `${report.sheet}: ${report.entries} Einträge an ${report.days} Tagen erkannt.`
-                  : `${report.sheet}: Keine Einträge erkannt. Tage und Einträge können manuell ergänzt werden.`}
-              </strong>
-              {report.diagnostics.length > 0 && (
-                <details>
-                  <summary>Details zur Auswertung ({report.diagnostics.length})</summary>
-                  <ul className="tb-diagnostics">
-                    {report.diagnostics.map((line, index) => (
-                      // biome-ignore lint/suspicious/noArrayIndexKey: static diagnostic list
-                      <li key={index}>{line}</li>
-                    ))}
-                  </ul>
-                </details>
+      <div className="tb-column">
+        <section className="card" aria-labelledby="tb-wap-title">
+          <header className="card-head">
+            <h2 id="tb-wap-title">
+              <Icon name="upload" /> WAP laden
+            </h2>
+            <span className="muted tb-head-note">Kp-WAP einlesen</span>
+          </header>
+          <div className="card-body tb-card-stack">
+            <p className="muted">
+              Die Datei wird nur lokal gelesen. Pro Tabellenblatt entsteht eine Woche; geprüfte
+              Wochen bleiben im Projekt gespeichert.
+            </p>
+            <div className="toolbar">
+              <label className={`btn tb-file-button ${file || weeks.length ? '' : 'btn-primary'}`}>
+                <Icon name="upload" size={16} />
+                {file ? 'Andere Datei wählen' : 'Kp-WAP (.xlsx) wählen'}
+                <input
+                  className="tb-file-input"
+                  type="file"
+                  aria-label="Kp-WAP (.xlsx) wählen"
+                  accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  disabled={archived}
+                  onChange={pick}
+                />
+              </label>
+              {file && (
+                <span className="tb-file-name">
+                  <Icon name="sheet" size={16} />
+                  <span className="truncate">{file.name}</span>
+                </span>
               )}
             </div>
-            {report.entries > 0 && (
-              <button type="button" className="button" onClick={onReview}>
-                Weiter zum Prüfen
-              </button>
+            {file && (
+              <div className="toolbar tb-parse-bar">
+                <label className="field">
+                  Tabellenblatt
+                  <select value={sheet} onChange={(event) => setSheet(event.target.value)}>
+                    {file.sheets.map((name) => (
+                      <option key={name} value={name}>
+                        {tb.wochen[name] ? `${name} (bereits geladen)` : name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={archived || busy || !sheet}
+                  onClick={() => (tb.wochen[sheet] ? setConfirm(true) : void parse())}
+                >
+                  {busy ? 'Wird eingelesen …' : 'Einlesen'}
+                </button>
+              </div>
+            )}
+            {report && (
+              <div
+                className={`callout ${report.entries ? 'callout-success' : 'callout-warning'}`}
+                role={report.entries ? 'status' : 'alert'}
+              >
+                <Icon name={report.entries ? 'checkCircle' : 'alert'} />
+                <div className="callout-body">
+                  <strong>
+                    {report.entries
+                      ? `${report.sheet}: ${report.entries} Einträge an ${report.days} Tagen erkannt.`
+                      : `${report.sheet}: Keine Einträge erkannt. Tage und Einträge können manuell ergänzt werden.`}
+                  </strong>
+                  {report.diagnostics.length > 0 && (
+                    <details className="tb-details">
+                      <summary>Details zur Auswertung ({report.diagnostics.length})</summary>
+                      <ul className="tb-diagnostics">
+                        {report.diagnostics.map((line, index) => (
+                          // biome-ignore lint/suspicious/noArrayIndexKey: static diagnostic list
+                          <li key={index}>{line}</li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
+                </div>
+                {report.entries > 0 && (
+                  <div className="callout-actions">
+                    <button type="button" className="btn btn-sm btn-primary" onClick={onReview}>
+                      Weiter zum Prüfen <Icon name="arrowRight" size={15} />
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
-        )}
+        </section>
+
         {weeks.length > 0 && (
-          <>
-            <h3 className="tb-subheading">Geladene Wochen</h3>
+          <section className="card tb-table-card" aria-labelledby="tb-weeks-title">
+            <header className="card-head">
+              <h2 id="tb-weeks-title">
+                <Icon name="calendar" /> Geladene Wochen
+              </h2>
+              <span className="badge">{weeks.length}</span>
+            </header>
             <div className="data-table">
               <div className="table-scroll">
                 <table>
@@ -200,7 +224,7 @@ export function WapStep({
                       <th>Nummern</th>
                       <th>Quelle</th>
                       <th>
-                        <span className="tb-sr-only">Aktionen</span>
+                        <span className="visually-hidden">Aktionen</span>
                       </th>
                     </tr>
                   </thead>
@@ -208,18 +232,18 @@ export function WapStep({
                     {weeks.map((item) => (
                       <tr
                         key={item.sheet}
-                        className={item.sheet === activeSheet ? 'selected-row' : ''}
+                        className={item.sheet === activeSheet ? 'is-selected' : ''}
                       >
                         <td>
                           <strong>{item.sheet}</strong>
                         </td>
-                        <td>{displayDate(item.startDate)}</td>
-                        <td>
+                        <td className="num">{displayDate(item.startDate)}</td>
+                        <td className="num">
                           {item.days.length
                             ? `Nr ${orderNumber(item, item.days[0])}–${lastNumber(item)}`
                             : '—'}
                         </td>
-                        <td>
+                        <td className="tb-source-cell">
                           {item.sourceFile || '—'}
                           <small>
                             {item.parsedAt
@@ -230,20 +254,22 @@ export function WapStep({
                         <td className="tb-row-actions">
                           <button
                             type="button"
-                            className="button secondary"
+                            className={`btn btn-sm ${item.sheet === activeSheet ? 'btn-ghost' : ''}`}
                             aria-pressed={item.sheet === activeSheet}
                             onClick={() => onSelectWeek(item.sheet)}
                           >
+                            {item.sheet === activeSheet && <Icon name="check" size={15} />}
                             {item.sheet === activeSheet ? 'Ausgewählt' : 'Auswählen'}
                           </button>
                           {!archived && (
                             <button
                               type="button"
-                              className="button danger"
+                              className="btn btn-ghost btn-icon btn-sm tb-remove"
                               aria-label={`Woche ${item.sheet} entfernen`}
+                              title="Entfernen"
                               onClick={() => setRemoving(item.sheet)}
                             >
-                              Entfernen
+                              <Icon name="trash" size={15} />
                             </button>
                           )}
                         </td>
@@ -253,9 +279,9 @@ export function WapStep({
                 </table>
               </div>
             </div>
-          </>
+          </section>
         )}
-      </section>
+      </div>
 
       {week && <WeekSettings week={week} {...{ project, tb, archived, run }} />}
 
@@ -265,10 +291,10 @@ export function WapStep({
           onClose={() => setConfirm(false)}
           footer={
             <>
-              <button type="button" className="button secondary" onClick={() => setConfirm(false)}>
+              <button type="button" className="btn btn-ghost" onClick={() => setConfirm(false)}>
                 Abbrechen
               </button>
-              <button type="button" className="button danger" onClick={() => void parse()}>
+              <button type="button" className="btn btn-danger" onClick={() => void parse()}>
                 Überschreiben
               </button>
             </>
@@ -290,12 +316,12 @@ export function WapStep({
           onClose={() => setRemoving('')}
           footer={
             <>
-              <button type="button" className="button secondary" onClick={() => setRemoving('')}>
+              <button type="button" className="btn btn-ghost" onClick={() => setRemoving('')}>
                 Abbrechen
               </button>
               <button
                 type="button"
-                className="button danger"
+                className="btn btn-danger"
                 onClick={() => {
                   const target = removing;
                   setRemoving('');
@@ -325,96 +351,104 @@ function WeekSettings({ tb, week, archived, run }: TbStepProps & { week: TbWeek 
   const edit = (mutator: (draft: TbWeek) => void) =>
     void run(() => changeWeek(week.sheet, (draft) => mutator(draft)));
   return (
-    <section className="panel" aria-labelledby="tb-week-title">
-      <span className="eyebrow">WOCHE {week.sheet}</span>
-      <h2 id="tb-week-title">Datum & Nummerierung</h2>
-      <div className="form-grid">
-        <div className="field">
-          <label className="field">
-            Startdatum (Montag)
-            <input
-              type="date"
-              value={week.startDate}
-              disabled={archived}
-              onChange={(event) =>
-                edit((draft) => {
-                  draft.startDate = event.target.value;
-                })
-              }
-            />
-          </label>
-          {week.startDate && !isMonday(week.startDate) && (
-            <small className="tb-warning-text">Das Datum ist kein Montag.</small>
-          )}
-          {!week.startDate && suggestedDate && !archived && (
-            <button
-              type="button"
-              className="text-button tb-suggestion"
-              onClick={() =>
-                edit((draft) => {
-                  draft.startDate = suggestedDate;
-                })
-              }
-            >
-              Vorschlag übernehmen: {displayDate(suggestedDate)}
-            </button>
-          )}
-        </div>
-        <div className="field">
-          <label className="field" htmlFor={numberId}>
-            Erste Tagesbefehl-Nummer (Montag)
-            <InlineNumber
-              id={numberId}
-              value={week.firstNumber}
-              disabled={archived}
-              onCommit={(value) =>
-                edit((draft) => {
-                  draft.firstNumber = value;
-                })
-              }
-            />
-          </label>
-          {suggestedNumber !== week.firstNumber && !archived && (
-            <button
-              type="button"
-              className="text-button tb-suggestion"
-              onClick={() =>
-                edit((draft) => {
-                  draft.firstNumber = suggestedNumber;
-                })
-              }
-            >
-              Vorschlag übernehmen: Nr {suggestedNumber} (nach der Vorwoche)
-            </button>
-          )}
-        </div>
-      </div>
-      <fieldset className="tb-days" disabled={archived}>
-        <legend>Tage mit Tagesbefehl</legend>
-        {TB_WEEKDAYS.map((day) => (
-          <label key={day} className="check-label">
-            <input
-              type="checkbox"
-              checked={week.days.includes(day)}
-              onChange={(event) => {
-                const checked = event.target.checked;
-                edit((draft) => {
-                  draft.days = TB_WEEKDAYS.filter((item) =>
-                    item === day ? checked : draft.days.includes(item),
-                  );
-                });
-              }}
-            />
-            <span>
-              {TB_WEEKDAY_NAMES[day]}
-              <small>
-                Nr {orderNumber(week, day)}
-                {week.startDate ? ` · ${displayDate(dayDate(week, day))}` : ''}
+    <section className="card" aria-labelledby="tb-week-title">
+      <header className="card-head">
+        <h2 id="tb-week-title">
+          <Icon name="calendar" /> Datum & Nummerierung
+        </h2>
+        <span className="badge badge-accent">Woche {week.sheet}</span>
+      </header>
+      <div className="card-body tb-card-stack">
+        <div className="form-grid">
+          <div className="tb-field-stack">
+            <label className="field">
+              Startdatum (Montag)
+              <input
+                type="date"
+                value={week.startDate}
+                disabled={archived}
+                onChange={(event) =>
+                  edit((draft) => {
+                    draft.startDate = event.target.value;
+                  })
+                }
+              />
+            </label>
+            {week.startDate && !isMonday(week.startDate) && (
+              <small className="tb-warning-text">
+                <Icon name="alert" size={14} /> Das Datum ist kein Montag.
               </small>
-            </span>
-          </label>
-        ))}
-      </fieldset>
+            )}
+            {!week.startDate && suggestedDate && !archived && (
+              <button
+                type="button"
+                className="btn-link tb-suggestion"
+                onClick={() =>
+                  edit((draft) => {
+                    draft.startDate = suggestedDate;
+                  })
+                }
+              >
+                Vorschlag übernehmen: {displayDate(suggestedDate)}
+              </button>
+            )}
+          </div>
+          <div className="tb-field-stack">
+            <label className="field" htmlFor={numberId}>
+              Erste Tagesbefehl-Nummer (Montag)
+              <InlineNumber
+                id={numberId}
+                value={week.firstNumber}
+                disabled={archived}
+                onCommit={(value) =>
+                  edit((draft) => {
+                    draft.firstNumber = value;
+                  })
+                }
+              />
+            </label>
+            {suggestedNumber !== week.firstNumber && !archived && (
+              <button
+                type="button"
+                className="btn-link tb-suggestion"
+                onClick={() =>
+                  edit((draft) => {
+                    draft.firstNumber = suggestedNumber;
+                  })
+                }
+              >
+                Vorschlag übernehmen: Nr {suggestedNumber} (nach der Vorwoche)
+              </button>
+            )}
+          </div>
+        </div>
+        <fieldset className="field-group tb-days" disabled={archived}>
+          <legend>Tage mit Tagesbefehl</legend>
+          {TB_WEEKDAYS.map((day) => (
+            <label key={day} className="check tb-day-check">
+              <input
+                type="checkbox"
+                checked={week.days.includes(day)}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  edit((draft) => {
+                    draft.days = TB_WEEKDAYS.filter((item) =>
+                      item === day ? checked : draft.days.includes(item),
+                    );
+                  });
+                }}
+              />
+              <span>
+                {TB_WEEKDAY_NAMES[day]}
+                <small>
+                  Nr {orderNumber(week, day)}
+                  {week.startDate ? ` · ${displayDate(dayDate(week, day))}` : ''}
+                </small>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      </div>
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { Icon } from '../components/Icon';
 import { AssetsStep } from '../components/tagesbefehl/AssetsStep';
 import { OfficersStep } from '../components/tagesbefehl/OfficersStep';
 import { OutputStep } from '../components/tagesbefehl/OutputStep';
@@ -10,6 +11,8 @@ import { readTbAssets } from '../io/tagesbefehl/assets';
 import { localError } from '../io/text';
 import { createTbState, officerLines, type TbAssets } from '../model/tagesbefehl';
 import { redoProject, undoProject, useHistory, useProject } from '../store';
+import { modKey } from '../ui';
+import type { StepState } from '../workflow';
 import './tagesbefehle.css';
 
 const STEPS = [
@@ -67,96 +70,113 @@ export default function TagesbefehlePage() {
     4: officersSet ? 'Eingeteilt' : tb.offiziere.length ? 'Einteilung offen' : 'Offen',
     5: 'Druck, .xlsx, PDF',
   };
+  // Same markers as the guided workflow in the sidebar; the current step is aria-current.
+  const marker = (id: Step): StepState =>
+    done[id] ? 'done' : id === 3 && open.length > 0 ? 'attention' : id === step ? 'active' : 'todo';
   const shared: TbStepProps = { project, tb, archived, run };
   const needsWeek = (step === 3 || step === 5) && !week;
 
   return (
-    <main className="page tb-page">
-      <header className="page-heading tb-screen-only">
+    <main className="page page-wide tb-page">
+      <section className="page-intro tb-screen-only">
         <div>
-          <p className="eyebrow">TAGESBEFEHLE AUS DEM KP-WAP</p>
-          <h1>Vom Wochenplan zum Tagesbefehl.</h1>
+          <h2>Vom Wochenplan zum Tagesbefehl.</h2>
           <p>
             WAP lokal einlesen, Einträge prüfen, Tagesoffiziere einteilen und drucken oder als
             .xlsx/PDF speichern. Nichts verlässt dieses Gerät.
           </p>
         </div>
-        {week && (
-          <span className={`status-pill ${open.length ? '' : 'is-good'}`}>
-            {open.length
-              ? `${open.length} ${open.length === 1 ? 'Hinweis' : 'Hinweise'} offen`
-              : 'Alle Hinweise geprüft'}
-          </span>
-        )}
-      </header>
+        <div className="actions tb-context">
+          {week && (
+            <span className={`badge ${open.length ? 'badge-warning' : 'badge-success'}`}>
+              <Icon name={open.length ? 'alert' : 'check'} />
+              {open.length
+                ? `${open.length} ${open.length === 1 ? 'Hinweis' : 'Hinweise'} offen`
+                : 'Alle Hinweise geprüft'}
+            </span>
+          )}
+          {weeks.length > 0 && (
+            <label className="tb-week-select">
+              Woche
+              <select value={week?.sheet ?? ''} onChange={(event) => setSheet(event.target.value)}>
+                {weeks.map((item) => (
+                  <option key={item.sheet} value={item.sheet}>
+                    {item.sheet}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <div className="btn-group">
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon btn-sm"
+              disabled={archived || !history.canUndo}
+              aria-label="Rückgängig"
+              title={`Rückgängig (${modKey}+Z)`}
+              onClick={() => run(undoProject)}
+            >
+              <Icon name="undo" size={17} />
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon btn-sm"
+              disabled={archived || !history.canRedo}
+              aria-label="Wiederholen"
+              title={`Wiederholen (${modKey}+Shift+Z)`}
+              onClick={() => run(redoProject)}
+            >
+              <Icon name="redo" size={17} />
+            </button>
+          </div>
+        </div>
+      </section>
 
       <nav className="tb-stepper tb-screen-only" aria-label="Schritte">
         <ol>
-          {STEPS.map((item) => (
-            <li key={item.id}>
-              <button
-                type="button"
-                className={`tb-step ${item.id === step ? 'is-active' : ''} ${done[item.id] ? 'is-done' : ''}`}
-                aria-current={item.id === step ? 'step' : undefined}
-                onClick={() => setStep(item.id)}
-              >
-                <span className="tb-step-number" aria-hidden="true">
-                  {done[item.id] ? '✓' : item.id}
-                </span>
-                <span>
-                  {item.label}
-                  <small>{status[item.id]}</small>
-                </span>
-              </button>
-            </li>
-          ))}
+          {STEPS.map((item) => {
+            const state = marker(item.id);
+            return (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  className="tb-step"
+                  aria-current={item.id === step ? 'step' : undefined}
+                  onClick={() => setStep(item.id)}
+                >
+                  <span className={`step-marker is-${state}`} aria-hidden="true">
+                    {state === 'done' ? (
+                      <Icon name="check" />
+                    ) : state === 'attention' ? (
+                      '!'
+                    ) : (
+                      item.id
+                    )}
+                  </span>
+                  <span className="tb-step-text">
+                    <span>{item.label}</span>
+                    <small>{status[item.id]}</small>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ol>
       </nav>
 
-      <div className="tb-context tb-screen-only">
-        {weeks.length > 0 && (
-          <label className="field tb-week-select">
-            Woche
-            <select value={week?.sheet ?? ''} onChange={(event) => setSheet(event.target.value)}>
-              {weeks.map((item) => (
-                <option key={item.sheet} value={item.sheet}>
-                  {item.sheet}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        <div className="history-buttons">
-          <button
-            type="button"
-            className="button secondary"
-            disabled={archived || !history.canUndo}
-            aria-label="Rückgängig"
-            onClick={() => run(undoProject)}
-          >
-            ↶
-          </button>
-          <button
-            type="button"
-            className="button secondary"
-            disabled={archived || !history.canRedo}
-            aria-label="Wiederholen"
-            onClick={() => run(redoProject)}
-          >
-            ↷
-          </button>
-        </div>
-      </div>
-
       {archived && (
-        <div className="notice tb-screen-only">
-          Archivstand · Tagesbefehle sind schreibgeschützt. Drucken und Herunterladen bleiben
-          möglich.
+        <div className="callout callout-info tb-screen-only">
+          <Icon name="archive" />
+          <div className="callout-body">
+            Archivstand · Tagesbefehle sind schreibgeschützt. Drucken und Herunterladen bleiben
+            möglich.
+          </div>
         </div>
       )}
       {error && (
-        <div role="alert" className="notice warning tb-screen-only">
-          {error}
+        <div role="alert" className="callout callout-danger tb-screen-only">
+          <Icon name="alert" />
+          <div className="callout-body">{error}</div>
         </div>
       )}
 
@@ -170,13 +190,18 @@ export default function TagesbefehlePage() {
         />
       )}
       {needsWeek && (
-        <div className="empty-state">
-          <strong>Noch keine Woche geladen.</strong>
+        <section className="card empty">
+          <span className="empty-icon">
+            <Icon name="calendar" />
+          </span>
+          <h2>Noch keine Woche geladen.</h2>
           <p>Zuerst den Kp-WAP wählen und ein Tabellenblatt einlesen.</p>
-          <button type="button" className="button" onClick={() => setStep(2)}>
-            WAP laden
-          </button>
-        </div>
+          <div className="actions">
+            <button type="button" className="btn btn-primary" onClick={() => setStep(2)}>
+              <Icon name="upload" size={16} /> WAP laden
+            </button>
+          </div>
+        </section>
       )}
       {step === 3 && week && <ReviewStep key={week.sheet} {...shared} week={week} />}
       {step === 4 && <OfficersStep {...shared} week={week} />}
