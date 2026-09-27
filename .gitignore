@@ -19,3 +19,6 @@ node_modules/
 dist/
 coverage/
 .vite/
+
+# Real Tagesbefehl fixtures: local-only owner exception, never commit.
+fixtures-private/

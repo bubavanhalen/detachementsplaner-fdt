@@ -1,6 +1,6 @@
-# Detachementsplaner · Einrückung & PISA
+# WK Util Suite · Einrückung, PISA & Tagesbefehle
 
-Eine lokale Browser-App für einen durchgehenden Ablauf: **Dienstleistung vorbereiten → mit PISA abgleichen → als Personenarchiv nachschlagen**. Die App arbeitet offline, ohne Server und ohne Datenbank.
+Eine lokale Browser-App für den WK: **Dienstleistung vorbereiten → mit PISA abgleichen → als Personenarchiv nachschlagen**, dazu **Tagesbefehle aus dem Kp-WAP** (Druck, .xlsx aus der offiziellen Vorlage, PDF je Tag als `01_Mo.pdf` … `07_So.pdf`). Die App arbeitet offline, ohne Server und ohne Datenbank.
 
 ## VERBINDLICHE GRENZE: ALLE NUTZERDATEN BLEIBEN OFFLINE
 

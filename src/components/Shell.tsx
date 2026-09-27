@@ -32,10 +32,20 @@ import { pickLocalFile } from './projectActions';
 const tools = [
   { to: '/persons', label: 'Personen', icon: 'users', hint: 'Nachschlagen & bearbeiten' },
   { to: '/contacts', label: 'Kontakte', icon: 'contact', hint: 'CSV lokal erstellen' },
+  {
+    to: '/tagesbefehle',
+    label: 'Tagesbefehle',
+    icon: 'calendar',
+    hint: 'Aus dem Kp-WAP erstellen',
+  },
 ] as const;
 const titles: Record<string, { title: string; description: string; step?: number }> = {
   '/persons': { title: 'Personen', description: 'Suchen, prüfen und Angaben ergänzen' },
   '/contacts': { title: 'Kontakte', description: 'Kontakt-CSV lokal vorbereiten' },
+  '/tagesbefehle': {
+    title: 'Tagesbefehle',
+    description: 'Kp-WAP prüfen, drucken, .xlsx und PDF je Tag',
+  },
 };
 
 export function Shell() {
@@ -50,7 +60,7 @@ export function Shell() {
   const currentStep = steps.find((step) => step.to === path);
   const heading = currentStep
     ? { title: currentStep.title, description: currentStep.description, step: currentStep.number }
-    : (titles[path] ?? { title: 'Detachementsplaner', description: '' });
+    : (titles[path] ?? { title: 'WK Util Suite', description: '' });
   const next = currentStep ? steps[currentStep.number] : undefined;
 
   useLayoutEffect(() => {
@@ -59,7 +69,7 @@ export function Shell() {
     else root.dataset.theme = preferences.theme;
   }, [preferences.theme]);
   useEffect(() => {
-    document.title = `${heading.title} · ${project.name} · Detachementsplaner`;
+    document.title = `${heading.title} · ${project.name} · WK Util Suite`;
   }, [heading.title, project.name]);
 
   // Global keyboard shortcuts. Text fields keep their native behaviour (including undo).
@@ -93,9 +103,17 @@ export function Shell() {
       } else if (mod && key === 'y') {
         event.preventDefault();
         runSafely(redoProject);
-      } else if (event.altKey && /^[1-6]$/.test(event.key)) {
+      } else if (event.altKey && /^[1-7]$/.test(event.key)) {
         event.preventDefault();
-        const targets = ['/sources', '/', '/pisa', '/finish', '/persons', '/contacts'] as const;
+        const targets = [
+          '/sources',
+          '/',
+          '/pisa',
+          '/finish',
+          '/persons',
+          '/contacts',
+          '/tagesbefehle',
+        ] as const;
         void navigate({ to: targets[Number(event.key) - 1] });
       } else if (!mod && !event.altKey && event.key === '?') {
         event.preventDefault();
@@ -118,11 +136,11 @@ export function Shell() {
     <div className="app" data-sidebar={preferences.sidebar}>
       <aside className="sidebar" aria-label="Seitenleiste">
         <div className="sb-top">
-          <Link to="/" className="brand" title="Detachementsplaner">
+          <Link to="/" className="brand" title="WK Util Suite">
             <span className="brand-mark" aria-hidden="true">
-              D
+              W
             </span>
-            <span className="brand-name sb-hide">Detachementsplaner</span>
+            <span className="brand-name sb-hide">WK Util Suite</span>
           </Link>
           <button
             type="button"
@@ -480,7 +498,7 @@ function ShortcutSheet({ onClose }: { onClose: () => void }) {
         ['JSON sichern', [modKey, 'S']],
         ['Seitenleiste', [modKey, 'B']],
         ['Schritt 1–4 öffnen', ['Alt', '1–4']],
-        ['Personen / Kontakte', ['Alt', '5/6']],
+        ['Personen / Kontakte / Tagesbefehle', ['Alt', '5–7']],
         ['Diese Übersicht', ['?']],
       ],
     ],

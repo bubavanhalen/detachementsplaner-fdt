@@ -1,0 +1,784 @@
+/* Tagesbefehle page. Unlayered like the other page styles; only tb-* selectors.
+   Colours come from the theme.css tokens, so light and dark mode follow the app theme.
+   The paper replica (.tb-sheet, order-sheet.css) deliberately stays white with black text. */
+
+/* ─────────── Intro & context ─────────── */
+/* One column that never grows past the page, whatever the min-content of a step. */
+.tb-page {
+  grid-template-columns: minmax(0, 1fr);
+}
+.tb-context {
+  align-items: center;
+}
+.tb-week-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+  font-size: 0.9rem;
+  font-weight: 560;
+}
+.tb-week-select select {
+  width: auto;
+  min-width: 150px;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* ─────────── Stepper (markers as in the sidebar workflow) ─────────── */
+.tb-stepper ol {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--sunken);
+}
+.tb-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  min-height: 48px;
+  padding: 7px 10px;
+  border-radius: var(--radius);
+  color: var(--text-2);
+  text-align: left;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    box-shadow 0.12s;
+}
+.tb-step:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.tb-step[aria-current="step"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 1px var(--border);
+}
+.tb-step .icon {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.6;
+}
+.tb-step-text {
+  display: grid;
+  min-width: 0;
+  line-height: 1.3;
+}
+.tb-step-text > span {
+  font-weight: 600;
+}
+.tb-step-text > small {
+  color: var(--text-2);
+  font-size: 0.82rem;
+}
+
+/* ─────────── Shared step layout ─────────── */
+.tb-step-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.tb-column {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 18px;
+  min-width: 0;
+}
+.tb-page .card-head {
+  flex-wrap: wrap;
+}
+.tb-head-note {
+  font-size: 0.88rem;
+}
+.tb-card-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 14px;
+}
+.tb-table-card {
+  overflow: hidden;
+}
+.tb-hint {
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+}
+.tb-hint code {
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: var(--sunken);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+.tb-warning-text {
+  color: var(--warning-text);
+  font-weight: 600;
+}
+small.tb-warning-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.tb-field-stack {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+.tb-suggestion {
+  justify-self: start;
+  font-size: 0.86rem;
+  text-align: left;
+}
+.tb-details > summary {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  font-weight: 560;
+}
+.tb-diagnostics {
+  margin-top: 6px;
+  padding-left: 18px;
+  font-size: 0.85rem;
+}
+.tb-row-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+.tb-row-actions > * + * {
+  margin-left: 2px;
+}
+.tb-remove:hover:not(:disabled) {
+  background: var(--danger-soft);
+  color: var(--danger-text);
+}
+.tb-icon-up {
+  transform: rotate(180deg);
+}
+
+/* File pickers: visually hidden input inside a button-styled label. */
+.tb-file-button {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.tb-file-button:has(.tb-file-input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.tb-file-button:has(.tb-file-input:disabled) {
+  opacity: 0.5;
+  box-shadow: none;
+  pointer-events: none;
+}
+.tb-file-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.tb-file-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--text-2);
+  font-size: 0.93rem;
+}
+.tb-file-name .icon {
+  color: var(--text-3);
+}
+
+/* ─────────── 1 · Vorlage & Unterschrift ─────────── */
+.tb-asset-list {
+  display: grid;
+  gap: 10px;
+}
+.tb-asset {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.tb-asset-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--sunken);
+  color: var(--text-2);
+}
+.tb-asset.is-loaded .tb-asset-icon {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.tb-asset-text {
+  flex: 1;
+  min-width: 0;
+}
+.tb-asset-status {
+  margin-top: 2px;
+  color: var(--text-3);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.tb-asset.is-loaded .tb-asset-status {
+  color: var(--success-text);
+  font-weight: 560;
+}
+.tb-asset-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+/* The signature is dark ink on a transparent PNG: show it on paper in both themes. */
+.tb-signature-preview {
+  display: block;
+  max-width: 220px;
+  max-height: 70px;
+  margin-top: 8px;
+  padding: 4px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+.tb-remove-all {
+  justify-self: start;
+  font-size: 0.9rem;
+}
+
+/* ─────────── 2 · WAP laden ─────────── */
+.tb-parse-bar {
+  align-items: flex-end;
+}
+.tb-parse-bar .field {
+  flex: 1 1 220px;
+  max-width: 340px;
+}
+.tb-source-cell {
+  min-width: 160px;
+}
+.tb-days {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px 14px;
+}
+.tb-day-check {
+  align-items: flex-start;
+}
+.tb-day-check input {
+  margin-top: 2px;
+}
+.tb-day-check small {
+  display: block;
+  color: var(--text-3);
+}
+
+/* ─────────── 3 · Prüfen ─────────── */
+.tb-review {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+  gap: 18px;
+  align-items: start;
+}
+.tb-review-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  min-width: 0;
+}
+.tb-review-side {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  max-height: calc(100dvh - var(--topbar-h) - 32px);
+  overflow: auto;
+}
+.tb-day-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-self: start;
+  max-width: 100%;
+}
+.tb-day-tabs button {
+  justify-content: center;
+  min-width: 52px;
+}
+.tb-day-tabs small {
+  color: var(--text-3);
+  font-size: 0.8rem;
+  font-weight: 450;
+}
+.tb-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--warning-soft);
+  color: var(--warning-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.tb-card-callout {
+  padding-bottom: 14px;
+}
+/* Fixed column widths for the entry table; «Tätigkeit» takes the remaining space. */
+.tb-col-time {
+  width: 112px;
+}
+.tb-col-who {
+  width: 17%;
+}
+.tb-col-where {
+  width: 14%;
+}
+.tb-col-section {
+  width: 19%;
+}
+.tb-col-actions {
+  width: 140px;
+}
+
+/* Compact inline-edit tables (entries and default rules) */
+.tb-edit-table th,
+.tb-edit-table td {
+  padding: 5px 6px;
+  vertical-align: top;
+}
+.tb-edit-table thead th {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.tb-edit-table tr > :first-child {
+  padding-left: 14px;
+}
+.tb-edit-table tr > :last-child {
+  padding-right: 12px;
+}
+.tb-edit-table input:not([type="checkbox"]),
+.tb-edit-table select {
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 0.92rem;
+}
+.tb-edit-table select {
+  padding-right: 26px;
+}
+.tb-review-table table {
+  min-width: 780px;
+  table-layout: fixed;
+}
+/* Row actions stay visible while the wide table scrolls sideways (opaque backgrounds). */
+.tb-review-table td.tb-row-actions {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+.tb-review-table .tb-bucket > th,
+.tb-review-table .tb-bucket > td {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  background: var(--sunken);
+  vertical-align: middle;
+}
+.tb-review-table .tb-bucket > th {
+  position: static;
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+}
+.tb-review-table .tb-bucket-group > th,
+.tb-review-table .tb-bucket-group > td {
+  background: var(--surface-2);
+}
+.tb-review-table .tb-bucket-group > th {
+  padding-left: 32px;
+  color: var(--text-2);
+  font-weight: 600;
+}
+.tb-review-table .tb-source-row > td {
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 0.86rem;
+}
+.tb-source-row ul {
+  padding-left: 18px;
+}
+.tb-review-table .tb-empty-row > td {
+  font-size: 0.86rem;
+}
+.tb-review-table .tb-row-warn > td {
+  background: var(--warning-soft);
+}
+.tb-review-table tr.is-target > td {
+  background: color-mix(in srgb, var(--warning) 22%, var(--surface));
+}
+.tb-review-table .tb-row-warn > td:first-child {
+  box-shadow: inset 3px 0 0 var(--warning);
+}
+.tb-review-table .tb-row-warn > td.tb-row-actions {
+  background: linear-gradient(var(--warning-soft), var(--warning-soft)), var(--surface);
+}
+.tb-review-table tr.is-target > td.tb-row-actions {
+  background: color-mix(in srgb, var(--warning) 22%, var(--surface));
+}
+.tb-review-table thead th:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+}
+.tb-info {
+  color: var(--text-3);
+}
+.tb-info.has-flags {
+  color: var(--warning-text);
+}
+.tb-info.has-issues {
+  background: var(--warning-soft);
+  color: var(--warning-text);
+}
+.tb-info.has-issues:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--warning) 24%, transparent);
+}
+.tb-info[aria-expanded="true"] {
+  background: var(--pressed);
+  color: var(--text);
+}
+.tb-group-form {
+  align-items: flex-end;
+  border-top: 1px solid var(--border);
+}
+
+/* Default rules (disclosure) */
+.tb-rules {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+.tb-rules > summary {
+  padding: 12px 16px;
+}
+.tb-rules > .disclosure-body {
+  padding: 0 16px 16px;
+}
+.tb-rules-table {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tb-rules-table table {
+  min-width: 720px;
+}
+
+/* Side panel: conflicts and notes */
+.tb-conflict-day h3,
+.tb-notes h3 {
+  margin-bottom: 6px;
+  color: var(--text-3);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tb-conflicts ul {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+}
+.tb-conflict {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.tb-conflict-link {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 2px;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--warning) 28%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--warning-soft);
+  color: var(--text);
+  font-size: 0.88rem;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.tb-conflict-link:hover {
+  border-color: var(--warning);
+}
+.tb-conflict-link small {
+  color: var(--warning-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tb-check {
+  flex: none;
+}
+.tb-checked > ul {
+  margin-top: 8px;
+}
+.tb-checked .tb-conflict-link {
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+.tb-checked .tb-conflict-link:hover {
+  border-color: var(--border-strong);
+}
+.tb-checked .tb-conflict-link small {
+  color: var(--text-3);
+}
+.tb-notes ul {
+  display: grid;
+  list-style: none;
+}
+.tb-note {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.tb-note:last-child {
+  border-bottom: 0;
+}
+.tb-note > span {
+  min-width: 0;
+  padding-top: 3px;
+  overflow-wrap: anywhere;
+}
+.tb-note-take {
+  flex: none;
+}
+
+/* ─────────── 4 · Tagesoffiziere ─────────── */
+.tb-rotation {
+  display: grid;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tb-rotation li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px 7px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.tb-rotation li:last-child {
+  border-bottom: 0;
+}
+.tb-rotation li.is-start {
+  background: var(--accent-softer);
+}
+.tb-rotation-no {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--sunken);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.tb-rotation li.is-start .tb-rotation-no {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.tb-rotation-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.tb-rotation .tb-rotation-text small {
+  color: var(--text-3);
+}
+.tb-rotation .tb-row-actions {
+  display: inline-flex;
+}
+.tb-add-officer {
+  align-items: flex-end;
+}
+.tb-officer-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+.tb-officer-day {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.tb-officer-day textarea {
+  min-height: 60px;
+}
+.tb-officer-preview {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 0.88rem;
+}
+.tb-officer-preview.is-open {
+  color: var(--warning-text);
+}
+.tb-empty-compact {
+  padding: 32px 20px;
+}
+
+/* ─────────── 5 · Ausgabe ─────────── */
+.tb-output {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  min-width: 0;
+}
+.tb-missing {
+  margin-top: 4px;
+  padding-left: 18px;
+}
+.tb-hints {
+  padding-left: 18px;
+  font-size: 0.88rem;
+}
+/* A desk behind the white paper sheets; the sheets themselves never follow the theme. */
+.tb-print-area {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--sunken);
+  overflow: auto;
+}
+.tb-print-area .tb-print-root {
+  align-items: safe center;
+}
+.tb-sheet-toolbar {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+  font-size: 0.9rem;
+}
+.tb-sheet-name {
+  margin-right: auto;
+}
+.tb-sheet-name strong {
+  color: var(--text);
+}
+/* When the A4 sheets are wider than the desk, the per-sheet actions stay in view. */
+@media screen {
+  .tb-print-area .tb-print-root {
+    container-type: inline-size;
+  }
+  .tb-print-area .tb-sheet-actions {
+    justify-content: flex-start;
+  }
+  .tb-print-area .tb-sheet-toolbar {
+    position: sticky;
+    left: 0;
+    max-width: 100cqw;
+  }
+}
+/* Callout actions move below the text when the card gets narrow. */
+.tb-page .callout {
+  flex-wrap: wrap;
+}
+.tb-page .callout-body {
+  flex: 1 1 200px;
+}
+
+/* ─────────── Responsive ─────────── */
+@media (max-width: 1100px) {
+  .tb-step-grid,
+  .tb-review {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tb-review-side {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+@media (max-width: 760px) {
+  .tb-stepper ol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tb-asset {
+    flex-wrap: wrap;
+  }
+  .tb-asset-actions {
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+  /* On phones the whole row scrolls; a pinned action column would hide the fields.
+     The header cell stays sticky (top only) so it keeps containing its hidden label. */
+  .tb-review-table thead th:last-child {
+    right: auto;
+  }
+  .tb-review-table tr > td.tb-row-actions {
+    position: static;
+  }
+  .tb-print-area {
+    padding: 10px;
+  }
+}
+
+@media print {
+  .tb-screen-only {
+    display: none;
+  }
+  .tb-page {
+    padding: 0;
+    max-width: none;
+  }
+  .tb-print-area {
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+  .tb-sheet-toolbar {
+    display: none;
+  }
+}

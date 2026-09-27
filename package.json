@@ -1,5 +1,5 @@
 {
-  "name": "detachementsplaner-fdt",
+  "name": "wk-util-suite",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -40,7 +40,9 @@
     "@tanstack/react-store": "0.11.1",
     "@tanstack/react-table": "9.2.4",
     "@xyflow/react": "12.11.6",
+    "fflate": "0.8.3",
     "motion": "13.4.0",
+    "pdf-lib": "1.17.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"

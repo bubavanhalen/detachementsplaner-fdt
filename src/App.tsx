@@ -15,6 +15,7 @@ import PeoplePage from './pages/PeoplePage';
 import PisaPage from './pages/PisaPage';
 import PlanningPage from './pages/PlanningPage';
 import SourcesPage from './pages/SourcesPage';
+import TagesbefehlePage from './pages/TagesbefehlePage';
 
 const rootRoute = createRootRoute({
   component: Shell,
@@ -46,6 +47,11 @@ const routes = [
   createRoute({ getParentRoute: () => rootRoute, path: '/finish', component: FinishPage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/persons', component: PeoplePage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/contacts', component: ContactsPage }),
+  createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/tagesbefehle',
+    component: TagesbefehlePage,
+  }),
   // Earlier versions kept imports and archives under one page.
   createRoute({
     getParentRoute: () => rootRoute,

@@ -5,6 +5,7 @@ import { Modal } from '../components/Modal';
 import { bundleHtml, download, exportJson, exportName, exportWorkbook } from '../io/exports';
 import { offlineTemplate } from '../io/offline';
 import { readArchives } from '../io/storage';
+import { readTbAssets } from '../io/tagesbefehl/assets';
 import { localError, searchText } from '../io/text';
 import { projectSignature } from '../model';
 import type { Project } from '../model/types';
@@ -68,14 +69,14 @@ export default function FinishPage() {
     {
       icon: 'file',
       title: 'Offline-HTML mit Daten',
-      text: 'Eine einzelne Datei inkl. Anwendung – öffnet ohne Installation. Privat halten.',
+      text: 'Eine einzelne Datei inkl. Anwendung, Tagesbefehl-Vorlage und Unterschrift – öffnet ohne Installation. Privat halten.',
       label: 'HTML erstellen',
       action: () =>
         run(
           () =>
             download(
               exportName(project, 'html'),
-              bundleHtml(offlineTemplate, project),
+              bundleHtml(offlineTemplate, project, readTbAssets()),
               'text/html',
             ),
           'Offline-HTML lokal gespeichert.',
