@@ -1,3 +1,4 @@
+import { normalizeTbState } from './tagesbefehl/state';
 import type { Detachment, Person, Project } from './types';
 
 export const newId = (prefix: string): string => `${prefix}_${crypto.randomUUID()}`;
@@ -255,6 +256,7 @@ export function normalizeProject(input: unknown): Project {
         }
       : null,
     migrationNotes: [...new Set(migrationNotes)],
+    ...(value.tb == null ? {} : { tb: normalizeTbState(value.tb) }),
   };
   for (const source of ['pisa', 'milo'] as const) {
     if (src[source] != null) {

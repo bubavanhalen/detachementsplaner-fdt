@@ -9,6 +9,7 @@ import {
   useTable,
 } from '@tanstack/react-table';
 import { type ReactNode, useMemo } from 'react';
+import { Icon } from './Icon';
 
 const features = tableFeatures({
   rowPaginationFeature,
@@ -29,11 +30,18 @@ export function DataTable<T extends object>({
   columns,
   getRowId,
   emptyMessage = 'Keine passenden Personen.',
+  selectedId,
+  onRowClick,
+  pageSize = 25,
 }: {
   data: T[];
   columns: DataColumn<T>[];
   getRowId?: (row: T) => string;
   emptyMessage?: string;
+  selectedId?: string;
+  /** Row click for convenience; every row action must also exist as a real control. */
+  onRowClick?: (row: T) => void;
+  pageSize?: number;
 }) {
   const definitions = useMemo<ColumnDef<typeof features, T>[]>(
     () =>
@@ -51,7 +59,7 @@ export function DataTable<T extends object>({
     columns: definitions,
     data,
     getRowId,
-    initialState: { pagination: { pageIndex: 0, pageSize: 25 } },
+    initialState: { pagination: { pageIndex: 0, pageSize } },
   });
   return (
     <div className="data-table">
@@ -97,7 +105,22 @@ export function DataTable<T extends object>({
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
+              <tr
+                key={row.id}
+                className={selectedId && row.id === selectedId ? 'is-selected' : undefined}
+                onClick={
+                  onRowClick
+                    ? (event) => {
+                        if (
+                          (event.target as HTMLElement).closest('button, a, input, label, select')
+                        )
+                          return;
+                        onRowClick(row.original);
+                      }
+                    : undefined
+                }
+                style={onRowClick ? { cursor: 'pointer' } : undefined}
+              >
                 {row.getAllCells().map((cell) => (
                   <td key={cell.id}>
                     <table.FlexRender cell={cell} />
@@ -115,28 +138,28 @@ export function DataTable<T extends object>({
           </tbody>
         </table>
       </div>
-      {data.length > 25 && (
+      {data.length > pageSize && (
         <div className="pagination">
           <span>
-            {data.length} Personen · Seite {table.state.pagination.pageIndex + 1} von{' '}
+            {data.length} Einträge · Seite {table.state.pagination.pageIndex + 1} von{' '}
             {table.getPageCount()}
           </span>
-          <div className="button-row">
+          <div className="btn-group">
             <button
               type="button"
-              className="button-secondary"
+              className="btn btn-sm"
               disabled={!table.getCanPreviousPage()}
               onClick={() => table.previousPage()}
             >
-              Zurück
+              <Icon name="chevronLeft" size={15} /> Zurück
             </button>
             <button
               type="button"
-              className="button-secondary"
+              className="btn btn-sm"
               disabled={!table.getCanNextPage()}
               onClick={() => table.nextPage()}
             >
-              Weiter
+              Weiter <Icon name="chevronRight" size={15} />
             </button>
           </div>
         </div>

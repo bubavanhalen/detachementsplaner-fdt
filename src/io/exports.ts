@@ -1,5 +1,7 @@
 import { derivePisa, groupPeople } from '../model';
+import type { TbAssets } from '../model/tagesbefehl/types';
 import type { Person, Project } from '../model/types';
+import { embeddedTbAssetsScript } from './tagesbefehl/assets';
 import { searchText } from './text';
 import { XLSX } from './workbook';
 
@@ -22,7 +24,11 @@ export function exportName(project: Project, extension: string): string {
 export function exportJson(project: Project): void {
   download(exportName(project, 'json'), JSON.stringify(project, null, 2), 'application/json');
 }
-export function bundleHtml(template: string, project: Project): string {
+/**
+ * Private local export: application + project (+ Tagesbefehl template/signature
+ * when given). All data sits in the one boot-data script; never publish it.
+ */
+export function bundleHtml(template: string, project: Project, tbAssets?: TbAssets): string {
   if (!template.includes('data-offline="true"'))
     throw new Error(
       'Die eigenständige HTML-Ausgabe ist im Produktionsbuild verfügbar. Im Entwicklungsmodus bitte JSON sichern.',
@@ -34,7 +40,7 @@ export function bundleHtml(template: string, project: Project): string {
   const data = JSON.stringify(project).replace(/</g, '\\u003c');
   const embedded = parsed.createElement('script');
   embedded.id = 'boot-data';
-  embedded.textContent = `window.__BOOTDATA=${data};`;
+  embedded.textContent = `window.__BOOTDATA=${data};${embeddedTbAssetsScript(tbAssets)}`;
   application.before(embedded);
   return `<!DOCTYPE html>\n${parsed.documentElement.outerHTML}`;
 }

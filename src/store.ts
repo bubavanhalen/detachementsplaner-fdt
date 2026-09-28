@@ -4,7 +4,27 @@ import { archiveSnapshot, createProject, normalizeProject, resumeProject } from 
 import type { Project } from './model/types';
 
 export const projectStore = createStore(createProject());
-export const feedbackStore = createStore({ message: '', saveError: '', savedAt: '' });
+export interface ToastAction {
+  label: string;
+  run: () => void;
+}
+export interface Feedback {
+  message: string;
+  /** Increments per notification so a repeated message restarts the toast timer. */
+  seq: number;
+  tone: 'neutral' | 'success' | 'warning';
+  action?: ToastAction;
+  saveError: string;
+  /** Epoch milliseconds of the last successful local save; 0 before the first save. */
+  savedAt: number;
+}
+export const feedbackStore = createStore<Feedback>({
+  message: '',
+  seq: 0,
+  tone: 'neutral',
+  saveError: '',
+  savedAt: 0,
+});
 const HISTORY_LIMIT = 30;
 const historyStore = createStore<{ past: Project[]; future: Project[] }>({ past: [], future: [] });
 let storageReadable = true;
@@ -26,8 +46,21 @@ function assertEditable(project: Project): void {
   if (project.archive)
     throw new Error('Archivstand ist schreibgeschützt. Öffne zuerst eine Arbeitskopie.');
 }
-export function notify(message: string): void {
-  feedbackStore.setState((old) => ({ ...old, message }));
+export function notify(
+  message: string,
+  options: { action?: ToastAction; tone?: Feedback['tone'] } = {},
+): void {
+  feedbackStore.setState((old) => ({
+    ...old,
+    message,
+    seq: old.seq + 1,
+    tone: options.tone ?? 'neutral',
+    action: options.action,
+  }));
+}
+/** Confirms a change and offers a one-click undo for it. */
+export function notifyUndoable(message: string): void {
+  notify(message, { tone: 'success', action: { label: 'Rückgängig', run: undoProject } });
 }
 function persist(project: Project): void {
   if (!storageReadable) return;
@@ -36,7 +69,7 @@ function persist(project: Project): void {
     feedbackStore.setState((old) => ({
       ...old,
       saveError: '',
-      savedAt: new Date().toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' }),
+      savedAt: Date.now(),
     }));
   } catch {
     feedbackStore.setState((old) => ({

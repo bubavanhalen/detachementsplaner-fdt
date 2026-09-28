@@ -1,5 +1,6 @@
 import { useForm } from '@tanstack/react-form';
 import { useState } from 'react';
+import { Icon } from '../components/Icon';
 import { ErrorBox, Modal } from '../components/Modal';
 import { PlanningPanel } from '../components/PlanningPanel';
 import { contactNames } from '../io/exports';
@@ -164,29 +165,51 @@ export function PersonEditor({
       }
     },
   });
-  const fields = [
-    ['first', 'Vorname / vollständiger Name'],
-    ['last', 'Nachname'],
-    ['grad', 'Grad'],
-    ['pnr', 'Versicherten-Nr.'],
-    ['funktion', 'Funktion'],
-    ['lics', 'Führerausweise (mit ; trennen)'],
-    ['zug', 'Zug / Element'],
-    ['einteilung', 'Einheit'],
-    ['tel', 'Telefon'],
-    ['mail', 'E-Mail'],
-  ] as const;
+  const input = (
+    name:
+      | 'first'
+      | 'last'
+      | 'grad'
+      | 'pnr'
+      | 'funktion'
+      | 'lics'
+      | 'zug'
+      | 'einteilung'
+      | 'tel'
+      | 'mail',
+    label: string,
+    type = 'text',
+    placeholder = '',
+  ) => (
+    <form.Field key={name} name={name}>
+      {(field) => (
+        <label className="field">
+          {label}
+          <input
+            type={type}
+            value={field.state.value}
+            placeholder={placeholder}
+            onBlur={field.handleBlur}
+            onChange={(event) => field.handleChange(event.target.value)}
+          />
+        </label>
+      )}
+    </form.Field>
+  );
   return (
     <Surface
       title={person ? 'Person bearbeiten' : 'Person erfassen'}
+      description={
+        person ? [person.grad, person.name].filter(Boolean).join(' ') : 'Manuell erfasste Person'
+      }
       onClose={onClose}
       wide
       footer={
         <>
-          <button type="button" className="button" onClick={onClose}>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>
             Abbrechen
           </button>
-          <button type="submit" form="person-form" className="button primary">
+          <button type="submit" form="person-form" className="btn btn-primary">
             Speichern
           </button>
         </>
@@ -196,92 +219,112 @@ export function PersonEditor({
       {person &&
         project.dets.filter((group) => (project.assign[group.id] || []).includes(person.id))
           .length > 1 && (
-          <div className="notice warning">
-            Mehrere bisherige direkte Zuteilungen. Sie bleiben erhalten, bis du unten ausdrücklich
-            ein Detachement auswählst.
+          <div className="callout callout-warning">
+            <Icon name="alert" />
+            <div className="callout-body">
+              Mehrere bisherige direkte Zuteilungen. Sie bleiben erhalten, bis du unten ausdrücklich
+              ein Detachement auswählst.
+            </div>
           </div>
         )}
       <form
         id="person-form"
+        className="stack"
         onSubmit={(event) => {
           event.preventDefault();
           void form.handleSubmit();
         }}
       >
-        <div className="form-grid">
-          {fields.map(([name, label]) => (
-            <form.Field key={name} name={name}>
+        <fieldset className="field-group">
+          <legend>
+            <Icon name="flag" size={15} /> Planung
+          </legend>
+          <div className="form-grid">
+            <form.Field name="status">
               {(field) => (
                 <label className="field">
-                  {label}
-                  <input
+                  Teilnahme
+                  <select
                     value={field.state.value}
-                    onBlur={field.handleBlur}
+                    onChange={(event) =>
+                      field.handleChange(event.target.value as typeof field.state.value)
+                    }
+                  >
+                    <option value="unreviewed">Teilnahme klären</option>
+                    <option value="included">Einplanen</option>
+                    <option value="excluded">Nicht einplanen</option>
+                  </select>
+                </label>
+              )}
+            </form.Field>
+            <form.Field name="group">
+              {(field) => (
+                <label className="field">
+                  Direktes Detachement
+                  <select
+                    value={field.state.value}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                  >
+                    {initial.groups.length > 1 && (
+                      <option value="__multiple__">Bisherige Mehrfachzuteilung beibehalten</option>
+                    )}
+                    <option value="">Noch nicht zugeteilt</option>
+                    {project.dets.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </form.Field>
+            <form.Field name="reason">
+              {(field) => (
+                <label className="field span-all">
+                  Begründung / Planungsnotiz
+                  <textarea
+                    value={field.state.value}
+                    placeholder="Pflicht bei «Nicht einplanen», z. B. Dienstverschiebung"
                     onChange={(event) => field.handleChange(event.target.value)}
                   />
                 </label>
               )}
             </form.Field>
-          ))}
-          <form.Field name="status">
-            {(field) => (
-              <label className="field">
-                Teilnahme
-                <select
-                  value={field.state.value}
-                  onChange={(event) =>
-                    field.handleChange(event.target.value as typeof field.state.value)
-                  }
-                >
-                  <option value="unreviewed">Teilnahme klären</option>
-                  <option value="included">Einplanen</option>
-                  <option value="excluded">Nicht einplanen</option>
-                </select>
-              </label>
-            )}
-          </form.Field>
-          <form.Field name="group">
-            {(field) => (
-              <label className="field">
-                Direktes Detachement
-                <select
-                  value={field.state.value}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                >
-                  {initial.groups.length > 1 && (
-                    <option value="__multiple__">Bisherige Mehrfachzuteilung beibehalten</option>
-                  )}
-                  <option value="">Noch nicht zugeteilt</option>
-                  {project.dets.map((group) => (
-                    <option key={group.id} value={group.id}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-          </form.Field>
-          <form.Field name="reason">
-            {(field) => (
-              <label className="field">
-                Begründung / Planungsnotiz
-                <textarea
-                  value={field.state.value}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                />
-              </label>
-            )}
-          </form.Field>
-        </div>
+          </div>
+        </fieldset>
+        <fieldset className="field-group">
+          <legend>
+            <Icon name="user" size={15} /> Person
+          </legend>
+          <div className="form-grid">
+            {input('first', 'Vorname / vollständiger Name')}
+            {input('last', 'Nachname')}
+            {input('grad', 'Grad', 'text', 'z. B. Wm')}
+            {input('pnr', 'Versicherten-Nr.')}
+            {input('funktion', 'Funktion')}
+            {input('lics', 'Führerausweise (mit ; trennen)', 'text', 'z. B. 30; 40')}
+            {input('zug', 'Zug / Element')}
+            {input('einteilung', 'Einheit')}
+          </div>
+        </fieldset>
+        <fieldset className="field-group">
+          <legend>
+            <Icon name="contact" size={15} /> Kontakt
+          </legend>
+          <div className="form-grid">
+            {input('tel', 'Telefon', 'tel')}
+            {input('mail', 'E-Mail', 'email')}
+          </div>
+        </fieldset>
         {person?.identityReview && (
           <form.Field name="identity">
             {(field) => (
-              <label className="check">
+              <label className="callout callout-warning check">
                 <input
                   type="checkbox"
                   checked={field.state.value}
                   onChange={(event) => field.handleChange(event.target.checked)}
-                />{' '}
+                />
                 Identität mit Quelle geprüft: {person.identityReview}
               </label>
             )}

@@ -1,3 +1,5 @@
+import type { TbState } from './tagesbefehl/types';
+
 export type Participation = 'unreviewed' | 'included' | 'excluded';
 export type Source = 'pisa' | 'milo';
 export interface Person {
@@ -72,6 +74,8 @@ export interface Project {
   archive: { id: string; at: string } | null;
   migrationNotes: string[];
   board?: { positions: Record<string, { x: number; y: number }> };
+  /** Optional Tagesbefehl state; old saves have none. */
+  tb?: TbState;
 }
 export interface PisaEntry {
   id: string;

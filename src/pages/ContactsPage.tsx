@@ -1,6 +1,7 @@
 // biome-ignore-all lint/suspicious/noArrayIndexKey: CSV preview cells use a fixed, non-reorderable field schema.
 import { useMemo, useState } from 'react';
 import { type DataColumn, DataTable } from '../components/DataTable';
+import { Icon } from '../components/Icon';
 import {
   contactCsv,
   contactNames,
@@ -13,8 +14,9 @@ import {
 import { localError, searchText } from '../io/text';
 import { groupPeople } from '../model';
 import type { Person } from '../model/types';
-import { useProject } from '../store';
+import { notify, useProject } from '../store';
 import { PersonEditor } from './PersonEditor';
+import './pages.css';
 
 export default function ContactsPage() {
   const project = useProject();
@@ -36,8 +38,7 @@ function Contacts() {
   const [rank, setRank] = useState(false),
     [groups, setGroups] = useState(false),
     [label, setLabel] = useState(project.name);
-  const [editing, setEditing] = useState<Person | null>(null),
-    [error, setError] = useState('');
+  const [editing, setEditing] = useState<Person | null>(null);
   const options = { rank, groups, label };
   const groupIds = group ? new Set(groupPeople(project, group).map((person) => person.id)) : null;
   const visible = project.persons.filter(
@@ -72,6 +73,11 @@ function Contacts() {
     }
     return ids;
   }, [chosen]);
+  const warningsFor = (person: Person) => [
+    ...contactWarnings(person),
+    ...(duplicateIds.has(person.id) ? ['Kontaktangabe mehrfach'] : []),
+  ];
+  const withWarnings = chosen.filter((person) => warningsFor(person).length).length;
   const toggle = (id: string) =>
     setSelected((previous) => {
       const next = new Set(previous);
@@ -79,10 +85,11 @@ function Contacts() {
       else next.add(id);
       return next;
     });
+  const allVisible = visible.length > 0 && visible.every((person) => selected.has(person.id));
   const columns: DataColumn<Person>[] = [
     {
       id: 'select',
-      header: 'Auswahl',
+      header: '',
       cell: (person) => (
         <input
           type="checkbox"
@@ -105,172 +112,240 @@ function Contacts() {
         );
       },
     },
-    { id: 'phone', header: 'Telefon', cell: (person) => person.tel || '—' },
-    { id: 'mail', header: 'E-Mail', cell: (person) => person.mail || '—' },
+    {
+      id: 'phone',
+      header: 'Telefon',
+      cell: (person) => person.tel || <span className="muted">—</span>,
+    },
+    {
+      id: 'mail',
+      header: 'E-Mail',
+      cell: (person) => person.mail || <span className="muted">—</span>,
+    },
     {
       id: 'warnings',
       header: 'Prüfung',
-      cell: (person) => (
-        <small>
-          {[
-            ...contactWarnings(person),
-            ...(duplicateIds.has(person.id) ? ['Kontaktangabe mehrfach'] : []),
-          ].join(' · ') || 'Bereit'}
-        </small>
-      ),
+      cell: (person) => {
+        const warnings = warningsFor(person);
+        return warnings.length ? (
+          <span className="badge badge-warning" title={warnings.join(' · ')}>
+            <Icon name="alert" /> {warnings.join(' · ')}
+          </span>
+        ) : (
+          <span className="badge badge-success">
+            <Icon name="check" /> Bereit
+          </span>
+        );
+      },
     },
     {
       id: 'edit',
       header: '',
       cell: (person) =>
         project.archive ? null : (
-          <button type="button" className="button" onClick={() => setEditing(person)}>
-            Bearbeiten
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm btn-icon"
+            aria-label={`${person.name} bearbeiten`}
+            title="Bearbeiten"
+            onClick={() => setEditing(person)}
+          >
+            <Icon name="edit" size={15} />
           </button>
         ),
     },
   ];
+  const header = contactRows(project, [], options)[0];
   return (
-    <div className="page">
-      <header className="page-header">
+    <div className="page page-wide">
+      <section className="page-intro">
         <div>
-          <span className="eyebrow">LOKALER KONTAKTEXPORT</span>
-          <h1>Kontakte vorbereiten.</h1>
-          <p className="muted">
-            Vorschau und CSV im Google-Kontakte-Format. Die Datei bleibt auf deinem Gerät.
+          <h2>Kontaktliste als lokale CSV-Datei</h2>
+          <p>
+            CSV im Google-Kontakte-Format. Die Datei entsteht auf diesem Gerät; die App überträgt
+            nichts zu Google oder anderen Diensten.
           </p>
         </div>
-        <button
-          type="button"
-          className="button primary"
-          disabled={!chosen.length}
-          onClick={() => {
-            try {
-              download(
-                `Kontakte_${exportName(project, 'csv')}`,
-                contactCsv(project, chosen, options),
-                'text/csv;charset=utf-8',
-              );
-              setError('');
-            } catch (failure) {
-              setError(localError(failure));
-            }
-          }}
-        >
-          CSV herunterladen · {chosen.length}
-        </button>
-      </header>
-      <div className="notice">
-        Keine Übertragung zu Google oder anderen Diensten. Die Offline-Grenze gilt auch für die
-        heruntergeladene Datei.
-      </div>
-      {error && (
-        <div role="alert" className="notice warning">
-          {error}
-        </div>
-      )}
-      <div className="toolbar">
-        <label className="field grow">
-          Kontakte suchen
-          <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
-        </label>
-        <label className="field">
-          Detachement
-          <select value={group} onChange={(event) => setGroup(event.target.value)}>
-            <option value="">Alle Detachemente</option>
-            {project.dets.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field">
-          Anzeige
-          <select value={scope} onChange={(event) => setScope(event.target.value)}>
-            <option value="all">Alle Kontakte</option>
-            <option value="selected">Ausgewählt</option>
-            <option value="missing">Kontaktdaten fehlen</option>
-          </select>
-        </label>
-      </div>
-      <div className="toolbar">
-        <label className="check">
-          <input
-            type="checkbox"
-            checked={rank}
-            onChange={(event) => setRank(event.target.checked)}
-          />{' '}
-          Grad vor Name
-        </label>
-        <label className="check">
-          <input
-            type="checkbox"
-            checked={groups}
-            onChange={(event) => setGroups(event.target.checked)}
-          />{' '}
-          Detachemente als Labels
-        </label>
-        <label className="field">
-          Gemeinsames Label
-          <input value={label} onChange={(event) => setLabel(event.target.value)} />
-        </label>
-      </div>
-      <div className="toolbar">
-        <button
-          type="button"
-          className="button"
-          onClick={() =>
-            setSelected((previous) => new Set([...previous, ...visible.map((person) => person.id)]))
-          }
-        >
-          Alle {visible.length} Treffer auswählen
-        </button>
-        <button type="button" className="button" onClick={() => setSelected(new Set())}>
-          Auswahl leeren
-        </button>
-        <span>
-          {chosen.length} ausgewählt · {hiddenCount} ausserhalb des Filters
-        </span>
-      </div>
-      <section className="panel">
-        <DataTable
-          data={visible}
-          columns={columns}
-          getRowId={(person) => person.id}
-          emptyMessage="Keine passenden Kontakte."
-        />
       </section>
-      <details className="panel">
-        <summary>CSV-Vorschau ({chosen.length} Kontakte)</summary>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                {contactRows(project, [], options)[0].map((header) => (
-                  <th key={header}>{header}</th>
+      <div className="contacts-layout">
+        <section className="card people-list-card">
+          <div className="people-filters">
+            <div className="toolbar">
+              <label className="search-field grow">
+                <Icon name="search" size={16} />
+                <input
+                  type="search"
+                  aria-label="Kontakte suchen"
+                  placeholder="Name, Telefon, E-Mail …"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                />
+              </label>
+              <select
+                aria-label="Detachement"
+                value={group}
+                onChange={(event) => setGroup(event.target.value)}
+                style={{ width: 'auto' }}
+              >
+                <option value="">Alle Detachemente</option>
+                {project.dets.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {contactRows(project, chosen.slice(0, 10), options)
-                .slice(1)
-                .map((row, i) => (
-                  <tr key={chosen[i].id}>
-                    {row.map((value, j) => (
-                      <td key={`${j}-${contactRows(project, [], options)[0][j]}`}>{value}</td>
-                    ))}
-                  </tr>
+              </select>
+            </div>
+            <div className="toolbar">
+              <fieldset className="segmented" aria-label="Anzeige">
+                {(
+                  [
+                    ['all', 'Alle'],
+                    ['selected', 'Ausgewählt'],
+                    ['missing', 'Kontaktdaten fehlen'],
+                  ] as const
+                ).map(([value, text]) => (
+                  <button
+                    type="button"
+                    key={value}
+                    aria-pressed={scope === value}
+                    onClick={() => setScope(value)}
+                  >
+                    {text}
+                  </button>
                 ))}
-            </tbody>
-          </table>
-        </div>
-        {chosen.length > 10 && (
-          <p className="muted">
-            Vorschau der ersten 10 Kontakte. Die Datei enthält alle ausgewählten Kontakte.
-          </p>
-        )}
-      </details>
+              </fieldset>
+              <label className="check spacer">
+                <input
+                  type="checkbox"
+                  checked={allVisible}
+                  disabled={!visible.length}
+                  onChange={(event) =>
+                    setSelected((previous) => {
+                      const next = new Set(previous);
+                      for (const person of visible)
+                        if (event.target.checked) next.add(person.id);
+                        else next.delete(person.id);
+                      return next;
+                    })
+                  }
+                />
+                Alle {visible.length} Treffer auswählen
+              </label>
+            </div>
+          </div>
+          <DataTable
+            data={visible}
+            columns={columns}
+            getRowId={(person) => person.id}
+            onRowClick={(person) => toggle(person.id)}
+            emptyMessage="Keine passenden Kontakte."
+            pageSize={50}
+          />
+        </section>
+        <aside className="contacts-aside">
+          <section className="card contacts-summary">
+            <div>
+              <span className="big">{chosen.length}</span>
+              <p className="muted">
+                Kontakte ausgewählt
+                {hiddenCount > 0 && ` · ${hiddenCount} ausserhalb des Filters`}
+              </p>
+              {withWarnings > 0 && (
+                <p className="warning-text">
+                  <Icon name="alert" size={14} className="inline-icon" /> {withWarnings} mit
+                  Hinweisen
+                </p>
+              )}
+            </div>
+            <hr />
+            <label className="check">
+              <input
+                type="checkbox"
+                checked={rank}
+                onChange={(event) => setRank(event.target.checked)}
+              />
+              Grad vor Name
+            </label>
+            <label className="check">
+              <input
+                type="checkbox"
+                checked={groups}
+                onChange={(event) => setGroups(event.target.checked)}
+              />
+              Detachemente als Labels
+            </label>
+            <label className="field">
+              Gemeinsames Label
+              <input value={label} onChange={(event) => setLabel(event.target.value)} />
+            </label>
+            <button
+              type="button"
+              className="btn btn-primary btn-block"
+              disabled={!chosen.length}
+              onClick={() => {
+                try {
+                  download(
+                    `Kontakte_${exportName(project, 'csv')}`,
+                    contactCsv(project, chosen, options),
+                    'text/csv;charset=utf-8',
+                  );
+                  notify('Kontakt-CSV lokal gespeichert.', { tone: 'success' });
+                } catch (failure) {
+                  notify(localError(failure), { tone: 'warning' });
+                }
+              }}
+            >
+              <Icon name="download" size={16} /> CSV herunterladen · {chosen.length}
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={!chosen.length}
+              onClick={() => setSelected(new Set())}
+            >
+              Auswahl leeren
+            </button>
+            <p className="muted small-note">
+              <Icon name="shield" size={13} className="inline-icon" /> Die Offline-Grenze gilt auch
+              für die heruntergeladene Datei.
+            </p>
+          </section>
+          <details className="disclosure">
+            <summary>
+              <Icon name="chevronRight" size={15} className="chev" /> CSV-Vorschau
+            </summary>
+            <div className="disclosure-body">
+              <div className="table-scroll" style={{ maxHeight: 280 }}>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      {header.map((name) => (
+                        <th key={name}>{name}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {contactRows(project, chosen.slice(0, 10), options)
+                      .slice(1)
+                      .map((row, i) => (
+                        <tr key={chosen[i].id}>
+                          {row.map((value, j) => (
+                            <td key={`${j}-${header[j]}`}>{value}</td>
+                          ))}
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+              {chosen.length > 10 && (
+                <p className="muted small-note">
+                  Vorschau der ersten 10 Kontakte. Die Datei enthält alle ausgewählten.
+                </p>
+              )}
+            </div>
+          </details>
+        </aside>
+      </div>
       {editing && <PersonEditor person={editing} onClose={() => setEditing(null)} />}
     </div>
   );

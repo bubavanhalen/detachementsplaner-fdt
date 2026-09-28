@@ -32,7 +32,7 @@ const result = await build({
     },
     lib: {
       entry: resolve('src/main.tsx'),
-      name: 'Detachementsplaner',
+      name: 'WKUtilSuite',
       formats: ['iife'],
     },
   },
@@ -68,7 +68,7 @@ const bundledPackages = new Set(
     return [parts[0].startsWith('@') ? parts.slice(0, 2).join('/') : parts[0]];
   }),
 );
-const notices = [`Detachementsplaner\n${await readFile('LICENSE', 'utf8')}`];
+const notices = [`WK Util Suite\n${await readFile('LICENSE', 'utf8')}`];
 for (const name of [...bundledPackages].sort()) {
   const directory = resolve('node_modules', name);
   const licenseFile = (await readdir(directory)).find((file) =>

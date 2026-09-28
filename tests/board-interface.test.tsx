@@ -2,6 +2,7 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { HistoryButtons } from '../src/components/HistoryButtons';
 import { PROJECT_KEY } from '../src/io/storage';
 import { createDetachment, createProject } from '../src/model';
 import { getBoardPositions } from '../src/model/board';
@@ -15,6 +16,15 @@ vi.mock('@tanstack/react-router', () => ({
     </a>
   ),
 }));
+
+function PlanningWithHistory() {
+  return (
+    <>
+      <HistoryButtons />
+      <PlanningPage />
+    </>
+  );
+}
 
 function fixture() {
   const project = createProject();
@@ -55,7 +65,7 @@ describe('interactive planning board with wholly fictional projects', () => {
     replaceProject(createProject());
     const mounted = render(<PlanningPage />);
     try {
-      await user.click(screen.getByRole('button', { name: '+ Detachement' }));
+      await user.click(screen.getByRole('button', { name: 'Neues Detachement' }));
       const name = screen.getByLabelText('Name');
       expect(name).not.toBeVisible();
       expect(name).not.toHaveFocus();
@@ -84,7 +94,7 @@ describe('interactive planning board with wholly fictional projects', () => {
     const user = userEvent.setup();
     replaceProject(createProject());
     render(<PlanningPage />);
-    await user.click(screen.getByRole('button', { name: '+ Detachement' }));
+    await user.click(screen.getByRole('button', { name: 'Neues Detachement' }));
     const name = await screen.findByRole('textbox', { name: 'Name' });
     expect(name).toHaveFocus();
     expect(projectStore.get().dets).toHaveLength(1);
@@ -151,7 +161,7 @@ describe('interactive planning board with wholly fictional projects', () => {
     replaceProject(project);
     render(<PlanningPage />);
     const source = await screen.findByRole('article', { name: 'Detachement Fiktiv KVK' });
-    await user.click(within(source).getByRole('button', { name: 'Verbinden →' }));
+    await user.click(within(source).getByRole('button', { name: 'Verbinden' }));
     const target = screen.getByRole('article', { name: 'Detachement Fiktives zweites Ziel' });
     await user.click(
       within(target).getByRole('button', { name: 'Hier anschliessend Dienst leisten' }),
@@ -166,10 +176,12 @@ describe('interactive planning board with wholly fictional projects', () => {
     const project = fixture();
     replaceProject(project);
     const initial = getBoardPositions(project);
-    render(<PlanningPage />);
+    render(<PlanningWithHistory />);
     const card = await screen.findByRole('article', { name: 'Detachement Fiktiv KVK' });
-    await user.click(within(card).getByText('Position ändern', { selector: 'summary' }));
-    await user.click(within(card).getByRole('button', { name: 'Karte → verschieben' }));
+    await user.click(within(card).getByRole('button', { name: 'Aktionen für Fiktiv KVK' }));
+    await user.click(
+      within(screen.getByRole('menu')).getByRole('menuitem', { name: 'Karte → verschieben' }),
+    );
     expect(getBoardPositions(projectStore.get())['fiction-early'].x).toBe(
       initial['fiction-early'].x + 40,
     );
@@ -196,7 +208,7 @@ describe('interactive planning board with wholly fictional projects', () => {
     expect(moved['fiction-early'].y).toBe(initial['fiction-early'].y);
     expect(JSON.parse(localStorage.getItem(PROJECT_KEY) ?? '{}').board.positions).toEqual(moved);
     mounted.unmount();
-    render(<PlanningPage />);
+    render(<PlanningWithHistory />);
     const reopened = await screen.findByRole('group', { name: 'Detachement Fiktiv KVK' });
     expect(reopened.style.transform).toContain(
       `translate(${moved['fiction-early'].x}px,${moved['fiction-early'].y}px)`,
@@ -211,7 +223,7 @@ describe('interactive planning board with wholly fictional projects', () => {
     replaceProject(fixture());
     render(<PlanningPage />);
     const card = await screen.findByRole('article', { name: 'Detachement Fiktiv KVK' });
-    await user.click(within(card).getByRole('button', { name: 'Details' }));
+    await user.click(within(card).getByRole('button', { name: 'Angaben' }));
     const panel = screen.getByRole('region', { name: 'Fiktiv KVK · Angaben' });
     await user.type(within(panel).getByLabelText('Einrückungsort'), 'Fiktiver neuer Ort');
     const name = within(card).getByRole('textbox', { name: 'Name' });
@@ -234,7 +246,7 @@ describe('interactive planning board with wholly fictional projects', () => {
     replaceProject(fixture());
     render(<PlanningPage />);
     const card = await screen.findByRole('article', { name: 'Detachement Fiktiv KVK' });
-    await user.click(within(card).getByRole('button', { name: 'Details' }));
+    await user.click(within(card).getByRole('button', { name: 'Angaben' }));
     const panel = screen.getByRole('region', { name: 'Fiktiv KVK · Angaben' });
     const panelName = within(panel).getByRole('textbox', { name: 'Name' });
     await user.clear(panelName);
@@ -268,12 +280,12 @@ describe('interactive planning board with wholly fictional projects', () => {
     mounted.unmount();
     project.archive = { id: 'fiction-archive', at: '2030-01-01' };
     replaceProject(project);
-    render(<PlanningPage />);
+    render(<PlanningWithHistory />);
     const archivedCard = await screen.findByRole('article', { name: 'Detachement Fiktiv KVK' });
     expect(within(archivedCard).getByRole('textbox', { name: 'Name' })).toBeDisabled();
-    expect(within(archivedCard).getByRole('button', { name: 'Verbinden →' })).toBeDisabled();
+    expect(within(archivedCard).getByRole('button', { name: 'Verbinden' })).toBeDisabled();
     expect(within(archivedCard).getByRole('button', { name: /Personen auswählen/ })).toBeDisabled();
-    expect(screen.getByRole('button', { name: '+ Detachement' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Neues Detachement' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Rückgängig' })).toBeDisabled();
   });
 });

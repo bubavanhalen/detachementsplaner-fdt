@@ -1,0 +1,176 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: while printOrders() runs, the print
+   rules must isolate the sheets from any application layout style, whatever its specificity. */
+/* Tagesbefehl print view: A4 portrait replica of the template day sheet.
+   Positions come from sheet-layout.ts (pt), identical to the PDF export. */
+
+.tb-print-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 8px 0 24px;
+  overflow-x: auto;
+}
+.tb-print-page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tb-sheet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+.tb-print-empty {
+  margin: 0;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.tb-sheet {
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  background: #fff;
+  color: #000;
+  font-family: Arial, Helvetica, "Liberation Sans", "Nimbus Sans", sans-serif;
+  font-size: 10pt;
+  font-style: normal;
+  font-kerning: normal;
+  font-synthesis: none;
+  font-variant-ligatures: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+  line-height: normal;
+  text-align: left;
+  text-transform: none;
+  text-rendering: geometricPrecision;
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 0.18),
+    0 10px 28px rgb(0 0 0 / 0.1);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.tb-sheet *,
+.tb-sheet *::before,
+.tb-sheet *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.tb-sheet-logo,
+.tb-sheet-signature {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+.tb-sheet-signature {
+  object-fit: contain;
+  object-position: left center;
+}
+/* A border instead of a background: borders print even with "background graphics" off. */
+.tb-sheet-bar {
+  position: absolute;
+  border-top: 0 solid #000;
+  background: #000;
+}
+.tb-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.tb-cell {
+  position: absolute;
+  white-space: nowrap;
+}
+.tb-line {
+  display: block;
+  white-space: pre;
+}
+.tb-line:empty::before {
+  content: "\200b";
+}
+
+@page tb-a4 {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  /* Only while printOrders() runs: hide everything except the print root. */
+  html.tb-print,
+  html.tb-print body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  html.tb-print body :not(:has(.tb-print-root)):not(.tb-print-root):not(.tb-print-root *) {
+    display: none !important;
+  }
+  html.tb-print body :has(.tb-print-root) {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+  html.tb-print .tb-print-root {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  html.tb-print .tb-print-page {
+    display: block !important;
+    margin: 0;
+    break-after: page;
+    page-break-after: always;
+  }
+  html.tb-print .tb-print-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+  html.tb-print .tb-sheet-actions {
+    display: none !important;
+  }
+  html.tb-print .tb-sheet {
+    page: tb-a4;
+    height: 296mm;
+    margin: 0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Per-day print: only the selected sheet, without page breaks. */
+  html.tb-print[data-tb-print-day] .tb-print-page {
+    display: none !important;
+    break-after: auto;
+    page-break-after: auto;
+  }
+  html.tb-print[data-tb-print-day="Mo"] .tb-print-page[data-day="Mo"],
+  html.tb-print[data-tb-print-day="Di"] .tb-print-page[data-day="Di"],
+  html.tb-print[data-tb-print-day="Mi"] .tb-print-page[data-day="Mi"],
+  html.tb-print[data-tb-print-day="Do"] .tb-print-page[data-day="Do"],
+  html.tb-print[data-tb-print-day="Fr"] .tb-print-page[data-day="Fr"],
+  html.tb-print[data-tb-print-day="Sa"] .tb-print-page[data-day="Sa"],
+  html.tb-print[data-tb-print-day="So"] .tb-print-page[data-day="So"] {
+    display: block !important;
+  }
+}

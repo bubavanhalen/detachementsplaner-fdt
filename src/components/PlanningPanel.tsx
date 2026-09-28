@@ -1,17 +1,21 @@
 import { type ReactNode, useId, useLayoutEffect, useRef } from 'react';
-import './planning-panel.css';
+import { Icon } from './Icon';
 
 /** A nonmodal workspace region: the planning board remains usable while editing. */
 export function PlanningPanel({
   title,
+  description,
   onClose,
   children,
   footer,
+  wide = false,
 }: {
   title: string;
+  description?: ReactNode;
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  wide?: boolean;
 }) {
   const panel = useRef<HTMLElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -34,7 +38,7 @@ export function PlanningPanel({
     <section
       ref={panel}
       aria-labelledby={headingId}
-      className="planning-panel"
+      className={`side-panel ${wide ? 'is-wide' : ''}`}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
           event.stopPropagation();
@@ -42,24 +46,25 @@ export function PlanningPanel({
         }
       }}
     >
-      <header className="planning-panel-header">
-        <div>
-          <span className="eyebrow">PLANUNG</span>
+      <header className="panel-header">
+        <div className="grow">
           <h2 ref={heading} id={headingId} tabIndex={-1}>
             {title}
           </h2>
+          {description && <p>{description}</p>}
         </div>
         <button
           type="button"
-          className="icon-button"
+          className="btn btn-ghost btn-icon btn-sm"
           aria-label="Bereich schliessen"
+          title="Schliessen (Esc)"
           onClick={onClose}
         >
-          ×
+          <Icon name="x" />
         </button>
       </header>
-      <div className="planning-panel-body">{children}</div>
-      {footer && <footer className="planning-panel-footer">{footer}</footer>}
+      <div className="panel-body">{children}</div>
+      {footer && <footer className="panel-footer">{footer}</footer>}
     </section>
   );
 }
