@@ -66,6 +66,46 @@ export interface ContactOptions {
   groups: boolean;
   label: string;
 }
+// Exact header row of Google's contact import template. Google files unrecognised
+// columns under Notes, so spelling and order must match (e.g. "E-mail", not "Email").
+export const GOOGLE_CONTACT_HEADERS = [
+  'Name Prefix',
+  'First Name',
+  'Middle Name',
+  'Last Name',
+  'Name Suffix',
+  'Phonetic First Name',
+  'Phonetic Middle Name',
+  'Phonetic Last Name',
+  'Nickname',
+  'File As',
+  'E-mail 1 - Label',
+  'E-mail 1 - Value',
+  'Phone 1 - Label',
+  'Phone 1 - Value',
+  'Address 1 - Label',
+  'Address 1 - Country',
+  'Address 1 - Street',
+  'Address 1 - Extended Address',
+  'Address 1 - City',
+  'Address 1 - Region',
+  'Address 1 - Postal Code',
+  'Address 1 - PO Box',
+  'Organization Name',
+  'Organization Title',
+  'Organization Department',
+  'Birthday',
+  'Event 1 - Label',
+  'Event 1 - Value',
+  'Relation 1 - Label',
+  'Relation 1 - Value',
+  'Website 1 - Label',
+  'Website 1 - Value',
+  'Custom Field 1 - Label',
+  'Custom Field 1 - Value',
+  'Notes',
+  'Labels',
+];
 export function contactRows(
   project: Project,
   people: Person[],
@@ -76,8 +116,8 @@ export function contactRows(
       'Name Prefix',
       'First Name',
       'Last Name',
-      'Email 1 - Label',
-      'Email 1 - Value',
+      'E-mail 1 - Label',
+      'E-mail 1 - Value',
       'Phone 1 - Label',
       'Phone 1 - Value',
       'Labels',
@@ -106,12 +146,16 @@ export function contactCsv(project: Project, people: Person[], options: ContactO
   if (!people.length) throw new Error('Bitte zuerst Kontakte auswählen.');
   if (people.length > 3000)
     throw new Error('Höchstens 3000 Kontakte pro Datei. Bitte die Auswahl einschränken.');
-  return (
-    '\uFEFF' +
-    contactRows(project, people, options)
-      .map((row) => row.map((value) => `"${value.replace(/"/g, '""')}"`).join(','))
-      .join('\r\n')
-  );
+  const [headers, ...rows] = contactRows(project, people, options);
+  const columns = GOOGLE_CONTACT_HEADERS.map((header) => headers.indexOf(header));
+  // Headers stay unquoted like Google's own export: a quote directly after the byte order
+  // mark is kept literally by parsers that do not strip it.
+  return [
+    `\uFEFF${GOOGLE_CONTACT_HEADERS.join(',')}`,
+    ...rows.map((row) =>
+      columns.map((index) => `"${(row[index] ?? '').replace(/"/g, '""')}"`).join(','),
+    ),
+  ].join('\r\n');
 }
 export function createWorkbook(project: Project): XLSX.WorkBook {
   const workbook = XLSX.utils.book_new(),
