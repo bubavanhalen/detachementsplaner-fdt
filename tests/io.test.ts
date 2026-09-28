@@ -7,6 +7,7 @@ import {
   contactRows,
   contactWarnings,
   createWorkbook,
+  GOOGLE_CONTACT_HEADERS,
   hasContactData,
 } from '../src/io/exports';
 import { findHeader, guessMapping, importRows, normalizePhone, splitName } from '../src/io/import';
@@ -72,6 +73,12 @@ function csvRows(csv: string): string[][] {
     raw: true,
     defval: '',
   });
+}
+function csvRecords(csv: string): Record<string, string>[] {
+  const [headers, ...rows] = csvRows(csv);
+  return rows.map((row) =>
+    Object.fromEntries(headers.map((header, index) => [header.trim(), row[index]])),
+  );
 }
 function readyDemo(): Project {
   const project = demoProject();
@@ -339,17 +346,40 @@ describe('private contact CSV and workbook exports', () => {
       label: 'Dienst, "Fiktiv"\n2027',
     });
     expect(csv.startsWith('\uFEFF')).toBe(true);
-    const rows = csvRows(csv);
-    expect(rows).toHaveLength(2);
-    expect(rows[1][0]).toBe('Wm');
-    expect(rows[1][1]).toBe(person.name);
-    expect(rows[1][2]).toBe('');
-    expect(rows[1][6]).toBe('+41 79 000 00 01');
-    expect(rows[1][7]).toContain('Dienst, "Fiktiv"\n2027');
-    expect(rows[1][7]).toContain('DET 1 · KVK');
-    expect(rows[1][7]).toContain('MAIN DET · WK');
+    const rows = csvRecords(csv);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]['Name Prefix']).toBe('Wm');
+    expect(rows[0]['First Name']).toBe(person.name);
+    expect(rows[0]['Last Name']).toBe('');
+    expect(rows[0]['E-mail 1 - Value']).toBe('zoe@example.invalid');
+    expect(rows[0]['Phone 1 - Label']).toBe('Mobile');
+    expect(rows[0]['Phone 1 - Value']).toBe('+41 79 000 00 01');
+    expect(rows[0].Notes).toBe('');
+    expect(rows[0].Labels).toContain('Dienst, "Fiktiv"\n2027');
+    expect(rows[0].Labels).toContain('DET 1 · KVK');
+    expect(rows[0].Labels).toContain('MAIN DET · WK');
     expect(csv).not.toContain(person.pnr);
     expect(csv).not.toContain('Fiktive Testperson');
+  });
+  it("writes Google's import template header row verbatim so email and phone are not filed under Notes", () => {
+    const project = readyDemo();
+    const header = csvRows(
+      contactCsv(project, [project.persons[0]], { rank: true, groups: true, label: '' }),
+    )[0];
+    // trim() also drops the UTF-8 byte order mark in front of the first header.
+    expect(header.map((value) => value.trim())).toEqual(GOOGLE_CONTACT_HEADERS);
+    expect(GOOGLE_CONTACT_HEADERS.join(',')).toBe(
+      'Name Prefix,First Name,Middle Name,Last Name,Name Suffix,Phonetic First Name,' +
+        'Phonetic Middle Name,Phonetic Last Name,Nickname,File As,E-mail 1 - Label,' +
+        'E-mail 1 - Value,Phone 1 - Label,Phone 1 - Value,Address 1 - Label,Address 1 - Country,' +
+        'Address 1 - Street,Address 1 - Extended Address,Address 1 - City,Address 1 - Region,' +
+        'Address 1 - Postal Code,Address 1 - PO Box,Organization Name,Organization Title,' +
+        'Organization Department,Birthday,Event 1 - Label,Event 1 - Value,Relation 1 - Label,' +
+        'Relation 1 - Value,Website 1 - Label,Website 1 - Value,Custom Field 1 - Label,' +
+        'Custom Field 1 - Value,Notes,Labels',
+    );
+    for (const name of contactRows(project, [], { rank: true, groups: true, label: '' })[0])
+      expect(GOOGLE_CONTACT_HEADERS).toContain(name);
   });
   it('keeps explicit first/last names only when they still match the displayed full name', () => {
     const person = fictionalPerson('one', 'TEST-001');
@@ -397,11 +427,11 @@ describe('private contact CSV and workbook exports', () => {
   it('archived CSV is read-only and preserves service/group context in local labels', () => {
     const project = archiveSnapshot(readyDemo()),
       before = structuredClone(project);
-    const rows = csvRows(
+    const rows = csvRecords(
       contactCsv(project, [project.persons[0]], { rank: true, groups: true, label: project.name }),
     );
-    expect(rows[1][7]).toContain(project.name);
-    expect(rows[1][7]).toContain('KVK');
+    expect(rows[0].Labels).toContain(project.name);
+    expect(rows[0].Labels).toContain('KVK');
     expect(project).toEqual(before);
   });
   it('Excel roundtrip includes all people, full MB details and only direct main personnel rows', () => {
