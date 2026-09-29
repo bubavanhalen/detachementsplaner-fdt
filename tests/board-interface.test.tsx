@@ -15,6 +15,7 @@ vi.mock('@tanstack/react-router', () => ({
       {children}
     </a>
   ),
+  useNavigate: () => () => Promise.resolve(),
 }));
 
 function PlanningWithHistory() {

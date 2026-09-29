@@ -16,6 +16,7 @@ vi.mock('@tanstack/react-router', () => ({
       {children}
     </a>
   ),
+  useNavigate: () => () => Promise.resolve(),
 }));
 
 function person(id: string, name: string, grad: string, lics: string[] = []): Person {

@@ -11,6 +11,7 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Shell } from './components/Shell';
 import ContactsPage from './pages/ContactsPage';
 import FinishPage from './pages/FinishPage';
+import OnsitePage from './pages/OnsitePage';
 import PeoplePage from './pages/PeoplePage';
 import PisaPage from './pages/PisaPage';
 import PlanningPage from './pages/PlanningPage';
@@ -52,6 +53,7 @@ const routes = [
     path: '/tagesbefehle',
     component: TagesbefehlePage,
   }),
+  createRoute({ getParentRoute: () => rootRoute, path: '/vor-ort', component: OnsitePage }),
   // Earlier versions kept imports and archives under one page.
   createRoute({
     getParentRoute: () => rootRoute,

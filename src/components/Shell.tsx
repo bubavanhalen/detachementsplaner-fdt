@@ -38,6 +38,7 @@ const tools = [
     icon: 'calendar',
     hint: 'Aus dem Kp-WAP erstellen',
   },
+  { to: '/vor-ort', label: 'Vor Ort', icon: 'layout', hint: 'Untergruppen & Det-Listen' },
 ] as const;
 const titles: Record<string, { title: string; description: string; step?: number }> = {
   '/persons': { title: 'Personen', description: 'Suchen, prüfen und Angaben ergänzen' },
@@ -45,6 +46,10 @@ const titles: Record<string, { title: string; description: string; step?: number
   '/tagesbefehle': {
     title: 'Tagesbefehle',
     description: 'Kp-WAP prüfen, drucken, .xlsx und PDF je Tag',
+  },
+  '/vor-ort': {
+    title: 'Vor Ort',
+    description: 'Detachemente in Untergruppen aufteilen und Listen ausgeben',
   },
 };
 
@@ -103,7 +108,7 @@ export function Shell() {
       } else if (mod && key === 'y') {
         event.preventDefault();
         runSafely(redoProject);
-      } else if (event.altKey && /^[1-7]$/.test(event.key)) {
+      } else if (event.altKey && /^[1-8]$/.test(event.key)) {
         event.preventDefault();
         const targets = [
           '/sources',
@@ -113,6 +118,7 @@ export function Shell() {
           '/persons',
           '/contacts',
           '/tagesbefehle',
+          '/vor-ort',
         ] as const;
         void navigate({ to: targets[Number(event.key) - 1] });
       } else if (!mod && !event.altKey && event.key === '?') {
@@ -498,7 +504,7 @@ function ShortcutSheet({ onClose }: { onClose: () => void }) {
         ['JSON sichern', [modKey, 'S']],
         ['Seitenleiste', [modKey, 'B']],
         ['Schritt 1–4 öffnen', ['Alt', '1–4']],
-        ['Personen / Kontakte / Tagesbefehle', ['Alt', '5–7']],
+        ['Personen / Kontakte / Tagesbefehle / Vor Ort', ['Alt', '5–8']],
         ['Diese Übersicht', ['?']],
       ],
     ],

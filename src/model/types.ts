@@ -45,6 +45,21 @@ export interface Detachment {
   zusatzIds: string[];
   generatedFrom?: string;
 }
+/**
+ * On-site sub-group of a planning card (e.g. «Det Mat» within the KVK detachement).
+ * Purely for the service on site: it never feeds PISA entries, validation or signatures.
+ */
+export interface SubDetachment {
+  [key: string]: unknown;
+  id: string;
+  parentId: string;
+  name: string;
+  /** Leader; '' or a member of personIds. */
+  chefId: string;
+  /** Free text such as task, place or vehicle. */
+  auftrag: string;
+  personIds: string[];
+}
 export interface Connection {
   id: string;
   from: string;
@@ -74,6 +89,8 @@ export interface Project {
   archive: { id: string; at: string } | null;
   migrationNotes: string[];
   board?: { positions: Record<string, { x: number; y: number }> };
+  /** Optional on-site sub-groups; old saves have none. Not part of the PISA handover. */
+  subDets?: SubDetachment[];
   /** Optional Tagesbefehl state; old saves have none. */
   tb?: TbState;
 }

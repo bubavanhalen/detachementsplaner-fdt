@@ -1,3 +1,25 @@
+export {
+  addSubDets,
+  DEFAULT_SUBDET_NAMES,
+  listName,
+  moveToSubDet,
+  type OnsiteView,
+  onsiteView,
+  parseSubDetNames,
+  RANK_CATEGORY_LABELS,
+  type RankCategory,
+  rankCategory,
+  rankIndex,
+  removeSubDet,
+  removeSubDetsOf,
+  renameSubDet,
+  type SubDetGroup,
+  setSubDetAuftrag,
+  setSubDetChef,
+  sortByRank,
+  subDetSuggestions,
+  subDetsOf,
+} from './onsite';
 export { derivePisa, entrySignature, generatedEntryId, projectSignature, validEc } from './pisa';
 export {
   assignPeople,
@@ -27,6 +49,7 @@ export type {
   PisaEntry,
   Project,
   Source,
+  SubDetachment,
   ValidationIssue,
 } from './types';
 export { validateProject } from './validation';

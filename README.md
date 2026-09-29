@@ -27,11 +27,17 @@ Die Seitenleiste führt durch vier Schritte und zeigt bei jedem den aktuellen St
 3. **In PISA übertragen:** Links die Checkliste der erforderlichen Haupt-/Zusatz-Einträge mit Fortschritt, rechts jedes Feld in PAT-Reihenfolge mit Kopierknopf (Datumsangaben im Format TT.MM.JJJJ). Ein reiner Zusatz erhält keine direkte Personenzuteilung; die Personen erscheinen bei ihrem zugehörigen Haupt-MB. Zusätzlich benötigte EC werden einmal vergeben und bleiben stabil. Nach «als abgeglichen markieren» springt die Ansicht zum nächsten offenen Eintrag. Änderungen machen frühere Abgleichsmarker ungültig. «Übersicht» zeigt alle Einträge als Tabelle.
 4. **Sichern & archivieren:** JSON, Excel-Arbeitsliste, Offline-HTML und Kontakt-CSV lokal erzeugen. Ein unveränderlicher lokaler Snapshot öffnet danach die Personensuche. Eine spätere Bearbeitung erstellt eine eigene Arbeitskopie. Unvollständig abgeglichene Stände bleiben als solche erkennbar.
 
-**Bedienhilfen:** `Ctrl/⌘+K` sucht Personen, Detachemente und Befehle; `Ctrl/⌘+Z` bzw. `Shift+Ctrl/⌘+Z` für Rückgängig/Wiederholen; `Ctrl/⌘+S` lädt eine JSON-Sicherung herunter; `Alt+1…6` wechselt die Ansicht; `?` zeigt alle Tastenkürzel. Hell/Dunkel und die eingeklappte Seitenleiste werden als reine Oberflächeneinstellung im Browser gemerkt.
+**Bedienhilfen:** `Ctrl/⌘+K` sucht Personen, Detachemente und Befehle; `Ctrl/⌘+Z` bzw. `Shift+Ctrl/⌘+Z` für Rückgängig/Wiederholen; `Ctrl/⌘+S` lädt eine JSON-Sicherung herunter; `Alt+1…8` wechselt die Ansicht; `?` zeigt alle Tastenkürzel. Hell/Dunkel und die eingeklappte Seitenleiste werden als reine Oberflächeneinstellung im Browser gemerkt.
 
 **KVK/WK:** Die PAT widerspricht sich auf S. 85 und S. 93–94. Verbundene Aufgebote benötigen deshalb eine pro Dienstleistung dokumentierte KF-Auskunft: separate MB oder ein durchgehender MB. Bis dahin bleibt die Vorschau mit **Aufgebotsart noch bestätigen** gekennzeichnet und enthält keine verbindlichen Übertragungsanweisungen. Ein gewöhnliches Einzelaufgebot benötigt diese Auswahl nicht. Die App sendet nichts an PISA und erstellt keine amtlichen Marschbefehle.
 
 Eine Verbindung hat aktuell ein Folgedetachement; mehrere Spezialdetachemente können dasselbe Ziel haben. Verbindungsketten werden mit einer verständlichen Meldung abgelehnt. Bereits explizit gespeicherte Haupt-/Zusatz-Gruppen aus alten Projekten bleiben erhalten, wenn eine Zusammenlegung ihre Bedeutung verändern könnte. Hinweise zeigen den Klärungsbedarf.
+
+## Vor Ort: Untergruppen und Det-Listen
+
+Im Dienst lässt sich jedes Detachement ohne Einfluss auf PISA in Untergruppen aufteilen, z. B. das KVK-Detachement in «Det Mat», «Det VT» und «Det Kp». Die Seite **Vor Ort** (Seitenleiste, `Alt+8` oder ⋯ auf der Karte → «Vor Ort aufteilen») legt die üblichen Untergruppen mit einem Klick an; weitere Namen lassen sich mit Komma getrennt ergänzen. Personen werden pro Zeile mit einem Klick eingeteilt, per Mehrfachauswahl (Filter nach Funktion, «Alle Treffer auswählen») oder mit der Tastatur: Zeile fokussieren, `1`–`9` für die Untergruppe bzw. `0` für «nicht eingeteilt» drücken; der Fokus springt zur nächsten Person. Pro Untergruppe werden Chef sowie Auftrag/Ort festgehalten. Eine Person gehört pro Detachement zu höchstens einer Untergruppe. Untergruppen verändern weder EC, Zuteilungen, Prüfungen noch PISA-Abgleiche.
+
+**Liste ausgeben** erstellt pro Detachement oder pro Untergruppe eine A4-Liste mit Einrückungsangaben, Bestand (Of / Höh Uof / Uof / Mannschaft), Fahrausweisen, Chef, Auftrag und wählbaren Spalten (Funktion, Fahrausweise, Zug, Telefon, E-Mail, Versicherten-Nr., Spalte zum Abhaken), sortiert nach Grad. Optional beginnt jede Untergruppe auf einer neuen Seite. Ausgabe als Druck/PDF über den Druckdialog, als Excel-Datei (Gesamtliste, ein Blatt pro Untergruppe, Angaben) oder als Text in die lokale Zwischenablage. Alles entsteht auf dem Gerät; Ausdrucke und Dateien enthalten Personendaten.
 
 ## Personen und Kontakte
 
@@ -66,7 +72,7 @@ Die Anwendung verwendet **React 19, TypeScript 7, Vite 8, TanStack Router, Table
 src/model/       Reine Planungsregeln, Migration, PISA-Ableitung und Prüfung
 src/io/          Lokale Dateien, Quellenimport, Browserablage und Exporte
 src/components/  Wiederverwendbare Dialoge, Tabellen und Personenauswahl
-src/pages/       Planung, PISA, Personen, Kontakte und Dateien/Archiv
+src/pages/       Planung, PISA, Vor Ort, Personen, Kontakte und Dateien/Archiv
 src/store.ts     Lokaler Zustand und atomare Änderungen
 src/App.tsx      Navigation und Anwendungshülle
 src/theme.css    Responsive Oberfläche

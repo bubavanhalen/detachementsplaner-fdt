@@ -1,5 +1,5 @@
 import { normalizeTbState } from './tagesbefehl/state';
-import type { Detachment, Person, Project } from './types';
+import type { Detachment, Person, Project, SubDetachment } from './types';
 
 export const newId = (prefix: string): string => `${prefix}_${crypto.randomUUID()}`;
 export function createProject(): Project {
@@ -154,6 +154,18 @@ function detachment(input: unknown): Detachment {
   if (d.generatedFrom != null) normalized.generatedFrom = text(d.generatedFrom);
   return normalized;
 }
+function subDetachment(input: unknown): SubDetachment {
+  const s = record(input);
+  return {
+    ...s,
+    id: identifier(s.id),
+    parentId: identifier(s.parentId),
+    name: text(s.name),
+    chefId: text(s.chefId),
+    auftrag: text(s.auftrag),
+    personIds: s.personIds == null ? [] : strings(s.personIds),
+  };
+}
 function confirmation(input: unknown) {
   const value = record(input);
   return { ...value, signature: text(value.signature), at: text(value.at) };
@@ -191,6 +203,7 @@ export function normalizeProject(input: unknown): Project {
       };
     }),
   );
+  if (value.subDets != null && !Array.isArray(value.subDets)) return invalid();
   const migrationNotes = value.migrationNotes == null ? [] : strings(value.migrationNotes);
   if (dets.some((d) => d.zusatzIds.length) && value.v !== 5)
     migrationNotes.push(
@@ -257,6 +270,9 @@ export function normalizeProject(input: unknown): Project {
       : null,
     migrationNotes: [...new Set(migrationNotes)],
     ...(value.tb == null ? {} : { tb: normalizeTbState(value.tb) }),
+    ...(value.subDets == null
+      ? {}
+      : { subDets: unique((value.subDets as unknown[]).map(subDetachment)) }),
   };
   for (const source of ['pisa', 'milo'] as const) {
     if (src[source] != null) {
