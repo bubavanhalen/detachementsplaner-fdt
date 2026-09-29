@@ -13,6 +13,7 @@ vi.mock('@tanstack/react-router', () => ({
       {children}
     </a>
   ),
+  useNavigate: () => () => Promise.resolve(),
 }));
 
 beforeEach(() => {
@@ -98,7 +99,27 @@ describe('confirmed card removal with wholly fictional data', () => {
 
   it('removes the confirmed group and connections, retains people, and undoes the whole operation', async () => {
     const user = userEvent.setup();
-    replaceProject(fixture());
+    const project = fixture();
+    project.onsiteEvents = [
+      {
+        id: 'fiction-event',
+        name: 'Fiktiver Anlass',
+        von: '',
+        bis: '',
+        detIds: ['fiction-early', 'fiction-main'],
+      },
+    ];
+    project.subDets = [
+      {
+        id: 'fiction-sub',
+        parentId: 'fiction-event',
+        name: 'Det Fiktiv',
+        chefId: '',
+        auftrag: '',
+        personIds: ['fiction-person'],
+      },
+    ];
+    replaceProject(project);
     const before = structuredClone(projectStore.get());
     render(
       <>
@@ -117,6 +138,9 @@ describe('confirmed card removal with wholly fictional data', () => {
     expect(projectStore.get().connections).toEqual([]);
     expect(projectStore.get().persons).toEqual(before.persons);
     expect(projectStore.get().board?.positions['fiction-early']).toBeUndefined();
+    // The removed card only leaves the event filter; the on-site detachements stay.
+    expect(projectStore.get().onsiteEvents?.[0].detIds).toEqual(['fiction-main']);
+    expect(projectStore.get().subDets).toEqual(before.subDets);
     await user.click(screen.getByRole('button', { name: 'Rückgängig' }));
     expect(projectStore.get()).toEqual(before);
   });

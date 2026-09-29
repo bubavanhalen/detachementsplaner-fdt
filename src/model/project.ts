@@ -1,5 +1,5 @@
 import { normalizeTbState } from './tagesbefehl/state';
-import type { Detachment, Person, Project } from './types';
+import type { Detachment, OnsiteEvent, Person, Project, SubDetachment } from './types';
 
 export const newId = (prefix: string): string => `${prefix}_${crypto.randomUUID()}`;
 export function createProject(): Project {
@@ -154,6 +154,55 @@ function detachment(input: unknown): Detachment {
   if (d.generatedFrom != null) normalized.generatedFrom = text(d.generatedFrom);
   return normalized;
 }
+function subDetachment(input: unknown): SubDetachment {
+  const s = record(input);
+  return {
+    ...s,
+    id: identifier(s.id),
+    parentId: identifier(s.parentId),
+    name: text(s.name),
+    chefId: text(s.chefId),
+    auftrag: text(s.auftrag),
+    personIds: s.personIds == null ? [] : strings(s.personIds),
+  };
+}
+function onsiteEvent(input: unknown): OnsiteEvent {
+  const e = record(input);
+  return {
+    ...e,
+    id: identifier(e.id),
+    name: text(e.name),
+    von: text(e.von),
+    bis: text(e.bis),
+    detIds: e.detIds == null ? [] : strings(e.detIds),
+  };
+}
+/**
+ * On-site events. Early drafts stored sub-groups under a planning card or under a
+ * combination of cards («onsiteUnits»); both become events that filter those cards.
+ */
+function onsiteEvents(
+  value: Record<string, unknown>,
+  dets: Detachment[],
+  subDets: SubDetachment[] | undefined,
+): OnsiteEvent[] | undefined {
+  const events = [
+    ...((value.onsiteEvents ?? []) as unknown[]).map(onsiteEvent),
+    ...((value.onsiteUnits ?? []) as unknown[]).map(onsiteEvent),
+  ];
+  for (const sub of subDets ?? []) {
+    if (events.some((event) => event.id === sub.parentId)) continue;
+    const det = dets.find((group) => group.id === sub.parentId);
+    events.push({
+      id: sub.parentId,
+      name: det?.name || 'Vor Ort',
+      von: det?.datum ?? '',
+      bis: det?.bisDatum ?? '',
+      detIds: det ? [det.id] : [],
+    });
+  }
+  return events.length ? unique(events) : undefined;
+}
 function confirmation(input: unknown) {
   const value = record(input);
   return { ...value, signature: text(value.signature), at: text(value.at) };
@@ -191,6 +240,12 @@ export function normalizeProject(input: unknown): Project {
       };
     }),
   );
+  if (value.subDets != null && !Array.isArray(value.subDets)) return invalid();
+  if (value.onsiteEvents != null && !Array.isArray(value.onsiteEvents)) return invalid();
+  if (value.onsiteUnits != null && !Array.isArray(value.onsiteUnits)) return invalid();
+  const subDets =
+    value.subDets == null ? undefined : unique((value.subDets as unknown[]).map(subDetachment));
+  const events = onsiteEvents(value, dets, subDets);
   const migrationNotes = value.migrationNotes == null ? [] : strings(value.migrationNotes);
   if (dets.some((d) => d.zusatzIds.length) && value.v !== 5)
     migrationNotes.push(
@@ -257,7 +312,10 @@ export function normalizeProject(input: unknown): Project {
       : null,
     migrationNotes: [...new Set(migrationNotes)],
     ...(value.tb == null ? {} : { tb: normalizeTbState(value.tb) }),
+    ...(subDets ? { subDets } : {}),
+    ...(events ? { onsiteEvents: events } : {}),
   };
+  delete normalized.onsiteUnits;
   for (const source of ['pisa', 'milo'] as const) {
     if (src[source] != null) {
       const sourceValue = record(src[source]);

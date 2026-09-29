@@ -14,6 +14,8 @@ export type DetachmentNodeData = {
   direct: number;
   inherited: number;
   preview: string[];
+  /** On-site sub-groups and combinations; `target` is the unit to open. */
+  onsite: { text: string; target: string } | null;
   issues: BoardIssue[];
   policyOpen: boolean;
   globalOpen: boolean;
@@ -31,6 +33,7 @@ export type DetachmentNodeData = {
   onTarget: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  onOnsite: (target?: string) => void;
   onDisconnect: () => void;
   onDropPeople: (ids: string[]) => void;
   onMove: (dx: number, dy: number) => void;
@@ -129,6 +132,9 @@ export const DetachmentNode = memo(function DetachmentNode({
           <MenuItem icon="duplicate" onSelect={data.onDuplicate} disabled={data.archived}>
             Duplizieren
           </MenuItem>
+          <MenuItem icon="layout" onSelect={() => data.onOnsite()}>
+            Vor Ort aufteilen …
+          </MenuItem>
           {data.connected && (
             <MenuItem icon="unlink" onSelect={data.onDisconnect} disabled={data.archived}>
               Verbindung lösen
@@ -218,6 +224,18 @@ export const DetachmentNode = memo(function DetachmentNode({
             </>
           )}
         </button>
+
+        {data.onsite && (
+          <button
+            type="button"
+            className="det-meta"
+            onClick={() => data.onOnsite(data.onsite?.target)}
+            title="Vor Ort: Untergruppen bearbeiten und Listen ausgeben"
+          >
+            <Icon name="layout" size={14} />
+            <span className="truncate">{data.onsite.text}</span>
+          </button>
+        )}
 
         <button type="button" className={`det-health is-${state}`} onClick={data.onIssues}>
           <span className="det-health-icon" aria-hidden="true">

@@ -45,6 +45,33 @@ export interface Detachment {
   zusatzIds: string[];
   generatedFrom?: string;
 }
+/**
+ * On-site detachement of an event (e.g. «Det Mat» during the KVK). Purely for the service
+ * on site: it never feeds PISA entries, validation or signatures.
+ */
+export interface SubDetachment {
+  [key: string]: unknown;
+  id: string;
+  /** The OnsiteEvent this detachement belongs to. */
+  parentId: string;
+  name: string;
+  /** Leader; '' or a member of personIds. */
+  chefId: string;
+  /** Free text such as task, place or vehicle. */
+  auftrag: string;
+  personIds: string[];
+}
+/** An on-site event (e.g. «KVK», von–bis) with its own detachements. */
+export interface OnsiteEvent {
+  [key: string]: unknown;
+  id: string;
+  name: string;
+  /** ISO dates or ''. */
+  von: string;
+  bis: string;
+  /** PISA detachements (planning cards) filtering the people of the event; [] = everyone. */
+  detIds: string[];
+}
 export interface Connection {
   id: string;
   from: string;
@@ -74,6 +101,10 @@ export interface Project {
   archive: { id: string; at: string } | null;
   migrationNotes: string[];
   board?: { positions: Record<string, { x: number; y: number }> };
+  /** Optional on-site sub-groups; old saves have none. Not part of the PISA handover. */
+  subDets?: SubDetachment[];
+  /** Optional on-site events. Not part of the PISA handover. */
+  onsiteEvents?: OnsiteEvent[];
   /** Optional Tagesbefehl state; old saves have none. */
   tb?: TbState;
 }

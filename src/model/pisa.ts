@@ -137,6 +137,14 @@ export function entrySignature(project: Project, entryValue: PisaEntry): string 
   });
 }
 export function projectSignature(project: Project): string {
-  const { pisa: _pisa, archive: _archive, board: _board, ...content } = project;
+  // Layout and the on-site organisation never change what is entered in PISA.
+  const {
+    pisa: _pisa,
+    archive: _archive,
+    board: _board,
+    subDets: _subDets,
+    onsiteEvents: _onsiteEvents,
+    ...content
+  } = project;
   return serialize(content);
 }

@@ -52,6 +52,8 @@ export interface Overlays {
   planningIntent: { kind: 'add' } | { kind: 'focus'; id: string } | null;
   /** A one-shot preset for the people page. Never placed in the URL. */
   peopleIntent: { personId?: string; filter?: Participation | 'issues' | 'review' } | null;
+  /** A one-shot request to open a detachement on the on-site page. Never placed in the URL. */
+  onsiteIntent: { id: string } | null;
 }
 export const overlayStore = createStore<Overlays>({
   palette: false,
@@ -61,6 +63,7 @@ export const overlayStore = createStore<Overlays>({
   workbook: null,
   planningIntent: null,
   peopleIntent: null,
+  onsiteIntent: null,
 });
 export function useOverlays(): Overlays {
   return useSelector(overlayStore, (value) => value);

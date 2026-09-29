@@ -1,3 +1,32 @@
+export {
+  addSubDets,
+  copyEvent,
+  createEvent,
+  DEFAULT_SUBDET_NAMES,
+  eventsForDet,
+  listName,
+  moveToSubDet,
+  type OnsiteView,
+  onsiteEvents,
+  onsiteSummary,
+  onsiteView,
+  parseSubDetNames,
+  RANK_CATEGORY_LABELS,
+  type RankCategory,
+  rankCategory,
+  rankIndex,
+  removeDetFromOnsite,
+  removeEvent,
+  removeSubDet,
+  renameSubDet,
+  type SubDetGroup,
+  setSubDetAuftrag,
+  setSubDetChef,
+  sortByRank,
+  subDetSuggestions,
+  subDetsOf,
+  updateEvent,
+} from './onsite';
 export { derivePisa, entrySignature, generatedEntryId, projectSignature, validEc } from './pisa';
 export {
   assignPeople,
@@ -17,16 +46,19 @@ export {
   normalizeProject,
   resumeProject,
 } from './project';
+export { licenseCategories, shortFunction, shortLicense } from './shortForms';
 export type {
   Confirmation,
   Connection,
   Detachment,
+  OnsiteEvent,
   OrderMode,
   Participation,
   Person,
   PisaEntry,
   Project,
   Source,
+  SubDetachment,
   ValidationIssue,
 } from './types';
 export { validateProject } from './validation';

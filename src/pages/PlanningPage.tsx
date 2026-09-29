@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import {
   type Connection,
   type Edge,
@@ -22,7 +22,9 @@ import {
   createDetachment,
   disconnectGroups,
   groupPeople,
+  onsiteSummary,
   remainingPeople,
+  removeDetFromOnsite,
   removePeople,
 } from '../model';
 import {
@@ -34,7 +36,14 @@ import {
 } from '../model/board';
 import type { Project } from '../model/types';
 import { changeProject, notifyUndoable, useProject } from '../store';
-import { isTyping, overlayStore, setPreference, useOverlays, usePreferences } from '../ui';
+import {
+  isTyping,
+  openOverlay,
+  overlayStore,
+  setPreference,
+  useOverlays,
+  usePreferences,
+} from '../ui';
 import { PersonEditor } from './PersonEditor';
 import '@xyflow/react/dist/style.css';
 import './planning-board.css';
@@ -66,6 +75,7 @@ function PlanningBoard() {
   const preferences = usePreferences();
   const overlays = useOverlays();
   const flow = useReactFlow<PlanningNode>();
+  const navigate = useNavigate();
   const canvas = useRef<HTMLDivElement>(null);
   const archived = Boolean(project.archive);
   const positions = useMemo(() => getBoardPositions(project), [project]);
@@ -138,6 +148,7 @@ function PlanningBoard() {
           );
           for (const group of draft.dets)
             group.zusatzIds = group.zusatzIds.filter((extra) => extra !== id);
+          removeDetFromOnsite(draft, id);
           if (draft.board) delete draft.board.positions[id];
         }, id)
       ) {
@@ -244,6 +255,7 @@ function PlanningBoard() {
               (person) => !direct.includes(person.id),
             ).length,
             preview: people.slice(0, direct.length > 5 ? 4 : 5).map(shortName),
+            onsite: onsiteSummary(project, group.id),
             issues: issues.byGroup[group.id] ?? [],
             policyOpen,
             globalOpen: issues.global.length > 0,
@@ -279,6 +291,10 @@ function PlanningBoard() {
                 });
             },
             onDelete: () => setPendingRemoval({ projectId: project.id, id: group.id }),
+            onOnsite: (target = group.id) => {
+              openOverlay({ onsiteIntent: { id: target } });
+              void navigate({ to: '/vor-ort' });
+            },
             onDuplicate: () => {
               const at = positions[group.id];
               add(at ? { x: at.x + CARD.width / 2 + 40, y: at.y + 80 } : undefined, group);
@@ -313,6 +329,7 @@ function PlanningBoard() {
       add,
       assign,
       positions,
+      navigate,
     ],
   );
   const nodes = useMemo(

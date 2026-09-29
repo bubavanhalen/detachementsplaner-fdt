@@ -1,0 +1,214 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: while printDetSheet() runs, the print
+   must override every layout rule of the application shell around the sheet. */
+/* Det list: fixed paper colours so screen preview, dark mode and print look the same. */
+.det-sheet {
+  --sheet-text: #16181a;
+  --sheet-muted: #5c6166;
+  --sheet-line: #c9cdd1;
+  --sheet-soft: #f1f2f3;
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 14mm 12mm;
+  background: #fff;
+  color: var(--sheet-text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  font-size: 10pt;
+  line-height: 1.35;
+}
+.det-sheet-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--sheet-text);
+}
+.det-sheet-head h2 {
+  font-size: 17pt;
+  letter-spacing: -0.01em;
+  color: var(--sheet-text);
+}
+.det-sheet-eyebrow {
+  color: var(--sheet-muted);
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.det-sheet-ec {
+  flex: none;
+  padding: 3px 8px;
+  border: 1.5px solid var(--sheet-text);
+  border-radius: 4px;
+  font: 700 11pt / 1.2 var(--font-mono);
+}
+.det-sheet-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 18px;
+}
+.det-sheet-facts div {
+  display: grid;
+  grid-template-columns: 26mm minmax(0, 1fr);
+  gap: 8px;
+}
+.det-sheet-facts dt {
+  color: var(--sheet-muted);
+}
+.det-sheet-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.det-sheet-section {
+  display: grid;
+  gap: 6px;
+}
+.det-sheet-section-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 4px;
+  padding: 5px 8px;
+  background: var(--sheet-soft);
+  border-left: 3px solid var(--sheet-text);
+  break-after: avoid;
+}
+.det-sheet-section-head h3 {
+  font-size: 12pt;
+  color: var(--sheet-text);
+}
+.det-sheet-section-head span {
+  color: var(--sheet-muted);
+}
+.det-sheet-section-head p {
+  flex-basis: 100%;
+}
+.det-sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.det-sheet-table th,
+.det-sheet-table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--sheet-line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.det-sheet-table th {
+  color: var(--sheet-muted);
+  font-size: 8.5pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1.5px solid var(--sheet-text);
+}
+/* Fixed layout keeps the columns of all sections aligned on the page. */
+.det-sheet-table {
+  table-layout: fixed;
+}
+.det-sheet-table th {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.det-sheet-table .det-sheet-grad {
+  width: 15mm;
+}
+.det-sheet-table .det-sheet-name {
+  width: 30%;
+}
+.det-sheet-table .num {
+  width: 10mm;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--sheet-muted);
+}
+.det-sheet-table tr {
+  break-inside: avoid;
+}
+.det-sheet-table tr.is-chef td {
+  background: var(--sheet-soft);
+}
+.det-sheet-tag {
+  margin-left: 6px;
+  padding: 0 5px;
+  border: 1px solid var(--sheet-text);
+  border-radius: 3px;
+  font-size: 7.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+.det-sheet-table .det-sheet-check {
+  width: 9mm;
+  text-align: center;
+}
+.det-sheet-box {
+  display: inline-block;
+  width: 3.6mm;
+  height: 3.6mm;
+  border: 1px solid var(--sheet-text);
+  border-radius: 1px;
+}
+.det-sheet-empty {
+  color: var(--sheet-muted);
+  font-style: italic;
+}
+.det-sheet-foot {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--sheet-line);
+  color: var(--sheet-muted);
+  font-size: 8pt;
+}
+
+@media screen {
+  .det-sheet {
+    min-width: 180mm;
+  }
+  .det-sheet-section.is-break {
+    margin-top: 10px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--sheet-line);
+  }
+}
+
+@media print {
+  /* Only while printDetSheet() runs: hide everything except the sheet. */
+  html.det-print body :not(:has(.det-sheet)):not(.det-sheet):not(.det-sheet *) {
+    display: none !important;
+  }
+  html.det-print body :has(.det-sheet) {
+    display: block !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    overflow: visible !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+  .det-sheet {
+    max-width: none;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .det-sheet-section.is-break {
+    break-before: page;
+  }
+  .det-sheet-table thead {
+    display: table-header-group;
+  }
+}

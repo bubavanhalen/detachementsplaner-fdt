@@ -38,8 +38,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     };
   }, []);
   const commands = useMemo<Command[]>(() => {
-    const go = (to: '/' | '/sources' | '/pisa' | '/finish' | '/persons' | '/contacts') => () =>
-      void navigate({ to });
+    const go =
+      (to: '/' | '/sources' | '/pisa' | '/finish' | '/persons' | '/contacts' | '/vor-ort') => () =>
+        void navigate({ to });
     const list: Command[] = [
       {
         id: 'n1',
@@ -81,6 +82,15 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         icon: 'contact',
         run: go('/contacts'),
         hint: 'Alt 6',
+      },
+      {
+        id: 'n8',
+        group: 'Ablauf',
+        label: 'Vor Ort: Events & Listen',
+        icon: 'layout',
+        keywords: 'event anlass subdet untergruppe aufteilen liste drucken appell det mat vt kp',
+        run: go('/vor-ort'),
+        hint: 'Alt 8',
       },
     ];
     if (!archived)
