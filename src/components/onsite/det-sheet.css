@@ -170,18 +170,13 @@
 }
 
 @media screen {
+  .det-sheet {
+    min-width: 180mm;
+  }
   .det-sheet-section.is-break {
     margin-top: 10px;
     padding-top: 14px;
     border-top: 1px dashed var(--sheet-line);
-  }
-}
-@media (max-width: 700px) {
-  .det-sheet {
-    padding: 16px 12px;
-  }
-  .det-sheet-facts {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 

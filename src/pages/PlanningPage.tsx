@@ -22,10 +22,10 @@ import {
   createDetachment,
   disconnectGroups,
   groupPeople,
-  onsiteView,
+  onsiteSummary,
   remainingPeople,
+  removeDetFromOnsite,
   removePeople,
-  removeSubDetsOf,
 } from '../model';
 import {
   type BoardIssue,
@@ -148,7 +148,7 @@ function PlanningBoard() {
           );
           for (const group of draft.dets)
             group.zusatzIds = group.zusatzIds.filter((extra) => extra !== id);
-          removeSubDetsOf(draft, id);
+          removeDetFromOnsite(draft, id);
           if (draft.board) delete draft.board.positions[id];
         }, id)
       ) {
@@ -255,10 +255,7 @@ function PlanningBoard() {
               (person) => !direct.includes(person.id),
             ).length,
             preview: people.slice(0, direct.length > 5 ? 4 : 5).map(shortName),
-            subDets: onsiteView(project, group.id).groups.map((item) => ({
-              name: item.sub.name,
-              count: item.people.length,
-            })),
+            onsite: onsiteSummary(project, group.id),
             issues: issues.byGroup[group.id] ?? [],
             policyOpen,
             globalOpen: issues.global.length > 0,
@@ -294,8 +291,8 @@ function PlanningBoard() {
                 });
             },
             onDelete: () => setPendingRemoval({ projectId: project.id, id: group.id }),
-            onOnsite: () => {
-              openOverlay({ onsiteIntent: { id: group.id } });
+            onOnsite: (target = group.id) => {
+              openOverlay({ onsiteIntent: { id: target } });
               void navigate({ to: '/vor-ort' });
             },
             onDuplicate: () => {

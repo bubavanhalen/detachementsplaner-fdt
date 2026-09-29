@@ -57,3 +57,27 @@ export function onsiteFixture(): Project {
   connectGroups(project, 'kvk', 'wk');
   return project;
 }
+
+/** A second fictional KVK detachement with its own people and place. */
+export function withSecondKvk(project: Project): Project {
+  project.persons.push(
+    person('p-ost1', 'Kpl', 'Gina', 'Ostwald', { funktion: 'Mat Uof', lics: ['C'] }),
+    person('p-ost2', 'Sdt', 'Hugo', 'Ostwald', { funktion: 'Mat Sdt' }),
+  );
+  project.dets.push(
+    createDetachment({
+      id: 'kvk-ost',
+      name: 'Fiktiv KVK Ost',
+      ec: 'K2',
+      datum: '2027-04-26',
+      von: '09:00',
+      ort: 'Fiktivdorf',
+      treffpunkt: 'Tor A',
+      anzug: 'Tenue B',
+      bisDatum: '2027-04-30',
+      entlassungsort: 'Fiktivdorf',
+    }),
+  );
+  project.assign['kvk-ost'] = ['p-ost1', 'p-ost2'];
+  return project;
+}

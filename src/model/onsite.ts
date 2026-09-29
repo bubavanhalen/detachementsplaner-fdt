@@ -1,24 +1,113 @@
-import { groupPeople } from './planning';
+import { directGroupIds, groupPeople } from './planning';
 import { assertWritable, newId } from './project';
-import type { Detachment, Person, Project, SubDetachment } from './types';
+import type { Detachment, OnsiteEvent, Person, Project, SubDetachment } from './types';
 
-// On-site sub-groups («Det Mat», «Det VT», …) organise a planning card for the service on
-// site. They are stored beside the planning cards and never feed PISA, validation or the
-// PISA signatures, so splitting a detachement on site cannot invalidate the handover.
+// On-site events («KVK», von–bis) hold their own detachements («Det Mat», «Det VT», …).
+// The PISA detachements (planning cards) only filter who takes part. Events are stored
+// beside the planning cards and never feed PISA, validation or the PISA signatures, so
+// organising the service on site cannot invalidate the handover.
 
 export const DEFAULT_SUBDET_NAMES = ['Det Mat', 'Det VT', 'Det Kp'];
 const MAX_NAME = 60;
+const MAX_EVENT_NAME = 80;
 
 const cleanName = (value: string): string => value.replace(/\s+/g, ' ').trim();
 const nameKey = (value: string): string => cleanName(value).toLocaleLowerCase('de-CH');
+const validDate = (value: string): boolean =>
+  !value ||
+  (/^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(Date.parse(value)) &&
+    new Date(value).toISOString().slice(0, 10) === value);
+
+// ─── Events ──────────────────────────────────────────────────────────────────────────
+
+/** By start date (undated last), then by name. */
+export function onsiteEvents(project: Project): OnsiteEvent[] {
+  return [...(project.onsiteEvents ?? [])].sort(
+    (a, b) =>
+      (a.von || '9999').localeCompare(b.von || '9999') || a.name.localeCompare(b.name, 'de-CH'),
+  );
+}
+function eventOf(project: Project, id: string): OnsiteEvent {
+  const event = project.onsiteEvents?.find((item) => item.id === id);
+  if (!event) throw new Error('Das Event ist nicht mehr vorhanden.');
+  return event;
+}
+/** Events whose PISA filter contains the planning card. */
+export function eventsForDet(project: Project, detId: string): OnsiteEvent[] {
+  return onsiteEvents(project).filter((event) => event.detIds.includes(detId));
+}
+
+type EventFields = Pick<OnsiteEvent, 'name' | 'von' | 'bis' | 'detIds'>;
+function checkedEvent(project: Project, fields: EventFields): EventFields {
+  const name = cleanName(fields.name);
+  if (!name) throw new Error('Bitte einen Namen für das Event eingeben.');
+  if (name.length > MAX_EVENT_NAME)
+    throw new Error(`Der Name eines Events hat höchstens ${MAX_EVENT_NAME} Zeichen.`);
+  if (!validDate(fields.von) || !validDate(fields.bis))
+    throw new Error('Das Datum des Events ist ungültig.');
+  if (fields.von && fields.bis && fields.bis < fields.von)
+    throw new Error('Das Event endet vor seinem Beginn.');
+  const ids = new Set(fields.detIds);
+  if ([...ids].some((id) => !project.dets.some((group) => group.id === id)))
+    throw new Error('Ein gewähltes Detachement existiert nicht mehr.');
+  return {
+    name,
+    von: fields.von,
+    bis: fields.bis,
+    // Board order keeps lists and filters stable.
+    detIds: project.dets.filter((group) => ids.has(group.id)).map((group) => group.id),
+  };
+}
+
+export function createEvent(project: Project, fields: EventFields): OnsiteEvent {
+  assertWritable(project);
+  const event = { id: newId('event'), ...checkedEvent(project, fields) };
+  project.onsiteEvents = [...(project.onsiteEvents ?? []), event];
+  return event;
+}
+export function updateEvent(project: Project, id: string, patch: Partial<EventFields>): void {
+  assertWritable(project);
+  const event = eventOf(project, id);
+  Object.assign(event, checkedEvent(project, { ...event, ...patch }));
+}
+/** A full copy with its detachements, leaders, tasks and people, e.g. for the next week. */
+export function copyEvent(project: Project, id: string): OnsiteEvent {
+  assertWritable(project);
+  const source = eventOf(project, id);
+  const taken = new Set((project.onsiteEvents ?? []).map((event) => nameKey(event.name)));
+  const base = `${source.name} (Kopie)`.slice(0, MAX_EVENT_NAME);
+  let name = base;
+  for (let index = 2; taken.has(nameKey(name)); index++) name = `${base} ${index}`;
+  const copy = { ...structuredClone(source), id: newId('event'), name };
+  project.onsiteEvents = [...(project.onsiteEvents ?? []), copy];
+  project.subDets = [
+    ...(project.subDets ?? []),
+    ...subDetsOf(project, id).map((sub) => ({
+      ...structuredClone(sub),
+      id: newId('sub'),
+      parentId: copy.id,
+    })),
+  ];
+  return copy;
+}
+/** Removes an event with its detachements; the planning cards stay unchanged. */
+export function removeEvent(project: Project, id: string): void {
+  assertWritable(project);
+  eventOf(project, id);
+  project.onsiteEvents = (project.onsiteEvents ?? []).filter((event) => event.id !== id);
+  project.subDets = (project.subDets ?? []).filter((sub) => sub.parentId !== id);
+}
+/** A removed planning card leaves every event filter; the on-site detachements stay. */
+export function removeDetFromOnsite(project: Project, detId: string): void {
+  for (const event of project.onsiteEvents ?? [])
+    if (event.detIds.includes(detId)) event.detIds = event.detIds.filter((id) => id !== detId);
+}
+
+// ─── On-site detachements of an event ────────────────────────────────────────────────
 
 export function subDetsOf(project: Project, parentId: string): SubDetachment[] {
   return (project.subDets ?? []).filter((sub) => sub.parentId === parentId);
-}
-function parentOf(project: Project, parentId: string): Detachment {
-  const group = project.dets.find((item) => item.id === parentId);
-  if (!group) throw new Error('Das gewählte Detachement existiert nicht.');
-  return group;
 }
 function subOf(project: Project, id: string): SubDetachment {
   const sub = project.subDets?.find((item) => item.id === id);
@@ -34,7 +123,7 @@ export function parseSubDetNames(input: string): string[] {
     .filter(Boolean);
 }
 
-/** Names used elsewhere in this service first, then the common defaults; never a duplicate. */
+/** Names used in other events first, then the common defaults; never a duplicate. */
 export function subDetSuggestions(project: Project, parentId: string): string[] {
   const seen = new Set(subDetsOf(project, parentId).map((sub) => nameKey(sub.name)));
   const result: string[] = [];
@@ -49,7 +138,7 @@ export function subDetSuggestions(project: Project, parentId: string): string[] 
 
 export function addSubDets(project: Project, parentId: string, names: string[]): SubDetachment[] {
   assertWritable(project);
-  parentOf(project, parentId);
+  eventOf(project, parentId);
   const taken = new Set(subDetsOf(project, parentId).map((sub) => nameKey(sub.name)));
   const created: SubDetachment[] = [];
   for (const raw of names) {
@@ -105,15 +194,10 @@ export function removeSubDet(project: Project, id: string): void {
   project.subDets = (project.subDets ?? []).filter((sub) => sub.id !== id);
 }
 
-/** Removes every sub-group of a planning card, e.g. when the card itself is removed. */
-export function removeSubDetsOf(project: Project, parentId: string): void {
-  if (!project.subDets?.some((sub) => sub.parentId === parentId)) return;
-  project.subDets = project.subDets.filter((sub) => sub.parentId !== parentId);
-}
-
 /**
- * Moves people between the sub-groups of one planning card. `subId` null returns them to
- * «nicht eingeteilt». A person belongs to at most one sub-group per planning card.
+ * Moves people between the detachements of one event. `subId` null returns them to
+ * «nicht eingeteilt». A person belongs to at most one detachement per event; the PISA
+ * filter only narrows the list, so anyone of the service can be placed.
  */
 export function moveToSubDet(
   project: Project,
@@ -122,16 +206,13 @@ export function moveToSubDet(
   personIds: string[],
 ): void {
   assertWritable(project);
-  parentOf(project, parentId);
+  eventOf(project, parentId);
   const target = subId ? subOf(project, subId) : undefined;
   if (target && target.parentId !== parentId)
-    throw new Error('Die Untergruppe gehört zu einem anderen Detachement.');
+    throw new Error('Die Untergruppe gehört zu einem anderen Event.');
   const selected = new Set(personIds);
-  if (target) {
-    const pool = new Set(groupPeople(project, parentId).map((person) => person.id));
-    if (personIds.some((id) => !pool.has(id)))
-      throw new Error('Nur Personen dieses Detachements können eingeteilt werden.');
-  }
+  if (target && personIds.some((id) => !project.persons.some((person) => person.id === id)))
+    throw new Error('Die Auswahl enthält nicht mehr vorhandene Personen.');
   for (const sub of subDetsOf(project, parentId)) {
     if (sub === target) continue;
     sub.personIds = sub.personIds.filter((id) => !selected.has(id));
@@ -253,23 +334,53 @@ export interface SubDetGroup {
   chef?: Person;
 }
 export interface OnsiteView {
-  /** Everyone serving with the planning card, including incoming connections. */
+  event: OnsiteEvent;
+  /** PISA detachements of the filter, in board order. */
+  dets: Detachment[];
+  /** People matching the PISA filter (everyone not excluded without a filter). */
+  candidates: Person[];
+  /** Candidates plus everyone already placed in the event, by grade. */
   pool: Person[];
   groups: SubDetGroup[];
+  /** Candidates not placed yet. */
   unassigned: Person[];
-  /** Sub-group entries of people who are no longer part of the planning card. */
+  /** Entries of people who no longer exist in the project. */
   staleIds: string[];
   /** person id → sub-group id */
   placement: Map<string, string>;
+  /** person id → PISA detachement the person serves with; filtered cards take precedence. */
+  origin: Map<string, Detachment>;
 }
-export function onsiteView(project: Project, parentId: string): OnsiteView {
-  const pool = sortByRank(groupPeople(project, parentId));
-  const poolIds = new Set(pool.map((person) => person.id));
-  const subs = subDetsOf(project, parentId);
+export function onsiteView(project: Project, eventId: string): OnsiteView {
+  const event = eventOf(project, eventId);
+  const dets = project.dets.filter((group) => event.detIds.includes(group.id));
+  const members = new Map(
+    dets.map((group) => [group.id, new Set(groupPeople(project, group.id).map(({ id }) => id))]),
+  );
+  const candidates = project.persons.filter((person) =>
+    dets.length
+      ? dets.some((group) => members.get(group.id)?.has(person.id))
+      : person.planning.status !== 'excluded',
+  );
+  const subs = subDetsOf(project, eventId);
+  const exists = new Set(project.persons.map((person) => person.id));
   const placement = new Map<string, string>();
   for (const sub of subs)
     for (const id of sub.personIds)
-      if (poolIds.has(id) && !placement.has(id)) placement.set(id, sub.id);
+      if (exists.has(id) && !placement.has(id)) placement.set(id, sub.id);
+  const candidateIds = new Set(candidates.map((person) => person.id));
+  const pool = sortByRank(
+    project.persons.filter((person) => candidateIds.has(person.id) || placement.has(person.id)),
+  );
+  const origin = new Map<string, Detachment>();
+  for (const person of pool) {
+    const direct = directGroupIds(project, person.id);
+    const group =
+      dets.find((item) => direct.includes(item.id)) ??
+      dets.find((item) => members.get(item.id)?.has(person.id)) ??
+      project.dets.find((item) => direct.includes(item.id));
+    if (group) origin.set(person.id, group);
+  }
   const groups = subs.map((sub) => {
     const people = pool.filter((person) => placement.get(person.id) === sub.id);
     const chef = people.find((person) => person.id === sub.chefId);
@@ -280,10 +391,27 @@ export function onsiteView(project: Project, parentId: string): OnsiteView {
     };
   });
   return {
+    event,
+    dets,
+    candidates,
     pool,
     groups,
-    unassigned: pool.filter((person) => !placement.has(person.id)),
-    staleIds: [...new Set(subs.flatMap((sub) => sub.personIds).filter((id) => !poolIds.has(id)))],
+    unassigned: pool.filter((person) => candidateIds.has(person.id) && !placement.has(person.id)),
+    staleIds: [...new Set(subs.flatMap((sub) => sub.personIds).filter((id) => !exists.has(id)))],
     placement,
+    origin,
+  };
+}
+
+/** Short note for a planning card: the events whose filter contains it. */
+export function onsiteSummary(
+  project: Project,
+  detId: string,
+): { text: string; target: string } | null {
+  const events = eventsForDet(project, detId);
+  if (!events.length) return null;
+  return {
+    text: `Vor Ort: ${events.map((event) => event.name).join(' · ')}`,
+    target: events[0].id,
   };
 }

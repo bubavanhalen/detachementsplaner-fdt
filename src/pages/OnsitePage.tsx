@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { copyText } from '../components/CopyButton';
 import { Icon } from '../components/Icon';
-import { ErrorBox, errorText } from '../components/Modal';
+import { ErrorBox, errorText, Modal } from '../components/Modal';
 import { DetSheetView, printDetSheet } from '../components/onsite/DetSheetView';
 import {
   bestand,
@@ -16,20 +16,29 @@ import {
 import { displayDate, localError, searchText } from '../io/text';
 import {
   addSubDets,
+  copyEvent,
+  createEvent,
+  eventsForDet,
+  groupPeople,
+  licenseCategories,
   listName,
   moveToSubDet,
+  onsiteEvents,
   onsiteView,
   parseSubDetNames,
+  removeEvent,
   removeSubDet,
   renameSubDet,
   type SubDetGroup,
   setSubDetAuftrag,
   setSubDetChef,
+  shortFunction,
   subDetSuggestions,
   subDetsOf,
+  updateEvent,
 } from '../model';
-import type { Detachment, Person, Project } from '../model/types';
-import { changeProject, notify, notifyUndoable, useProject } from '../store';
+import type { OnsiteEvent, Person, Project } from '../model/types';
+import { changeProject, notify, notifyUndoable, projectStore, useProject } from '../store';
 import { overlayStore, useOverlays } from '../ui';
 import './pages.css';
 import './onsite.css';
@@ -39,143 +48,453 @@ export default function OnsitePage() {
   return <Onsite key={project.id} />;
 }
 
+/** «26.04.–30.04.2027» */
+function shortPeriod(event: OnsiteEvent): string {
+  if (!event.von && !event.bis) return '';
+  if (!event.von || !event.bis || event.von === event.bis)
+    return displayDate(event.von || event.bis);
+  return `${displayDate(event.von).slice(0, 6)}–${displayDate(event.bis)}`;
+}
+
 function Onsite() {
   const project = useProject();
   const overlays = useOverlays();
-  const [selectedId, setSelectedId] = useState(
-    () => overlays.onsiteIntent?.id ?? project.dets[0]?.id ?? '',
-  );
+  const archived = Boolean(project.archive);
+  const events = onsiteEvents(project);
+  const [selectedId, setSelectedId] = useState(() => events[0]?.id ?? '');
   const [tab, setTab] = useState<'split' | 'output'>('split');
   const [options, setOptions] = useState<DetSheetOptions>(DEFAULT_DET_SHEET_OPTIONS);
-  // One-shot request from a planning card.
+  // undefined: closed; otherwise the PISA detachements preselected for a new event.
+  const [creating, setCreating] = useState<string[] | undefined>(undefined);
+  // One-shot request from a planning card: open its event or prepare a new one.
   useEffect(() => {
     const intent = overlays.onsiteIntent;
     if (!intent) return;
     overlayStore.setState((old) => ({ ...old, onsiteIntent: null }));
-    setSelectedId(intent.id);
+    const current = projectStore.get();
+    const forDet = eventsForDet(current, intent.id);
+    if (current.onsiteEvents?.some((event) => event.id === intent.id)) setSelectedId(intent.id);
+    else if (forDet.length) setSelectedId(forDet[0].id);
+    else if (!archived && current.dets.some((group) => group.id === intent.id))
+      setCreating([intent.id]);
     setTab('split');
-  }, [overlays.onsiteIntent]);
-  const selected = project.dets.find((group) => group.id === selectedId) ?? project.dets[0];
+  }, [overlays.onsiteIntent, archived]);
+  const selected = events.find((event) => event.id === selectedId) ?? events[0];
+  const mutate = (callback: (draft: Project) => void): boolean => {
+    try {
+      changeProject(callback);
+      return true;
+    } catch (failure) {
+      notify(localError(failure), { tone: 'warning' });
+      return false;
+    }
+  };
+  const dialog = creating && (
+    <NewEventDialog
+      project={project}
+      detIds={creating}
+      onClose={() => setCreating(undefined)}
+      onCreated={(id) => {
+        setCreating(undefined);
+        setSelectedId(id);
+        setTab('split');
+      }}
+    />
+  );
   if (!selected)
     return (
       <div className="page">
         <div className="empty">
           <span className="empty-icon">
-            <Icon name="layout" size={22} />
+            <Icon name="calendar" size={22} />
           </span>
-          <h2>Noch keine Detachemente.</h2>
-          <p>Vor Ort teilst du bestehende Detachemente in Untergruppen auf.</p>
-          <Link to="/" className="btn btn-primary">
-            Zur Planung
-          </Link>
+          <h2>Noch kein Event.</h2>
+          <p>
+            Ein Event (z. B. «KVK» vom … bis …) enthält die Detachemente vor Ort wie Det Mat, Det VT
+            oder Det Kp. Die PISA-Detachemente dienen als Filter.
+          </p>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={archived}
+            onClick={() => setCreating([])}
+          >
+            <Icon name="plus" size={16} /> Neues Event
+          </button>
         </div>
+        {dialog}
       </div>
     );
   return (
     <div className="page page-wide onsite-page">
       <section className="page-intro no-print">
         <div>
-          <h2>Vor Ort aufteilen und Listen ausgeben</h2>
+          <h2>Events vor Ort</h2>
           <p>
-            Untergruppen wie «Det Mat» oder «Det VT» gelten nur für den Dienst vor Ort.
-            PISA-Einträge, EC und die Einrückungsgruppen bleiben unverändert.
+            Pro Event (z. B. «KVK») Detachemente wie «Det Mat» oder «Det VT» bilden. Die
+            PISA-Detachemente filtern nur, wer zur Auswahl steht; PISA-Einträge, EC und die Planung
+            bleiben unverändert.
           </p>
         </div>
       </section>
       <div className="onsite-layout">
         <aside className="onsite-rail no-print">
           <div className="card">
-            <ul className="entry-list" aria-label="Detachemente">
-              {project.dets.map((group) => (
-                <DetRailItem
-                  key={group.id}
+            <p className="onsite-rail-label">Events</p>
+            <ul className="entry-list" aria-label="Events">
+              {events.map((event) => (
+                <EventRailItem
+                  key={event.id}
                   project={project}
-                  group={group}
-                  active={group.id === selected.id}
-                  onSelect={() => setSelectedId(group.id)}
+                  event={event}
+                  active={event.id === selected.id}
+                  onSelect={() => setSelectedId(event.id)}
                 />
               ))}
             </ul>
+            <div className="onsite-rail-foot">
+              <button
+                type="button"
+                className="btn btn-sm btn-block"
+                disabled={archived}
+                onClick={() => setCreating([])}
+              >
+                <Icon name="plus" size={15} /> Neues Event
+              </button>
+            </div>
           </div>
         </aside>
         <div className="onsite-main" key={selected.id}>
-          <header className="card onsite-head no-print">
-            <span className={`ec ${selected.ec ? '' : 'is-missing'}`}>{selected.ec || '—'}</span>
-            <div className="grow">
-              <h2>{selected.name}</h2>
-              <p>
-                {[
-                  selected.datum &&
-                    `${displayDate(selected.datum)} – ${selected.bisDatum ? displayDate(selected.bisDatum) : '…'}`,
-                  selected.ort,
-                ]
-                  .filter(Boolean)
-                  .join(' · ') || 'Einrücken & Entlassung in der Planung ergänzen'}
-              </p>
-            </div>
-            <div className="segmented" role="tablist" aria-label="Ansicht">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'split'}
-                onClick={() => setTab('split')}
-              >
-                <Icon name="layout" size={15} /> Aufteilen
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'output'}
-                onClick={() => setTab('output')}
-              >
-                <Icon name="printer" size={15} /> Liste ausgeben
-              </button>
-            </div>
-          </header>
+          <EventHeader
+            project={project}
+            event={selected}
+            tab={tab}
+            onTab={setTab}
+            onCopy={() => {
+              let id = '';
+              if (
+                mutate((draft) => {
+                  id = copyEvent(draft, selected.id).id;
+                })
+              ) {
+                setSelectedId(id);
+                notifyUndoable(`«${selected.name}» kopiert.`);
+              }
+            }}
+            onRemove={() => {
+              if (mutate((draft) => removeEvent(draft, selected.id))) {
+                setSelectedId('');
+                notifyUndoable(
+                  `Event «${selected.name}» gelöscht. Die Planung bleibt unverändert.`,
+                );
+              }
+            }}
+          />
           {tab === 'split' ? (
-            <SplitView project={project} group={selected} onOutput={() => setTab('output')} />
+            <SplitView project={project} eventId={selected.id} onOutput={() => setTab('output')} />
           ) : (
             <OutputView
               project={project}
-              group={selected}
+              eventId={selected.id}
               options={options}
               onOptions={setOptions}
             />
           )}
         </div>
       </div>
+      {dialog}
     </div>
   );
 }
 
-function DetRailItem({
+function EventRailItem({
   project,
-  group,
+  event,
   active,
   onSelect,
 }: {
   project: Project;
-  group: Detachment;
+  event: OnsiteEvent;
   active: boolean;
   onSelect: () => void;
 }) {
-  const view = onsiteView(project, group.id);
+  const view = onsiteView(project, event.id);
   const subs = view.groups.length;
   return (
     <li>
       <button type="button" className="entry-item" aria-pressed={active} onClick={onSelect}>
-        <span className={`ec ${group.ec ? '' : 'is-missing'}`}>{group.ec || '—'}</span>
         <span className="grow">
-          <span className="truncate">{group.name}</span>
+          <span className="truncate">{event.name}</span>
           <small>
-            {view.pool.length} Pers. ·{' '}
-            {subs
-              ? `${subs} ${subs === 1 ? 'Untergruppe' : 'Untergruppen'}${view.unassigned.length ? ` · ${view.unassigned.length} offen` : ''}`
-              : 'nicht aufgeteilt'}
+            {[
+              shortPeriod(event),
+              `${view.pool.length} Pers.`,
+              subs
+                ? `${subs} Det${view.unassigned.length ? ` · ${view.unassigned.length} offen` : ''}`
+                : 'nicht aufgeteilt',
+            ]
+              .filter(Boolean)
+              .join(' · ')}
           </small>
         </span>
       </button>
     </li>
+  );
+}
+
+function EventHeader({
+  project,
+  event,
+  tab,
+  onTab,
+  onCopy,
+  onRemove,
+}: {
+  project: Project;
+  event: OnsiteEvent;
+  tab: 'split' | 'output';
+  onTab: (tab: 'split' | 'output') => void;
+  onCopy: () => void;
+  onRemove: () => void;
+}) {
+  const archived = Boolean(project.archive);
+  const [error, setError] = useState('');
+  const vonId = useId(),
+    bisId = useId();
+  const update = (patch: Parameters<typeof updateEvent>[2]): boolean => {
+    try {
+      changeProject((draft) => updateEvent(draft, event.id, patch));
+      setError('');
+      return true;
+    } catch (caught) {
+      setError(errorText(caught));
+      return false;
+    }
+  };
+  return (
+    <header className="card onsite-head no-print">
+      <div className="onsite-head-main">
+        <span className="ec">
+          <Icon name="calendar" size={16} />
+        </span>
+        <div className="grow">
+          <CommitInput
+            label="Name des Events"
+            className="onsite-event-name"
+            value={event.name}
+            disabled={archived}
+            onCommit={(name) => update({ name })}
+          />
+          <div className="onsite-dates">
+            <label htmlFor={vonId}>Von</label>
+            <input
+              id={vonId}
+              type="date"
+              value={event.von}
+              disabled={archived}
+              onChange={(change) => update({ von: change.target.value })}
+            />
+            <label htmlFor={bisId}>Bis</label>
+            <input
+              id={bisId}
+              type="date"
+              value={event.bis}
+              disabled={archived}
+              onChange={(change) => update({ bis: change.target.value })}
+            />
+          </div>
+        </div>
+        {!archived && (
+          <div className="row">
+            <button type="button" className="btn btn-sm btn-ghost" onClick={onCopy}>
+              <Icon name="duplicate" size={15} /> Kopieren
+            </button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={onRemove}>
+              <Icon name="trash" size={15} /> Löschen
+            </button>
+          </div>
+        )}
+        <div className="segmented" role="tablist" aria-label="Ansicht">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'split'}
+            onClick={() => onTab('split')}
+          >
+            <Icon name="layout" size={15} /> Aufteilen
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'output'}
+            onClick={() => onTab('output')}
+          >
+            <Icon name="printer" size={15} /> Liste ausgeben
+          </button>
+        </div>
+      </div>
+      <fieldset className="chip-row" aria-label="PISA-Detachemente">
+        <span className="muted onsite-chip-label">PISA-Det</span>
+        <button
+          type="button"
+          className="chip"
+          aria-pressed={!event.detIds.length}
+          disabled={archived}
+          onClick={() => update({ detIds: [] })}
+          title="Ohne Filter stehen alle Personen der Dienstleistung zur Auswahl"
+        >
+          Alle
+        </button>
+        {project.dets.map((group) => {
+          const active = event.detIds.includes(group.id);
+          return (
+            <button
+              type="button"
+              key={group.id}
+              className="chip"
+              aria-pressed={active}
+              disabled={archived}
+              onClick={() =>
+                update({
+                  detIds: active
+                    ? event.detIds.filter((id) => id !== group.id)
+                    : [...event.detIds, group.id],
+                })
+              }
+            >
+              {group.name}
+              <span className="count">{groupPeople(project, group.id).length}</span>
+            </button>
+          );
+        })}
+      </fieldset>
+      <ErrorBox message={error} />
+    </header>
+  );
+}
+
+/** Name, period and the PISA detachements to filter by; dates follow the chosen cards. */
+function NewEventDialog({
+  project,
+  detIds,
+  onClose,
+  onCreated,
+}: {
+  project: Project;
+  detIds: string[];
+  onClose: () => void;
+  onCreated: (id: string) => void;
+}) {
+  const preset = project.dets.filter((group) => detIds.includes(group.id));
+  const [name, setName] = useState(() => preset.map((group) => group.name).join(' + '));
+  const [von, setVon] = useState(
+    () =>
+      preset
+        .map((group) => group.datum)
+        .filter(Boolean)
+        .sort()[0] ?? '',
+  );
+  const [bis, setBis] = useState(
+    () =>
+      preset
+        .map((group) => group.bisDatum)
+        .filter(Boolean)
+        .sort()
+        .at(-1) ?? '',
+  );
+  const [chosen, setChosen] = useState(() => new Set(detIds));
+  const [error, setError] = useState('');
+  const nameId = useId(),
+    vonId = useId(),
+    bisId = useId();
+  const save = () => {
+    let id = '';
+    try {
+      changeProject((draft) => {
+        id = createEvent(draft, { name, von, bis, detIds: [...chosen] }).id;
+      });
+      notify('Event erstellt. Jetzt Detachemente bilden.', { tone: 'success' });
+      onCreated(id);
+    } catch (caught) {
+      setError(errorText(caught));
+    }
+  };
+  return (
+    <Modal
+      title="Neues Event"
+      description="Z. B. «KVK» oder «WK Woche 1». Die PISA-Detachemente filtern, wer zur Auswahl steht; ohne Auswahl stehen alle zur Verfügung."
+      onClose={onClose}
+      footer={
+        <>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>
+            Abbrechen
+          </button>
+          <button type="button" className="btn btn-primary" disabled={!name.trim()} onClick={save}>
+            Event erstellen
+          </button>
+        </>
+      }
+    >
+      <div className="stack">
+        <ErrorBox message={error} />
+        <div className="field">
+          <label htmlFor={nameId}>Name</label>
+          <input
+            id={nameId}
+            value={name}
+            placeholder="z. B. KVK"
+            onChange={(change) => setName(change.target.value)}
+          />
+        </div>
+        <div className="form-grid">
+          <div className="field">
+            <label htmlFor={vonId}>Von</label>
+            <input
+              id={vonId}
+              type="date"
+              value={von}
+              onChange={(change) => setVon(change.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor={bisId}>Bis</label>
+            <input
+              id={bisId}
+              type="date"
+              value={bis}
+              onChange={(change) => setBis(change.target.value)}
+            />
+          </div>
+        </div>
+        <fieldset className="combine-list" aria-label="PISA-Detachemente">
+          {project.dets.map((group) => (
+            <label key={group.id} className="check combine-option">
+              <input
+                type="checkbox"
+                aria-label={group.ec ? `${group.name} (EC ${group.ec})` : group.name}
+                checked={chosen.has(group.id)}
+                onChange={(change) =>
+                  setChosen((old) => {
+                    const next = new Set(old);
+                    if (change.target.checked) next.add(group.id);
+                    else next.delete(group.id);
+                    return next;
+                  })
+                }
+              />
+              <span className={`ec ${group.ec ? '' : 'is-missing'}`}>{group.ec || '—'}</span>
+              <span className="grow">{group.name}</span>
+              <span className="muted">{groupPeople(project, group.id).length} Pers.</span>
+            </label>
+          ))}
+        </fieldset>
+        <p className="muted small-note">
+          {chosen.size
+            ? `${chosen.size} PISA-Detachement${chosen.size === 1 ? '' : 'e'} als Filter.`
+            : 'Ohne Auswahl stehen alle Personen der Dienstleistung zur Auswahl.'}
+        </p>
+      </div>
+    </Modal>
   );
 }
 
@@ -186,21 +505,22 @@ function shortLabel(name: string): string {
 
 function SplitView({
   project,
-  group,
+  eventId,
   onOutput,
 }: {
   project: Project;
-  group: Detachment;
+  eventId: string;
   onOutput: () => void;
 }) {
   const archived = Boolean(project.archive);
-  const view = useMemo(() => onsiteView(project, group.id), [project, group.id]);
-  const suggestions = subDetSuggestions(project, group.id);
+  const view = useMemo(() => onsiteView(project, eventId), [project, eventId]);
+  const suggestions = subDetSuggestions(project, eventId);
+  // The PISA card is shown per person as soon as people come from more than one.
+  const showOrigin = new Set([...view.origin.values()].map((group) => group.id)).size > 1;
   const [error, setError] = useState('');
   const [names, setNames] = useState('');
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
-  const [funktion, setFunktion] = useState('');
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const anchor = useRef<string | null>(null);
   const list = useRef<HTMLUListElement>(null);
@@ -215,25 +535,30 @@ function SplitView({
     }
   };
   const create = (values: string[]) => {
-    const before = subDetsOf(project, group.id).length;
-    if (mutate((draft) => addSubDets(draft, group.id, values))) {
+    const before = subDetsOf(project, eventId).length;
+    if (mutate((draft) => addSubDets(draft, eventId, values))) {
       setNames('');
       const created = values.length > 1 ? `${values.length} Untergruppen` : `«${values[0]}»`;
       if (!before) notify(`${created} erstellt. Jetzt Personen einteilen.`, { tone: 'success' });
     }
   };
   const move = (subId: string | null, ids: string[]) =>
-    mutate((draft) => moveToSubDet(draft, group.id, subId, ids));
-  const functions = [...new Set(view.pool.map((person) => person.funktion).filter(Boolean))].sort(
-    (a, b) => a.localeCompare(b, 'de-CH'),
-  );
+    mutate((draft) => moveToSubDet(draft, eventId, subId, ids));
   const words = searchText(search).split(' ').filter(Boolean);
   const visible = view.pool.filter((person) => {
     const place = view.placement.get(person.id) ?? '';
     if (filter === 'open' ? place : filter !== 'all' && place !== filter) return false;
-    if (funktion && person.funktion !== funktion) return false;
     const haystack = searchText(
-      [person.grad, person.name, person.funktion, ...person.lics, person.zug].join(' '),
+      [
+        person.grad,
+        person.name,
+        person.funktion,
+        shortFunction(project, person.funktion),
+        ...person.lics,
+        ...licenseCategories(project, person),
+        person.zug,
+        view.origin.get(person.id)?.name,
+      ].join(' '),
     );
     return words.every((word) => haystack.includes(word));
   });
@@ -290,12 +615,12 @@ function SplitView({
       <section className="card no-print">
         <header className="card-head">
           <h2>
-            <Icon name="layout" size={17} /> Untergruppen
+            <Icon name="layout" size={17} /> Detachemente vor Ort
           </h2>
           <span className="muted">
             {view.groups.length
               ? `${view.unassigned.length} von ${view.pool.length} noch nicht eingeteilt`
-              : `${view.pool.length} Personen im Detachement`}
+              : `${view.pool.length} Personen im Event`}
           </span>
         </header>
         <div className="card-body stack">
@@ -368,7 +693,7 @@ function SplitView({
             </div>
           ) : (
             <p className="muted">
-              Noch keine Untergruppen. Vorschlag anklicken oder Namen eingeben – mehrere mit Komma
+              Noch keine Detachemente. Vorschlag anklicken oder Namen eingeben – mehrere mit Komma
               trennen.
             </p>
           )}
@@ -419,21 +744,6 @@ function SplitView({
                   onChange={(event) => setSearch(event.target.value)}
                 />
               </label>
-              {functions.length > 1 && (
-                <select
-                  aria-label="Funktion"
-                  value={funktion}
-                  onChange={(event) => setFunktion(event.target.value)}
-                  style={{ width: 'auto' }}
-                >
-                  <option value="">Alle Funktionen</option>
-                  {functions.map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              )}
             </div>
             <fieldset className="chip-row" aria-label="Anzeige">
               <button
@@ -546,8 +856,13 @@ function SplitView({
                       <strong>{listName(person)}</strong>
                     </span>
                     <small className="truncate">
-                      {[person.funktion, ...person.lics].filter(Boolean).join(' · ') ||
-                        'Keine weiteren Angaben'}
+                      {[
+                        showOrigin ? view.origin.get(person.id)?.name : '',
+                        shortFunction(project, person.funktion),
+                        ...licenseCategories(project, person),
+                      ]
+                        .filter(Boolean)
+                        .join(' · ') || 'Keine weiteren Angaben'}
                     </small>
                   </span>
                   <fieldset
@@ -603,8 +918,8 @@ function SplitView({
         <div className="callout callout-info no-print">
           <Icon name="info" />
           <div className="callout-body">
-            Diesem Detachement sind noch keine Personen zugeteilt.{' '}
-            <Link to="/">In der Planung zuteilen →</Link>
+            Im Filter sind keine Personen. Oben PISA-Detachemente wählen oder{' '}
+            <Link to="/">in der Planung zuteilen →</Link>
           </div>
         </div>
       )}
@@ -678,7 +993,7 @@ function SubDetTile({
               ))}
             </optgroup>
           )}
-          <optgroup label="Übrige im Detachement">
+          <optgroup label="Übrige im Event">
             {pool
               .filter((person) => !members.has(person.id))
               .map((person) => (
@@ -774,22 +1089,25 @@ const OPTION_TOGGLES: [keyof Omit<DetSheetOptions, 'scope' | 'columns'>, string]
 
 function OutputView({
   project,
-  group,
+  eventId,
   options,
   onOptions,
 }: {
   project: Project;
-  group: Detachment;
+  eventId: string;
   options: DetSheetOptions;
   onOptions: (options: DetSheetOptions) => void;
 }) {
-  const view = onsiteView(project, group.id);
+  const view = onsiteView(project, eventId);
+  const multiOrigin = new Set([...view.origin.values()].map((group) => group.id)).size > 1;
+  // Without detachements everyone is still open, so the whole event is listed.
+  const placed = view.groups.length ? view.pool.length - view.unassigned.length : view.pool.length;
   // A scope from another detachement or a removed sub-group falls back to the whole list.
   const effective =
     options.scope === 'all' || view.groups.some((item) => item.sub.id === options.scope)
       ? options
       : { ...options, scope: 'all' };
-  const sheet = buildDetSheet(project, group.id, effective);
+  const sheet = buildDetSheet(project, eventId, effective);
   const scoped = effective.scope !== 'all';
   const run = (action: () => void, done: string) => {
     try {
@@ -810,13 +1128,24 @@ function OutputView({
                 value={effective.scope}
                 onChange={(event) => onOptions({ ...options, scope: event.target.value })}
               >
-                <option value="all">Ganzes Detachement ({view.pool.length})</option>
+                <option value="all">
+                  Ganzes Event ({options.unassigned ? view.pool.length : placed})
+                </option>
                 {view.groups.map((item) => (
                   <option key={item.sub.id} value={item.sub.id}>
                     {item.sub.name} ({item.people.length})
                   </option>
                 ))}
               </select>
+            </label>
+            <label className="check onsite-unassigned">
+              <input
+                type="checkbox"
+                checked={options.unassigned}
+                disabled={scoped || !view.groups.length}
+                onChange={(event) => onOptions({ ...options, unassigned: event.target.checked })}
+              />
+              Nicht eingeteilte zeigen ({view.unassigned.length})
             </label>
             <div className="spacer" />
             <button
@@ -847,22 +1176,24 @@ function OutputView({
           </div>
           <fieldset className="chip-row" aria-label="Spalten">
             <span className="muted onsite-chip-label">Spalten</span>
-            {DET_SHEET_COLUMNS.map((column) => (
-              <button
-                type="button"
-                key={column.key}
-                className="chip"
-                aria-pressed={options.columns[column.key]}
-                onClick={() =>
-                  onOptions({
-                    ...options,
-                    columns: { ...options.columns, [column.key]: !options.columns[column.key] },
-                  })
-                }
-              >
-                {column.label}
-              </button>
-            ))}
+            {DET_SHEET_COLUMNS.filter((column) => column.key !== 'herkunft' || multiOrigin).map(
+              (column) => (
+                <button
+                  type="button"
+                  key={column.key}
+                  className="chip"
+                  aria-pressed={options.columns[column.key]}
+                  onClick={() =>
+                    onOptions({
+                      ...options,
+                      columns: { ...options.columns, [column.key]: !options.columns[column.key] },
+                    })
+                  }
+                >
+                  {column.label}
+                </button>
+              ),
+            )}
           </fieldset>
           <fieldset className="chip-row" aria-label="Gliederung">
             <span className="muted onsite-chip-label">Gliederung</span>
@@ -885,7 +1216,9 @@ function OutputView({
           </p>
         </div>
       </section>
-      <DetSheetView sheet={sheet} />
+      <div className="det-sheet-scroll">
+        <DetSheetView sheet={sheet} />
+      </div>
     </>
   );
 }

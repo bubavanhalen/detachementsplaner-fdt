@@ -137,7 +137,14 @@ export function entrySignature(project: Project, entryValue: PisaEntry): string 
   });
 }
 export function projectSignature(project: Project): string {
-  // Layout and on-site sub-groups never change what is entered in PISA.
-  const { pisa: _pisa, archive: _archive, board: _board, subDets: _subDets, ...content } = project;
+  // Layout and the on-site organisation never change what is entered in PISA.
+  const {
+    pisa: _pisa,
+    archive: _archive,
+    board: _board,
+    subDets: _subDets,
+    onsiteEvents: _onsiteEvents,
+    ...content
+  } = project;
   return serialize(content);
 }

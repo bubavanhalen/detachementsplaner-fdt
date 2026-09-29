@@ -38,7 +38,7 @@ const tools = [
     icon: 'calendar',
     hint: 'Aus dem Kp-WAP erstellen',
   },
-  { to: '/vor-ort', label: 'Vor Ort', icon: 'layout', hint: 'Untergruppen & Det-Listen' },
+  { to: '/vor-ort', label: 'Vor Ort', icon: 'layout', hint: 'Events, Dets & Listen' },
 ] as const;
 const titles: Record<string, { title: string; description: string; step?: number }> = {
   '/persons': { title: 'Personen', description: 'Suchen, prüfen und Angaben ergänzen' },
@@ -49,7 +49,7 @@ const titles: Record<string, { title: string; description: string; step?: number
   },
   '/vor-ort': {
     title: 'Vor Ort',
-    description: 'Detachemente in Untergruppen aufteilen und Listen ausgeben',
+    description: 'Events vor Ort: Detachemente bilden und Listen ausgeben',
   },
 };
 

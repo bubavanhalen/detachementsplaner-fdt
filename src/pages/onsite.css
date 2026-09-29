@@ -9,28 +9,97 @@
   position: sticky;
   top: 16px;
 }
+.onsite-rail-label {
+  padding: 12px 16px 2px;
+  color: var(--text-3);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.onsite-rail-foot {
+  padding: 10px;
+  border-top: 1px solid var(--border);
+}
+fieldset.combine-list {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  max-height: 50vh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-y: auto;
+}
+.combine-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.combine-option:has(input:checked) {
+  background: var(--accent-softer);
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+}
 .onsite-main {
   display: grid;
   gap: 16px;
   min-width: 0;
 }
 .onsite-head {
+  display: grid;
+  gap: 12px;
+  padding: 14px 18px;
+}
+.onsite-head-main {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 12px 14px;
-  padding: 14px 18px;
 }
 .onsite-head .ec {
   height: 36px;
   min-width: 48px;
-  font-size: 1.05rem;
 }
-.onsite-head h2 {
+.onsite-head .grow {
+  display: grid;
+  gap: 4px;
+  min-width: 240px;
+}
+input.onsite-event-name {
+  width: 100%;
+  padding: 2px 6px;
+  margin-left: -6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
   font-size: 1.2rem;
+  font-weight: 650;
 }
-.onsite-head p {
+input.onsite-event-name:hover:not(:disabled),
+input.onsite-event-name:focus {
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+.onsite-dates {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
   color: var(--text-3);
+  font-size: 0.88rem;
+}
+.onsite-dates input {
+  width: auto;
+  padding: 2px 6px;
+  font-size: 0.9rem;
+}
+/* The preview keeps its A4 proportions; narrow windows scroll sideways instead of squeezing it. */
+.det-sheet-scroll {
+  overflow-x: auto;
 }
 .subdet-add {
   display: flex;
@@ -165,4 +234,8 @@ input.subdet-name:focus {
   .onsite-layout {
     display: block;
   }
+}
+.onsite-unassigned {
+  align-self: center;
+  margin-top: 22px;
 }

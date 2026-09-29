@@ -86,9 +86,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       {
         id: 'n8',
         group: 'Ablauf',
-        label: 'Vor Ort: Untergruppen & Listen',
+        label: 'Vor Ort: Events & Listen',
         icon: 'layout',
-        keywords: 'subdet untergruppe aufteilen liste drucken appell det mat vt kp',
+        keywords: 'event anlass subdet untergruppe aufteilen liste drucken appell det mat vt kp',
         run: go('/vor-ort'),
         hint: 'Alt 8',
       },

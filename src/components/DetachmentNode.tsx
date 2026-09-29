@@ -14,8 +14,8 @@ export type DetachmentNodeData = {
   direct: number;
   inherited: number;
   preview: string[];
-  /** On-site sub-groups with their current size. */
-  subDets: { name: string; count: number }[];
+  /** On-site sub-groups and combinations; `target` is the unit to open. */
+  onsite: { text: string; target: string } | null;
   issues: BoardIssue[];
   policyOpen: boolean;
   globalOpen: boolean;
@@ -33,7 +33,7 @@ export type DetachmentNodeData = {
   onTarget: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
-  onOnsite: () => void;
+  onOnsite: (target?: string) => void;
   onDisconnect: () => void;
   onDropPeople: (ids: string[]) => void;
   onMove: (dx: number, dy: number) => void;
@@ -132,7 +132,7 @@ export const DetachmentNode = memo(function DetachmentNode({
           <MenuItem icon="duplicate" onSelect={data.onDuplicate} disabled={data.archived}>
             Duplizieren
           </MenuItem>
-          <MenuItem icon="layout" onSelect={data.onOnsite}>
+          <MenuItem icon="layout" onSelect={() => data.onOnsite()}>
             Vor Ort aufteilen …
           </MenuItem>
           {data.connected && (
@@ -225,17 +225,15 @@ export const DetachmentNode = memo(function DetachmentNode({
           )}
         </button>
 
-        {data.subDets.length > 0 && (
+        {data.onsite && (
           <button
             type="button"
             className="det-meta"
-            onClick={data.onOnsite}
+            onClick={() => data.onOnsite(data.onsite?.target)}
             title="Vor Ort: Untergruppen bearbeiten und Listen ausgeben"
           >
             <Icon name="layout" size={14} />
-            <span className="truncate">
-              {data.subDets.map((sub) => `${sub.name} ${sub.count}`).join(' · ')}
-            </span>
+            <span className="truncate">{data.onsite.text}</span>
           </button>
         )}
 

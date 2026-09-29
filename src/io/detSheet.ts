@@ -1,24 +1,27 @@
 import {
+  licenseCategories,
   listName,
   onsiteView,
   RANK_CATEGORY_LABELS,
   type RankCategory,
   rankCategory,
-  sortByRank,
+  shortFunction,
 } from '../model';
 import type { Detachment, Person, Project } from '../model/types';
 import { download } from './exports';
 import { XLSX } from './workbook';
 
-// One derived sheet per detachement (or one of its on-site sub-groups) feeds the print
-// preview, the Excel file and the copied text, so all three outputs always agree.
+// One derived sheet per on-site event (or one of its detachements) feeds the print preview,
+// the Excel file and the copied text, so all three outputs always agree.
 
-export type DetSheetColumn = 'funktion' | 'lics' | 'zug' | 'tel' | 'mail' | 'pnr';
+export type DetSheetColumn = 'herkunft' | 'funktion' | 'lics' | 'zug' | 'tel' | 'mail' | 'pnr';
 export interface DetSheetOptions {
   /** 'all' or the id of one sub-group. */
   scope: string;
   /** One section per sub-group (when sub-groups exist). */
   grouped: boolean;
+  /** Also list people not placed yet; applies once the event has detachements. */
+  unassigned: boolean;
   /** Start every sub-group on a new printed page, e.g. to hand each leader their list. */
   pageBreaks: boolean;
   /** Empty box per person for roll call. */
@@ -28,23 +31,45 @@ export interface DetSheetOptions {
 export const DEFAULT_DET_SHEET_OPTIONS: DetSheetOptions = {
   scope: 'all',
   grouped: true,
+  unassigned: false,
   pageBreaks: false,
   checkColumn: true,
-  columns: { funktion: true, lics: true, zug: false, tel: true, mail: false, pnr: false },
+  columns: {
+    herkunft: true,
+    funktion: true,
+    lics: true,
+    zug: false,
+    tel: true,
+    mail: false,
+    pnr: false,
+  },
 };
 export interface SheetColumn {
   key: DetSheetColumn;
   label: string;
   value: (person: Person) => string;
 }
-export const DET_SHEET_COLUMNS: SheetColumn[] = [
-  { key: 'funktion', label: 'Funktion', value: (person) => person.funktion },
-  { key: 'lics', label: 'Fahrausweise', value: (person) => person.lics.join(', ') },
-  { key: 'zug', label: 'Zug', value: (person) => person.zug ?? '' },
-  { key: 'tel', label: 'Telefon', value: (person) => person.tel ?? '' },
-  { key: 'mail', label: 'E-Mail', value: (person) => person.mail ?? '' },
-  { key: 'pnr', label: 'Versicherten-Nr.', value: (person) => person.pnr ?? '' },
+/** Column choices; «Detachement» (the PISA card) only shows when people come from several. */
+export const DET_SHEET_COLUMNS: { key: DetSheetColumn; label: string }[] = [
+  { key: 'herkunft', label: 'Detachement' },
+  { key: 'funktion', label: 'Funktion' },
+  { key: 'lics', label: 'Fahrausweise' },
+  { key: 'zug', label: 'Zug' },
+  { key: 'tel', label: 'Telefon' },
+  { key: 'mail', label: 'E-Mail' },
+  { key: 'pnr', label: 'Versicherten-Nr.' },
 ];
+/** Function and licences use the short forms of the cards. */
+const values = (
+  project: Project,
+): Record<Exclude<DetSheetColumn, 'herkunft'>, (person: Person) => string> => ({
+  funktion: (person) => shortFunction(project, person.funktion),
+  lics: (person) => licenseCategories(project, person).join(', '),
+  zug: (person) => person.zug ?? '',
+  tel: (person) => person.tel ?? '',
+  mail: (person) => person.mail ?? '',
+  pnr: (person) => person.pnr ?? '',
+});
 
 export interface DetSheetSection {
   /** Sub-group id, 'unassigned' or 'all'. */
@@ -101,6 +126,30 @@ function details(group: Detachment): [string, string][] {
   ];
   return rows.filter(([, value]) => value.trim());
 }
+/** Shared values once; differing values per card, e.g. two KVK with different places. */
+function combinedDetails(dets: Detachment[]): [string, string][] {
+  const rows: [string, string][] = [
+    [
+      'Detachemente',
+      dets.map((group) => (group.ec ? `${group.name} (EC ${group.ec})` : group.name)).join(' · '),
+    ],
+  ];
+  const perDet = dets.map((group) => new Map(details(group)));
+  for (const label of ['Einrücken', 'Treffpunkt', 'Anzug', 'Entlassung', 'Bemerkungen']) {
+    const values = perDet.map((rows) => rows.get(label) ?? '');
+    if (!values.some(Boolean)) continue;
+    rows.push([
+      label,
+      new Set(values).size === 1
+        ? values[0]
+        : dets
+            .map((group, index) => values[index] && `${group.name}: ${values[index]}`)
+            .filter(Boolean)
+            .join(' · '),
+    ]);
+  }
+  return rows;
+}
 
 /** «2 Of · 3 Uof · 12 Mannschaft», the usual strength breakdown. */
 export function bestand(people: Person[]): string {
@@ -128,10 +177,18 @@ export function fileStem(...parts: string[]): string {
   return `${stem || 'Detachement'}_${new Date().toISOString().slice(0, 10)}`;
 }
 
-export function buildDetSheet(project: Project, detId: string, options: DetSheetOptions): DetSheet {
-  const group = project.dets.find((item) => item.id === detId);
-  if (!group) throw new Error('Das gewählte Detachement existiert nicht.');
-  const view = onsiteView(project, detId);
+function period(von: string, bis: string): string {
+  if (von && bis && von !== bis) return `${longDate(von)} – ${longDate(bis)}`;
+  return longDate(von || bis);
+}
+
+export function buildDetSheet(
+  project: Project,
+  eventId: string,
+  options: DetSheetOptions,
+): DetSheet {
+  const view = onsiteView(project, eventId);
+  const { event, dets } = view;
   const scoped = view.groups.find((item) => item.sub.id === options.scope);
   const section = (
     id: string,
@@ -154,29 +211,64 @@ export function buildDetSheet(project: Project, detId: string, options: DetSheet
         auftrag: item.sub.auftrag,
       }),
     );
-    if (view.unassigned.length)
+    if (options.unassigned && view.unassigned.length)
       sections.push(section('unassigned', 'Nicht eingeteilt', view.unassigned));
-  } else sections = [section('all', '', sortByRank(view.pool))];
+  } else
+    sections = [
+      section(
+        'all',
+        '',
+        options.unassigned || !view.groups.length
+          ? view.pool
+          : view.pool.filter((person) => view.placement.has(person.id)),
+      ),
+    ];
   const people = sections.flatMap((item) => item.people);
   const licenses = new Map<string, number>();
   for (const person of people)
-    for (const license of new Set(person.lics))
+    for (const license of licenseCategories(project, person))
       if (license.trim()) licenses.set(license, (licenses.get(license) ?? 0) + 1);
-  const title = scoped ? `${group.name} · ${scoped.sub.name}` : group.name;
+  const title = scoped ? `${event.name} · ${scoped.sub.name}` : event.name;
+  const origins = new Set(people.map((person) => view.origin.get(person.id)?.id ?? ''));
+  const detRows: [string, string][] =
+    dets.length > 1
+      ? combinedDetails(dets)
+      : dets.length
+        ? [
+            ['Detachement', dets[0].ec ? `${dets[0].name} (EC ${dets[0].ec})` : dets[0].name],
+            ...details(dets[0]),
+          ]
+        : [];
   return {
     title,
-    ec: group.ec,
+    ec: dets
+      .map((group) => group.ec)
+      .filter(Boolean)
+      .join(' · '),
     service: project.name,
     unit: project.settings.eigeneEinheit,
-    details: details(group),
+    details: [
+      ...(event.von || event.bis
+        ? ([['Zeitraum', period(event.von, event.bis)]] as [string, string][])
+        : []),
+      ...detRows,
+    ],
     sections,
     total: people.length,
     bestand: bestand(people),
     licenses: [...licenses].sort(([a], [b]) => a.localeCompare(b, 'de-CH')),
-    columns: DET_SHEET_COLUMNS.filter((column) => options.columns[column.key]),
+    columns: DET_SHEET_COLUMNS.filter(
+      (column) => options.columns[column.key] && (column.key !== 'herkunft' || origins.size > 1),
+    ).map((column) => ({
+      ...column,
+      value:
+        column.key === 'herkunft'
+          ? (person: Person) => view.origin.get(person.id)?.name ?? ''
+          : values(project)[column.key],
+    })),
     checkColumn: options.checkColumn,
     pageBreaks: options.pageBreaks && sections.length > 1,
-    fileStem: fileStem(group.name, scoped?.sub.name ?? ''),
+    fileStem: fileStem(event.name, scoped?.sub.name ?? ''),
   };
 }
 

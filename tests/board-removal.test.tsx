@@ -100,22 +100,23 @@ describe('confirmed card removal with wholly fictional data', () => {
   it('removes the confirmed group and connections, retains people, and undoes the whole operation', async () => {
     const user = userEvent.setup();
     const project = fixture();
+    project.onsiteEvents = [
+      {
+        id: 'fiction-event',
+        name: 'Fiktiver Anlass',
+        von: '',
+        bis: '',
+        detIds: ['fiction-early', 'fiction-main'],
+      },
+    ];
     project.subDets = [
       {
         id: 'fiction-sub',
-        parentId: 'fiction-early',
+        parentId: 'fiction-event',
         name: 'Det Fiktiv',
         chefId: '',
         auftrag: '',
         personIds: ['fiction-person'],
-      },
-      {
-        id: 'fiction-other',
-        parentId: 'fiction-main',
-        name: 'Det Anders',
-        chefId: '',
-        auftrag: '',
-        personIds: [],
       },
     ];
     replaceProject(project);
@@ -137,7 +138,9 @@ describe('confirmed card removal with wholly fictional data', () => {
     expect(projectStore.get().connections).toEqual([]);
     expect(projectStore.get().persons).toEqual(before.persons);
     expect(projectStore.get().board?.positions['fiction-early']).toBeUndefined();
-    expect(projectStore.get().subDets?.map((sub) => sub.id)).toEqual(['fiction-other']);
+    // The removed card only leaves the event filter; the on-site detachements stay.
+    expect(projectStore.get().onsiteEvents?.[0].detIds).toEqual(['fiction-main']);
+    expect(projectStore.get().subDets).toEqual(before.subDets);
     await user.click(screen.getByRole('button', { name: 'Rückgängig' }));
     expect(projectStore.get()).toEqual(before);
   });
