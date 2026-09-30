@@ -139,8 +139,13 @@ export interface TbState {
   settings: TbSettings;
   regeln: TbRule[];
   wochen: Record<string, TbWeek>;
-  /** Ordered person ids for the Tagesoffizier rotation. */
+  /**
+   * Person ids whose rotation order the user fixed. Planned officers who are not
+   * listed here (and not removed) join the rotation automatically after them.
+   */
   offiziere: string[];
+  /** Person ids the user removed from the automatic rotation. */
+  offiziereEntfernt: string[];
   /** Rotation offset: which officer takes the first weekday of the earliest week. */
   rotationStart: number;
 }

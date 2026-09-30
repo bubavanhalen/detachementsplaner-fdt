@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import {
   eligibleOfficers,
+  isCommanderFunction,
+  isRotationGrade,
   isWeekend,
   officerLines,
   personLabel,
   rotationOfficer,
+  rotationOrder,
   TB_WEEKDAY_NAMES,
   type TbOfficerOverride,
   type TbWeek,
@@ -26,32 +29,52 @@ export function OfficersStep({
 }: TbStepProps & { week: TbWeek | undefined }) {
   const [candidate, setCandidate] = useState('');
   const eligible = eligibleOfficers(project);
+  const order = rotationOrder(project, tb);
   const persons = new Map(project.persons.map((person) => [person.id, person]));
-  const available = eligible.filter((person) => !tb.offiziere.includes(person.id));
-  const choice = available.some((person) => person.id === candidate)
+  const addable = project.persons.filter(
+    (person) => !order.includes(person.id) && person.planning.status !== 'excluded',
+  );
+  const suggested = addable.filter(
+    (person) => eligible.includes(person) || isRotationGrade(person.grad),
+  );
+  const others = addable.filter((person) => !suggested.includes(person));
+  const choice = addable.some((person) => person.id === candidate)
     ? candidate
-    : (available[0]?.id ?? '');
+    : (suggested[0]?.id ?? others[0]?.id ?? '');
+  const customised = tb.offiziere.length > 0 || tb.offiziereEntfernt.length > 0;
+  const lieutenants = project.persons.filter(
+    (person) =>
+      person.planning.status !== 'excluded' &&
+      isRotationGrade(person.grad) &&
+      !isCommanderFunction(person.funktion),
+  );
   const label = (id: string) => {
     const person = persons.get(id);
     return person ? personLabel(person) : 'Person nicht mehr vorhanden';
   };
-  const editRotation = (mutator: (list: string[]) => string[], start?: (old: number) => number) =>
+  /** Stores the fixed order; planned officers not listed are appended automatically. */
+  const editRotation = (next: string[], removed: string[], start = tb.rotationStart) => {
+    const unique = [...new Set(removed)];
+    const length = rotationOrder(project, {
+      ...tb,
+      offiziere: next,
+      offiziereEntfernt: unique,
+    }).length;
     void run(() =>
       changeTb((draft) => {
-        draft.offiziere = mutator([...draft.offiziere]);
-        const next = start ? start(draft.rotationStart) : draft.rotationStart;
-        draft.rotationStart = draft.offiziere.length
-          ? Math.min(Math.max(0, next), draft.offiziere.length - 1)
-          : 0;
+        draft.offiziere = next;
+        draft.offiziereEntfernt = unique;
+        draft.rotationStart = length ? Math.min(Math.max(0, start), length - 1) : 0;
       }),
     );
-  const move = (index: number, direction: -1 | 1) =>
-    editRotation((list) => {
-      const target = index + direction;
-      if (target < 0 || target >= list.length) return list;
-      [list[index], list[target]] = [list[target], list[index]];
-      return list;
-    });
+  };
+  const move = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= order.length) return;
+    const list = [...order];
+    [list[index], list[target]] = [list[target], list[index]];
+    editRotation(list, tb.offiziereEntfernt);
+  };
 
   return (
     <div className="tb-step-grid">
@@ -64,21 +87,33 @@ export function OfficersStep({
         </header>
         <div className="card-body tb-card-stack">
           <p className="muted">
-            Lt und Oblt der eigenen Einheit ohne Kdt und Kdt Stv. Die Reihenfolge läuft Mo–Fr über
-            alle geladenen Wochen (nach Startdatum) weiter.
+            Eingeplante Lt und Oblt der eigenen Einheit (ohne Kdt und Kdt Stv) sind automatisch in
+            der Rotation. Reihenfolge ändern, entfernen oder weitere Personen hinzufügen ist
+            jederzeit möglich. Die Reihenfolge läuft Mo–Fr über alle geladenen Wochen (nach
+            Startdatum) weiter.
           </p>
           {!project.settings.eigeneEinheit.trim() && (
             <div className="callout callout-warning">
               <Icon name="info" />
               <p className="callout-body">
                 Eigene Einheit noch nicht erfasst (Projektmenü → Bezeichnung & Zeitraum). Bis dahin
-                werden alle Lt/Oblt vorgeschlagen.
+                werden alle eingeplanten Lt/Oblt aufgenommen.
               </p>
             </div>
           )}
-          {tb.offiziere.length ? (
+          {!eligible.length && (
+            <div className="callout callout-warning" data-testid="tb-rotation-hint">
+              <Icon name="info" />
+              <p className="callout-body">
+                {lieutenants.length
+                  ? `${lieutenants.length} eingeplante Lt/Oblt gehören laut Personenliste zu einer anderen Einheit als «${project.settings.eigeneEinheit.trim()}». Einheit prüfen oder unten von Hand hinzufügen.`
+                  : 'Keine eingeplanten Lt/Oblt in der Personenliste gefunden (Grad prüfen). Offiziere können unten von Hand hinzugefügt werden.'}
+              </p>
+            </div>
+          )}
+          {order.length ? (
             <ol className="tb-rotation">
-              {tb.offiziere.map((id, index) => {
+              {order.map((id, index) => {
                 const person = persons.get(id);
                 return (
                   <li key={id} className={index === tb.rotationStart ? 'is-start' : ''}>
@@ -89,6 +124,7 @@ export function OfficersStep({
                       <strong>{label(id)}</strong>
                       <small>
                         {person?.tel || 'Telefon fehlt'}
+                        {tb.offiziere.includes(id) ? '' : ' · automatisch'}
                         {index === tb.rotationStart ? ' · Beginn der Rotation' : ''}
                       </small>
                     </span>
@@ -109,7 +145,7 @@ export function OfficersStep({
                           className="btn btn-ghost btn-icon btn-sm"
                           aria-label={`${label(id)} nach unten`}
                           title="Nach unten"
-                          disabled={index === tb.offiziere.length - 1}
+                          disabled={index === order.length - 1}
                           onClick={() => move(index, 1)}
                         >
                           <Icon name="chevronDown" size={16} />
@@ -121,8 +157,9 @@ export function OfficersStep({
                           title="Aus der Rotation entfernen"
                           onClick={() =>
                             editRotation(
-                              (list) => list.filter((item) => item !== id),
-                              (old) => (index < old ? old - 1 : old),
+                              order.filter((item) => item !== id),
+                              [...tb.offiziereEntfernt, id],
+                              index < tb.rotationStart ? tb.rotationStart - 1 : tb.rotationStart,
                             )
                           }
                         >
@@ -139,61 +176,69 @@ export function OfficersStep({
           )}
           {!archived && (
             <div className="toolbar tb-add-officer">
-              {available.length > 0 ? (
+              {addable.length > 0 && (
                 <>
                   <label className="field grow">
                     Offizier hinzufügen
                     <select value={choice} onChange={(event) => setCandidate(event.target.value)}>
-                      {available.map((person) => (
-                        <option key={person.id} value={person.id}>
-                          {personLabel(person)}
-                        </option>
-                      ))}
+                      {suggested.length > 0 && (
+                        <optgroup label="Lt / Oblt">
+                          {suggested.map((person) => (
+                            <option key={person.id} value={person.id}>
+                              {personLabel(person)}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {others.length > 0 && (
+                        <optgroup label="Weitere Personen">
+                          {others.map((person) => (
+                            <option key={person.id} value={person.id}>
+                              {personLabel(person)}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
                     </select>
                   </label>
                   <button
                     type="button"
                     className="btn"
                     disabled={!choice}
-                    onClick={() => editRotation((list) => [...list, choice])}
+                    onClick={() =>
+                      editRotation(
+                        [...order, choice],
+                        tb.offiziereEntfernt.filter((id) => id !== choice),
+                      )
+                    }
                   >
                     <Icon name="plus" size={16} /> Hinzufügen
                   </button>
-                  <button
-                    type="button"
-                    className="btn"
-                    onClick={() =>
-                      editRotation((list) => [...list, ...available.map((person) => person.id)])
-                    }
-                  >
-                    <Icon name="users" size={16} />
-                    {`Alle berechtigten übernehmen (${available.length})`}
-                  </button>
                 </>
-              ) : (
-                <p className="muted">
-                  {eligible.length
-                    ? 'Alle berechtigten Offiziere sind in der Rotation.'
-                    : 'Keine berechtigten Offiziere in der Personenliste.'}
-                </p>
+              )}
+              {customised && (
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => editRotation([], [], 0)}
+                  title="Eigene Reihenfolge und entfernte Personen zurücksetzen"
+                >
+                  <Icon name="undo" size={16} /> Automatische Rotation wiederherstellen
+                </button>
               )}
             </div>
           )}
-          {tb.offiziere.length > 1 && (
+          {order.length > 1 && (
             <label className="field">
               Erster Tagesoffizier (erster Wochentag der frühesten Woche)
               <select
                 value={tb.rotationStart}
                 disabled={archived}
-                onChange={(event) => {
-                  const value = Number(event.target.value);
-                  editRotation(
-                    (list) => list,
-                    () => value,
-                  );
-                }}
+                onChange={(event) =>
+                  editRotation(tb.offiziere, tb.offiziereEntfernt, Number(event.target.value))
+                }
               >
-                {tb.offiziere.map((id, index) => (
+                {order.map((id, index) => (
                   <option key={id} value={index}>
                     {label(id)}
                   </option>
@@ -225,12 +270,13 @@ function DayOfficers({
   week,
   eligible,
 }: TbStepProps & { week: TbWeek; eligible: Person[] }) {
+  const order = rotationOrder(project, tb);
   const options = [
     ...eligible,
     ...project.persons.filter(
       (person) =>
         !eligible.includes(person) &&
-        (tb.offiziere.includes(person.id) ||
+        (order.includes(person.id) ||
           Object.values(week.officers).some((item) => item?.personId === person.id)),
     ),
   ];
@@ -287,7 +333,7 @@ function DayOfficers({
                 </div>
               );
             const override = week.officers[day];
-            const rotation = rotationOfficer(tb, week.sheet, day);
+            const rotation = rotationOfficer(project, tb, week.sheet, day);
             const mode = override ? override.personId || FREE_TEXT : '';
             return (
               <div className="tb-officer-day" key={day}>
