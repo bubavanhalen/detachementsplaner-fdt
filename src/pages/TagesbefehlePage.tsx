@@ -9,7 +9,7 @@ import { WapStep } from '../components/tagesbefehl/WapStep';
 import { openConflicts, orderedWeeks, weekConflicts } from '../components/tagesbefehl/weekTools';
 import { readTbAssets } from '../io/tagesbefehl/assets';
 import { localError } from '../io/text';
-import { createTbState, officerLines, type TbAssets } from '../model/tagesbefehl';
+import { createTbState, officerLines, rotationOrder, type TbAssets } from '../model/tagesbefehl';
 import { redoProject, undoProject, useHistory, useProject } from '../store';
 import { modKey } from '../ui';
 import type { StepState } from '../workflow';
@@ -67,7 +67,11 @@ export default function TagesbefehlePage() {
       : 'Vorlage fehlt',
     2: weeks.length ? `${weeks.length} ${weeks.length === 1 ? 'Woche' : 'Wochen'}` : 'Offen',
     3: week ? (open.length ? `${open.length} Hinweise offen` : 'Geprüft') : 'Offen',
-    4: officersSet ? 'Eingeteilt' : tb.offiziere.length ? 'Einteilung offen' : 'Offen',
+    4: officersSet
+      ? 'Eingeteilt'
+      : rotationOrder(project, tb).length
+        ? 'Einteilung offen'
+        : 'Offen',
     5: 'Druck, .xlsx, PDF',
   };
   // Same markers as the guided workflow in the sidebar; the current step is aria-current.

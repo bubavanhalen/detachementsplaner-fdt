@@ -54,6 +54,7 @@ export function createTbState(): TbState {
     regeln: structuredClone([...DEFAULT_TB_RULES]),
     wochen: {},
     offiziere: [],
+    offiziereEntfernt: [],
     rotationStart: 0,
   };
 }
@@ -202,6 +203,7 @@ export function normalizeTbState(input: unknown): TbState {
       Object.entries(obj(t.wochen)).map(([sheet, week]) => [sheet, normalizeWeek(sheet, week)]),
     ),
     offiziere: strList(t.offiziere),
+    offiziereEntfernt: strList(t.offiziereEntfernt),
     rotationStart: Math.max(0, Math.round(num(t.rotationStart) ?? 0)),
   };
 }
@@ -265,15 +267,68 @@ export function orderTitle(number: number, day: TbWeekday, iso: string): string 
   return `Tagesbefehl Nr ${number} für ${TB_WEEKDAY_NAMES[day]}${iso ? `, ${swissDate(iso)}` : ''}`;
 }
 
-/** Officers eligible for the rotation: Lt/Oblt of the own unit, without Kdt / Kdt Stv. */
+/** Lowercase letters and digits only, umlauts folded: tolerant comparison of imported text. */
+const compact = (value: string): string =>
+  value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+
+const ROTATION_GRADES = new Set(['lt', 'oblt', 'leutnant', 'oberleutnant']);
+/** Lt / Oblt in any common spelling ("Oblt.", "Oberleutnant", "Lt (…)"). */
+export function isRotationGrade(grad: string): boolean {
+  const first = grad.trim().split(/[\s(,/]+/)[0] ?? '';
+  return ROTATION_GRADES.has(compact(grad)) || ROTATION_GRADES.has(compact(first));
+}
+
+/** Kdt and Kdt Stv in any common spelling ("Kdt Stv", "Stv Kdt", "Kommandant-Stellvertreter"). */
+export function isCommanderFunction(funktion: string): boolean {
+  return /kommandant|(?:^|[^a-zäöü])kdt(?:[^a-zäöü]|$)/i.test(funktion);
+}
+
+/** Same unit ignoring spaces, punctuation and case; a missing unit on either side never excludes. */
+export function sameUnit(a: string | undefined, b: string | undefined): boolean {
+  const left = compact(a ?? ''),
+    right = compact(b ?? '');
+  return !left || !right || left === right || left.includes(right) || right.includes(left);
+}
+
+/**
+ * Planned officers for the rotation: Lt/Oblt of the own unit who are not marked as
+ * not taking part in the planning, without Kdt / Kdt Stv. Ordered by Zug, then name.
+ */
 export function eligibleOfficers(project: Project): Person[] {
-  const unit = project.settings.eigeneEinheit.trim();
-  return project.persons.filter(
-    (p) =>
-      /^(?:Lt|Oblt)$/i.test(p.grad.trim()) &&
-      (!unit || (p.einteilung ?? '').trim() === unit) &&
-      !/^kommandant(?:\s+stellvertreter)?$/i.test(p.funktion.trim()),
+  const unit = project.settings.eigeneEinheit;
+  return project.persons
+    .filter(
+      (p) =>
+        p.planning.status !== 'excluded' &&
+        isRotationGrade(p.grad) &&
+        sameUnit(unit, p.einteilung) &&
+        !isCommanderFunction(p.funktion),
+    )
+    .sort(
+      (a, b) =>
+        (a.zug ?? '').localeCompare(b.zug ?? '', 'de-CH', { numeric: true }) ||
+        (a.nachname || a.name).localeCompare(b.nachname || b.name, 'de-CH'),
+    );
+}
+
+/**
+ * Effective rotation order: officers whose position the user fixed, then every other
+ * planned officer automatically (unless removed). Persons not taking part are skipped.
+ */
+export function rotationOrder(project: Project, tb: TbState): string[] {
+  const active = new Set(
+    project.persons.filter((p) => p.planning.status !== 'excluded').map((p) => p.id),
   );
+  const removed = new Set(tb.offiziereEntfernt);
+  const fixed = [...new Set(tb.offiziere)].filter((id) => active.has(id));
+  const automatic = eligibleOfficers(project)
+    .map((p) => p.id)
+    .filter((id) => !fixed.includes(id) && !removed.has(id));
+  return [...fixed, ...automatic];
 }
 
 export function personLabel(person: Person): string {
@@ -294,11 +349,17 @@ function rotationSlots(tb: TbState): { sheet: string; day: TbWeekday }[] {
     );
 }
 
-export function rotationOfficer(tb: TbState, sheet: string, day: TbWeekday): string {
-  if (!tb.offiziere.length || isWeekend(day)) return '';
+export function rotationOfficer(
+  project: Project,
+  tb: TbState,
+  sheet: string,
+  day: TbWeekday,
+): string {
+  const order = rotationOrder(project, tb);
+  if (!order.length || isWeekend(day)) return '';
   const slot = rotationSlots(tb).findIndex((s) => s.sheet === sheet && s.day === day);
   if (slot < 0) return '';
-  return tb.offiziere[(tb.rotationStart + slot) % tb.offiziere.length];
+  return order[(tb.rotationStart + slot) % order.length];
 }
 
 export function officerLines(
@@ -310,7 +371,7 @@ export function officerLines(
   if (isWeekend(day)) return week.wachtOf[day] ?? [];
   const override: TbOfficerOverride | undefined = week.officers[day];
   const personId =
-    override?.personId || (override?.text ? '' : rotationOfficer(tb, week.sheet, day));
+    override?.personId || (override?.text ? '' : rotationOfficer(project, tb, week.sheet, day));
   const person = project.persons.find((p) => p.id === personId);
   if (person) return [personLabel(person), override?.tel || person.tel || ''].filter(Boolean);
   if (override?.text) return [override.text, override.tel].filter(Boolean);

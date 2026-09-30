@@ -539,13 +539,28 @@ describe('Tagesoffiziere', () => {
     projectStore.setState(() => projectWithWeek());
     render(<TagesbefehlePage />);
     await openStep(user, /Tagesoffiziere/);
-    await user.click(screen.getByRole('button', { name: 'Alle berechtigten übernehmen (3)' }));
-    expect(tbOf().offiziere).toEqual(['a', 'b', 'c']);
+    // Planned officers are in the rotation without any click; viewing stores nothing.
+    expect(tbOf().offiziere).toEqual([]);
+    expect(screen.getByRole('combobox', { name: 'Tagesoffizier Mo' })).toHaveDisplayValue(
+      'Gemäss Rotation (Lt Test FiktivA)',
+    );
     expect(screen.getByTestId('tb-officer-Mo')).toHaveTextContent('Lt Test FiktivA');
     expect(screen.getByTestId('tb-officer-Di')).toHaveTextContent('Oblt Test FiktivB');
 
     await user.click(screen.getByRole('button', { name: 'Lt Test FiktivA nach unten' }));
     expect(tbOf().offiziere).toEqual(['b', 'a', 'c']);
+
+    await user.click(
+      screen.getByRole('button', { name: 'Oblt Test FiktivB aus der Rotation entfernen' }),
+    );
+    expect(tbOf().offiziereEntfernt).toEqual(['b']);
+    expect(screen.getByTestId('tb-officer-Mo')).toHaveTextContent('Lt Test FiktivA');
+    await user.click(
+      screen.getByRole('button', { name: /Automatische Rotation wiederherstellen/ }),
+    );
+    expect(tbOf().offiziere).toEqual([]);
+    expect(tbOf().offiziereEntfernt).toEqual([]);
+    expect(screen.getByTestId('tb-officer-Di')).toHaveTextContent('Oblt Test FiktivB');
 
     await user.selectOptions(
       screen.getByRole('combobox', { name: 'Tagesoffizier Mi' }),

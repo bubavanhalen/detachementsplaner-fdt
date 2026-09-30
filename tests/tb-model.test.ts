@@ -12,6 +12,7 @@ import {
   normalizeTbState,
   officerLines,
   rotationOfficer,
+  rotationOrder,
   type TbEntry,
   type TbState,
   type TbWeek,
@@ -125,6 +126,7 @@ describe('Tagesbefehl state normalisation', () => {
     expect(kvk.officers).toEqual({ Mo: { personId: 'a', text: '', tel: '' } });
     expect(kvk.wachtOf).toEqual({ Sa: ['Fiktiv Wacht Of'] });
     expect(tb.offiziere).toEqual(['a', 'b']);
+    expect(tb.offiziereEntfernt).toEqual([]);
     expect(tb.rotationStart).toBe(0);
     expect(normalizeTbState(null)).toEqual(createTbState());
     expect(normalizeTbState('kaputt')).toEqual(createTbState());
@@ -200,15 +202,58 @@ describe('Tagesoffizier rotation', () => {
   });
 
   it('continues across weeks in date order and skips weekends', () => {
-    const tb = rotationState();
+    const p = project(),
+      tb = rotationState();
     expect(
-      ['Mo', 'Di', 'Mi', 'Do', 'Fr'].map((d) => rotationOfficer(tb, 'KVK', d as 'Mo')),
+      ['Mo', 'Di', 'Mi', 'Do', 'Fr'].map((d) => rotationOfficer(p, tb, 'KVK', d as 'Mo')),
     ).toEqual(['a', 'b', 'c', 'a', 'b']);
-    expect(rotationOfficer(tb, 'KVK', 'Sa')).toBe('');
-    expect(rotationOfficer(tb, 'Wo 1', 'Mo')).toBe('c');
+    expect(rotationOfficer(p, tb, 'KVK', 'Sa')).toBe('');
+    expect(rotationOfficer(p, tb, 'Wo 1', 'Mo')).toBe('c');
     tb.rotationStart = 1;
-    expect(rotationOfficer(tb, 'KVK', 'Mo')).toBe('b');
-    expect(rotationOfficer(tb, 'Wo 1', 'Mo')).toBe('a');
+    expect(rotationOfficer(p, tb, 'KVK', 'Mo')).toBe('b');
+    expect(rotationOfficer(p, tb, 'Wo 1', 'Mo')).toBe('a');
+  });
+
+  it('puts planned officers into the rotation without any manual list', () => {
+    const p = project(),
+      tb = rotationState();
+    tb.offiziere = [];
+    expect(rotationOrder(p, tb)).toEqual(['a', 'b', 'c']);
+    expect(rotationOfficer(p, tb, 'KVK', 'Mo')).toBe('a');
+    expect(officerLines(p, tb, tb.wochen.KVK, 'Di')).toEqual([
+      'Oblt Test FiktivB',
+      '+41 00 000 00 01',
+    ]);
+  });
+
+  it('keeps a fixed order first, appends new planned officers and honours removals', () => {
+    const p = project(),
+      tb = rotationState();
+    tb.offiziere = ['c', 'sdt'];
+    tb.offiziereEntfernt = ['b'];
+    expect(rotationOrder(p, tb)).toEqual(['c', 'sdt', 'a']);
+    p.persons.push(person('d', 'Lt'));
+    expect(rotationOrder(p, tb)).toEqual(['c', 'sdt', 'a', 'd']);
+    // Persons marked as not planned leave the rotation, even when fixed by hand.
+    (p.persons.find((x) => x.id === 'c') as Person).planning.status = 'excluded';
+    expect(rotationOrder(p, tb)).toEqual(['sdt', 'a', 'd']);
+  });
+
+  it('matches common spellings of grade, unit and commander functions', () => {
+    const p = project();
+    p.persons = [
+      person('dot', 'Oblt.'),
+      person('long', 'Oberleutnant'),
+      person('lower', 'lt', { einteilung: 'fiktiv kp 99 / 9' }),
+      person('nounit', 'Lt', { einteilung: '' }),
+      person('stv1', 'Oblt', { funktion: 'Kdt Stv' }),
+      person('stv2', 'Oblt', { funktion: 'Stv Kdt' }),
+      person('stv3', 'Oblt', { funktion: 'Kommandant-Stellvertreter' }),
+      person('away', 'Lt', { planning: { status: 'excluded', reason: 'Fiktiv' } }),
+      person('foreign', 'Lt', { einteilung: 'Fiktiv Kp 11/1' }),
+      person('wm', 'Wm'),
+    ];
+    expect(eligibleOfficers(p).map((x) => x.id)).toEqual(['dot', 'long', 'lower', 'nounit']);
   });
 
   it('applies per-day overrides, free text and weekend Wacht Of lines', () => {
