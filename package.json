@@ -41,7 +41,7 @@
     "@tanstack/react-table": "9.2.4",
     "@xyflow/react": "12.11.6",
     "fflate": "0.8.3",
-    "motion": "13.4.0",
+    "motion": "13.4.4",
     "pdf-lib": "1.17.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
