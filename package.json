@@ -39,7 +39,7 @@
     "@tanstack/react-router": "1.170.38",
     "@tanstack/react-store": "0.11.1",
     "@tanstack/react-table": "9.2.4",
-    "@xyflow/react": "12.11.6",
+    "@xyflow/react": "12.12.0",
     "fflate": "0.8.3",
     "motion": "13.4.0",
     "pdf-lib": "1.17.1",
