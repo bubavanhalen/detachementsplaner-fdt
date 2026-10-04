@@ -63,6 +63,18 @@
   margin: 0;
   overflow-wrap: anywhere;
 }
+.det-sheet-note {
+  display: grid;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--sheet-line);
+  border-radius: 3px;
+  break-inside: avoid;
+}
+.det-sheet-note ul {
+  margin: 0;
+  padding-left: 18px;
+}
 .det-sheet-section {
   display: grid;
   gap: 6px;
@@ -94,7 +106,8 @@
 }
 .det-sheet-table th,
 .det-sheet-table td {
-  padding: 3px 6px;
+  padding: 3px 4px;
+  font-size: 9pt;
   border-bottom: 1px solid var(--sheet-line);
   text-align: left;
   vertical-align: top;
@@ -103,29 +116,18 @@
 }
 .det-sheet-table th {
   color: var(--sheet-muted);
-  font-size: 8.5pt;
+  font-size: 7.5pt;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  vertical-align: bottom;
   border-bottom: 1.5px solid var(--sheet-text);
 }
-/* Fixed layout keeps the columns of all sections aligned on the page. */
+/* Fixed layout with the proportions of DetSheetView keeps the columns of all sections
+   aligned and always within the page width. */
 .det-sheet-table {
   table-layout: fixed;
 }
-.det-sheet-table th {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.det-sheet-table .det-sheet-grad {
-  width: 15mm;
-}
-.det-sheet-table .det-sheet-name {
-  width: 30%;
-}
 .det-sheet-table .num {
-  width: 10mm;
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: var(--sheet-muted);
@@ -147,8 +149,14 @@
   vertical-align: 1px;
 }
 .det-sheet-table .det-sheet-check {
-  width: 9mm;
   text-align: center;
+}
+/* Room to sign: rows tall enough for a handwritten visum. */
+.det-sheet-table.has-visum tbody td {
+  height: 8mm;
+}
+.det-sheet-table td.det-sheet-visum {
+  border-left: 1px solid var(--sheet-line);
 }
 .det-sheet-box {
   display: inline-block;
@@ -170,8 +178,9 @@
 }
 
 @media screen {
+  /* Same width as the printed page, so the preview breaks lines like the printout. */
   .det-sheet {
-    min-width: 180mm;
+    min-width: 210mm;
   }
   .det-sheet-section.is-break {
     margin-top: 10px;

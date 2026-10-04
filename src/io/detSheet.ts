@@ -26,6 +26,10 @@ export interface DetSheetOptions {
   pageBreaks: boolean;
   /** Empty box per person for roll call. */
   checkColumn: boolean;
+  /** Wide empty column for a signature, e.g. when receiving material. */
+  visum: boolean;
+  /** Heading of the signature column; '' means «Visum». */
+  visumLabel: string;
   columns: Record<DetSheetColumn, boolean>;
 }
 export const DEFAULT_DET_SHEET_OPTIONS: DetSheetOptions = {
@@ -34,11 +38,13 @@ export const DEFAULT_DET_SHEET_OPTIONS: DetSheetOptions = {
   unassigned: false,
   pageBreaks: false,
   checkColumn: true,
+  visum: false,
+  visumLabel: '',
   columns: {
     herkunft: true,
     funktion: true,
     lics: true,
-    zug: false,
+    zug: true,
     tel: true,
     mail: false,
     pnr: false,
@@ -93,6 +99,10 @@ export interface DetSheet {
   licenses: [string, number][];
   columns: SheetColumn[];
   checkColumn: boolean;
+  /** Heading of the signature column; '' when there is none. */
+  visum: string;
+  /** Event text such as «Der AdA bestätigt den Erhalt von: …»; lines with «-» form a list. */
+  note: string;
   pageBreaks: boolean;
   /** File name without extension, also used as print title. */
   fileStem: string;
@@ -267,6 +277,8 @@ export function buildDetSheet(
           : values(project)[column.key],
     })),
     checkColumn: options.checkColumn,
+    visum: options.visum ? options.visumLabel.replace(/\s+/g, ' ').trim() || 'Visum' : '',
+    note: event.hinweis ?? '',
     pageBreaks: options.pageBreaks && sections.length > 1,
     fileStem: fileStem(event.name, scoped?.sub.name ?? ''),
   };
@@ -284,6 +296,7 @@ export function detSheetText(sheet: DetSheet): string {
     ...sheet.details.map(([label, value]) => `${label}: ${value}`),
     `Bestand: ${sheet.total}${sheet.bestand ? ` (${sheet.bestand})` : ''}`,
   ].filter(Boolean);
+  if (sheet.note) lines.push('', sheet.note);
   for (const section of sheet.sections) {
     lines.push('');
     if (section.title)
@@ -318,6 +331,18 @@ export function detSheetWorkbook(sheet: DetSheet): XLSX.WorkBook {
   const workbook = XLSX.utils.book_new(),
     taken = new Set<string>();
   const grouped = sheet.sections.some((section) => section.title);
+  // A heading equal to another column must not overwrite that column's values.
+  const visum = [
+    'Nr',
+    'Untergruppe',
+    'Rolle',
+    'Grad',
+    'Name',
+    'Anwesend',
+    ...sheet.columns.map((column) => column.label),
+  ].includes(sheet.visum)
+    ? `${sheet.visum} (Visum)`
+    : sheet.visum;
   const rows = (section: DetSheetSection, withGroup: boolean) =>
     section.people.map((person, index) => ({
       Nr: index + 1,
@@ -327,6 +352,7 @@ export function detSheetWorkbook(sheet: DetSheet): XLSX.WorkBook {
       Name: listName(person),
       ...Object.fromEntries(sheet.columns.map((column) => [column.label, column.value(person)])),
       ...(sheet.checkColumn ? { Anwesend: '' } : {}),
+      ...(visum ? { [visum]: '' } : {}),
     }));
   XLSX.utils.book_append_sheet(
     workbook,
@@ -349,6 +375,7 @@ export function detSheetWorkbook(sheet: DetSheet): XLSX.WorkBook {
       ['Einheit', sheet.unit],
       ...sheet.details,
       ['Bestand', `${sheet.total}${sheet.bestand ? ` (${sheet.bestand})` : ''}`],
+      ...(sheet.note ? [['Zusatztext', sheet.note]] : []),
       ...sheet.licenses.map(([license, count]): [string, string] => [
         `Fahrausweis ${license}`,
         String(count),

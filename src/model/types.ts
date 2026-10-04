@@ -71,6 +71,8 @@ export interface OnsiteEvent {
   bis: string;
   /** PISA detachements (planning cards) filtering the people of the event; [] = everyone. */
   detIds: string[];
+  /** Optional text printed on the lists, e.g. which material is confirmed by signature. */
+  hinweis?: string;
 }
 export interface Connection {
   id: string;

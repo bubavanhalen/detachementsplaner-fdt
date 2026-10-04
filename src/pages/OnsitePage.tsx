@@ -30,6 +30,7 @@ import {
   removeSubDet,
   renameSubDet,
   type SubDetGroup,
+  setEventNote,
   setSubDetAuftrag,
   setSubDetChef,
   shortFunction,
@@ -1081,11 +1082,51 @@ function CommitInput({
   );
 }
 
-const OPTION_TOGGLES: [keyof Omit<DetSheetOptions, 'scope' | 'columns'>, string][] = [
+const OPTION_TOGGLES: [
+  keyof Omit<DetSheetOptions, 'scope' | 'columns' | 'unassigned' | 'visum' | 'visumLabel'>,
+  string,
+][] = [
   ['grouped', 'Nach Untergruppen gliedern'],
   ['pageBreaks', 'Jede Untergruppe auf neuer Seite'],
   ['checkColumn', 'Spalte zum Abhaken'],
 ];
+
+/** Text printed on every list of the event; saved when the field is left. */
+function EventNoteField({
+  value,
+  disabled,
+  onSave,
+}: {
+  value: string;
+  disabled: boolean;
+  onSave: (text: string) => void;
+}) {
+  const [draft, setDraft] = useState(value);
+  const id = useId();
+  useEffect(() => setDraft(value), [value]);
+  return (
+    <div className="field onsite-note">
+      <label htmlFor={id}>
+        Zusatztext auf der Liste <span className="optional">· optional</span>
+      </label>
+      <textarea
+        id={id}
+        rows={3}
+        maxLength={2000}
+        value={draft}
+        disabled={disabled}
+        placeholder={
+          'z. B. Der AdA bestätigt mit seinem Visum den Erhalt von:\n- Schutzmaske\n- Gehörschutz'
+        }
+        onChange={(event) => setDraft(event.target.value)}
+        onBlur={() => {
+          if (draft.trim() !== value) onSave(draft);
+        }}
+      />
+      <small className="muted">Zeilen mit «-» am Anfang werden als Liste gedruckt.</small>
+    </div>
+  );
+}
 
 function OutputView({
   project,
@@ -1194,6 +1235,25 @@ function OutputView({
                 </button>
               ),
             )}
+            <button
+              type="button"
+              className="chip"
+              aria-pressed={options.visum}
+              title="Leere Spalte zum Visieren, z. B. beim Materialempfang"
+              onClick={() => onOptions({ ...options, visum: !options.visum })}
+            >
+              Visum
+            </button>
+            {options.visum && (
+              <input
+                className="onsite-visum-label"
+                aria-label="Überschrift der Visum-Spalte"
+                placeholder="Visum"
+                maxLength={40}
+                value={options.visumLabel}
+                onChange={(event) => onOptions({ ...options, visumLabel: event.target.value })}
+              />
+            )}
           </fieldset>
           <fieldset className="chip-row" aria-label="Gliederung">
             <span className="muted onsite-chip-label">Gliederung</span>
@@ -1210,6 +1270,18 @@ function OutputView({
               </button>
             ))}
           </fieldset>
+          <EventNoteField
+            key={eventId}
+            value={view.event.hinweis ?? ''}
+            disabled={Boolean(project.archive)}
+            onSave={(text) => {
+              try {
+                changeProject((draft) => setEventNote(draft, eventId, text));
+              } catch (failure) {
+                notify(localError(failure), { tone: 'warning' });
+              }
+            }}
+          />
           <p className="muted small-note">
             <Icon name="shield" size={13} className="inline-icon" /> Die Liste entsteht auf diesem
             Gerät und enthält Personendaten. Ausdrucke und Dateien vertraulich behandeln.

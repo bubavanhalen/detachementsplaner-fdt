@@ -10,6 +10,7 @@ import type { Detachment, OnsiteEvent, Person, Project, SubDetachment } from './
 export const DEFAULT_SUBDET_NAMES = ['Det Mat', 'Det VT', 'Det Kp'];
 const MAX_NAME = 60;
 const MAX_EVENT_NAME = 80;
+const MAX_NOTE = 2000;
 
 const cleanName = (value: string): string => value.replace(/\s+/g, ' ').trim();
 const nameKey = (value: string): string => cleanName(value).toLocaleLowerCase('de-CH');
@@ -70,6 +71,19 @@ export function updateEvent(project: Project, id: string, patch: Partial<EventFi
   assertWritable(project);
   const event = eventOf(project, id);
   Object.assign(event, checkedEvent(project, { ...event, ...patch }));
+}
+/** Text for the lists of an event; lines starting with «-» are printed as a list. */
+export function setEventNote(project: Project, id: string, value: string): void {
+  assertWritable(project);
+  const event = eventOf(project, id);
+  const note = value
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .join('\n')
+    .trim();
+  if (note.length > MAX_NOTE) throw new Error(`Der Zusatztext hat höchstens ${MAX_NOTE} Zeichen.`);
+  if (note) event.hinweis = note;
+  else delete event.hinweis;
 }
 /** A full copy with its detachements, leaders, tasks and people, e.g. for the next week. */
 export function copyEvent(project: Project, id: string): OnsiteEvent {

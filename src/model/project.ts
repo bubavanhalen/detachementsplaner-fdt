@@ -175,6 +175,7 @@ function onsiteEvent(input: unknown): OnsiteEvent {
     von: text(e.von),
     bis: text(e.bis),
     detIds: e.detIds == null ? [] : strings(e.detIds),
+    ...(e.hinweis == null ? {} : { hinweis: text(e.hinweis) }),
   };
 }
 /**

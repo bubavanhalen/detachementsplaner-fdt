@@ -207,6 +207,30 @@ describe('on-site page', () => {
         '+41 00 000 00 01',
       ),
     ).not.toBeInTheDocument();
+
+    // An optional signature column with its own heading, and a text stored with the event.
+    const current = () => screen.getByRole('article', { name: 'Liste KVK · Det Mat' });
+    expect(within(current()).getByRole('columnheader', { name: 'Zug' })).toBeInTheDocument();
+    expect(within(current()).queryByRole('columnheader', { name: 'Visum' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Visum' }));
+    expect(within(current()).getByRole('columnheader', { name: 'Visum' })).toBeInTheDocument();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Überschrift der Visum-Spalte' }),
+      'Visum Mat',
+    );
+    expect(within(current()).getByRole('columnheader', { name: 'Visum Mat' })).toBeInTheDocument();
+    const note = screen.getByRole('textbox', { name: /Zusatztext auf der Liste/ });
+    await user.type(note, 'Der AdA bestätigt den Erhalt von:{Enter}- Schutzmaske{Enter}- Helm');
+    await user.tab();
+    expect(projectStore.get().onsiteEvents?.[0].hinweis).toBe(
+      'Der AdA bestätigt den Erhalt von:\n- Schutzmaske\n- Helm',
+    );
+    expect(within(current()).getByText('Der AdA bestätigt den Erhalt von:')).toBeInTheDocument();
+    expect(
+      within(current())
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Schutzmaske', 'Helm']);
   });
 
   it('opens events from a planning card', async () => {
