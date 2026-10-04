@@ -239,3 +239,13 @@ input.subdet-name:focus {
   align-self: center;
   margin-top: 22px;
 }
+input.onsite-visum-label {
+  width: 180px;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 0.9rem;
+}
+.onsite-note textarea {
+  min-height: 72px;
+  resize: vertical;
+}

@@ -20,6 +20,7 @@ export {
   removeSubDet,
   renameSubDet,
   type SubDetGroup,
+  setEventNote,
   setSubDetAuftrag,
   setSubDetChef,
   sortByRank,

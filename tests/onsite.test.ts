@@ -29,6 +29,7 @@ import {
   removeEvent,
   removeSubDet,
   renameSubDet,
+  setEventNote,
   setSubDetAuftrag,
   setSubDetChef,
   shortFunction,
@@ -349,8 +350,11 @@ describe('Det lists', () => {
     expect(sheet.columns.map((column) => column.label)).toEqual([
       'Funktion',
       'Fahrausweise',
+      'Zug',
       'Telefon',
     ]);
+    expect(sheet.visum).toBe('');
+    expect(sheet.note).toBe('');
     expect(sheet.fileStem).toMatch(/^KVK_\d{4}-\d{2}-\d{2}$/);
   });
 
@@ -493,6 +497,49 @@ describe('Det lists', () => {
     const text = detSheetText(sheet);
     expect(text).not.toContain('Motorwagen');
     expect(text).not.toContain('Sehhilfe');
+  });
+
+  it('adds a signature column and an event text to the list', () => {
+    const { project, event } = split();
+    expect(() => setEventNote(project, 'missing', 'x')).toThrow('nicht mehr vorhanden');
+    expect(() => setEventNote(project, event.id, 'x'.repeat(2001))).toThrow('höchstens');
+    setEventNote(
+      project,
+      event.id,
+      '\n  Der AdA bestätigt den Erhalt von:   \r\n- Schutzmaske\n- Gehörschutz  \n\n',
+    );
+    expect(event.hinweis).toBe('Der AdA bestätigt den Erhalt von:\n- Schutzmaske\n- Gehörschutz');
+    // The text travels with copies and through the JSON boundary.
+    expect(copyEvent(project, event.id).hinweis).toBe(event.hinweis);
+    expect(normalizeProject(JSON.parse(JSON.stringify(project))).onsiteEvents?.[0].hinweis).toBe(
+      event.hinweis,
+    );
+    const options = { ...DEFAULT_DET_SHEET_OPTIONS, visum: true };
+    const sheet = buildDetSheet(project, event.id, options);
+    expect(sheet.visum).toBe('Visum');
+    expect(sheet.note).toBe(event.hinweis);
+    expect(detSheetText(sheet)).toContain('Der AdA bestätigt den Erhalt von:\n- Schutzmaske');
+    const workbook = detSheetWorkbook(sheet);
+    const rows = XLSX.utils.sheet_to_json<Record<string, string>>(workbook.Sheets.Liste, {
+      defval: '',
+    });
+    expect(Object.keys(rows[0])).toEqual(expect.arrayContaining(['Zug', 'Anwesend', 'Visum']));
+    const details = XLSX.utils.sheet_to_json<string[]>(workbook.Sheets.Angaben, { header: 1 });
+    expect(details).toContainEqual(['Zusatztext', event.hinweis]);
+    expect(
+      buildDetSheet(project, event.id, { ...options, visumLabel: '  Visum   Mat-Fassung ' }).visum,
+    ).toBe('Visum Mat-Fassung');
+    // A heading equal to another column keeps both columns in Excel.
+    const clash = detSheetWorkbook(
+      buildDetSheet(project, event.id, { ...options, visumLabel: 'Telefon' }),
+    );
+    const clashRows = XLSX.utils.sheet_to_json<Record<string, string>>(clash.Sheets.Liste, {
+      defval: '',
+    });
+    expect(clashRows[0]).toMatchObject({ Telefon: '+41 00 000 00 01', 'Telefon (Visum)': '' });
+    setEventNote(project, event.id, '   ');
+    expect(event.hinweis).toBeUndefined();
+    expect(() => setEventNote(archiveSnapshot(project), event.id, 'x')).toThrow('schreibgeschützt');
   });
 
   it('writes the same list to Excel with valid, unique sheet names', () => {
