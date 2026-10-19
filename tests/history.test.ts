@@ -24,6 +24,7 @@ describe('shared local project history', () => {
     store.undoProject();
     expect(store.projectStore.get().name).toBe('Fiktiver Anfang');
     expect(store.projectStore.get().dets).toHaveLength(0);
+    store.flushProjectSave();
     expect(JSON.parse(localStorage.getItem(PROJECT_KEY) ?? '{}').name).toBe('Fiktiver Anfang');
     store.redoProject();
     expect(store.projectStore.get()).toEqual(changed);
@@ -108,6 +109,7 @@ describe('shared local project history', () => {
     expect(store.projectStore.get().name).toBe('Fiktiver Anfang');
     store.redoProject();
     expect(store.projectStore.get().name).toBe('Fiktive ungespeicherte Arbeit');
+    expect(store.flushProjectSave()).toBe(false);
     expect(store.feedbackStore.get().saveError).toContain('JSON herunterladen');
   });
 
