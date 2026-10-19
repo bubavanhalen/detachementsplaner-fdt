@@ -74,14 +74,23 @@ export function clearTbAssets(storage?: Storage): void {
 
 /**
  * Seeds the device storage from assets embedded in a self-contained HTML export.
- * Existing local assets always win. Returns true when assets were stored.
+ * Each kind is seeded on its own and an existing local asset of that kind always
+ * wins, so a leftover legacy signature never blocks the embedded template.
+ * Returns true when assets were stored.
  */
 export function seedTbAssets(embedded: unknown, storage?: Storage): boolean {
   if (embedded == null) return false;
-  const incoming = normalizeTbAssets(embedded);
-  if (!hasTbAssets(incoming) || hasTbAssets(readTbAssets(storage))) return false;
+  const incoming = normalizeTbAssets(embedded),
+    local = readTbAssets(storage);
+  const missing = (['template', 'signature'] as const).filter(
+    (kind) => incoming[kind] && !local[kind],
+  );
+  if (!missing.length) return false;
   try {
-    saveTbAssets(incoming, storage);
+    saveTbAssets(
+      { ...local, ...Object.fromEntries(missing.map((kind) => [kind, incoming[kind]])) },
+      storage,
+    );
     return true;
   } catch {
     return false;
