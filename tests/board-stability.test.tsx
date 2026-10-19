@@ -7,7 +7,7 @@ import { PROJECT_KEY } from '../src/io/storage';
 import { createDetachment, createProject } from '../src/model';
 import { getBoardPositions } from '../src/model/board';
 import PlanningPage from '../src/pages/PlanningPage';
-import { projectStore, replaceProject } from '../src/store';
+import { flushProjectSave, projectStore, replaceProject } from '../src/store';
 
 const renderCounts = vi.hoisted(() => new Map<string, number>());
 vi.mock('motion/react', async (importOriginal) => {
@@ -127,6 +127,7 @@ describe('planning board stability with wholly fictional projects', () => {
         initial.board?.positions['fiction-early'],
       );
       expect(projectStore.get().dets).toEqual(initial.dets);
+      flushProjectSave();
       expect(writes.mock.calls.filter(([key]) => key === PROJECT_KEY)).toHaveLength(1);
       await user.click(screen.getByRole('button', { name: 'Rückgängig' }));
       expect(projectStore.get()).toEqual(initial);

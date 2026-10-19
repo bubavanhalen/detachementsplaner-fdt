@@ -67,5 +67,7 @@ Object.defineProperty(window, 'matchMedia', {
 
 afterEach(() => {
   cleanup();
+  // Flush debounced saves of every store instance so none lands in a later test.
+  window.dispatchEvent(new Event('pagehide'));
   localStorage.clear();
 });

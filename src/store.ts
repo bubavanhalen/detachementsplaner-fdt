@@ -62,8 +62,17 @@ export function notify(
 export function notifyUndoable(message: string): void {
   notify(message, { tone: 'success', action: { label: 'Rückgängig', run: undoProject } });
 }
-function persist(project: Project): void {
-  if (!storageReadable) return;
+/** Rapid edits are written once after this pause of inactivity … */
+const SAVE_DELAY_MS = 400;
+/** … but continuous editing still writes at least this often. */
+const SAVE_MAX_WAIT_MS = 2000;
+let pendingSave: Project | null = null;
+let pendingSince = 0;
+let saveTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** Returns false only when the browser rejected the write; the working copy stays in memory. */
+function writeProject(project: Project): boolean {
+  if (!storageReadable) return true;
   try {
     saveProject(project);
     feedbackStore.setState((old) => ({
@@ -71,13 +80,111 @@ function persist(project: Project): void {
       saveError: '',
       savedAt: Date.now(),
     }));
+    return true;
   } catch {
     feedbackStore.setState((old) => ({
       ...old,
       saveError:
         'Lokal noch nicht gespeichert. Browserablage nicht verfügbar oder voll — bitte JSON herunterladen.',
     }));
+    return false;
   }
+}
+function cancelPendingSave(): void {
+  if (saveTimer !== undefined) clearTimeout(saveTimer);
+  saveTimer = undefined;
+  pendingSave = null;
+}
+/** Coalesces rapid edits: serialising a large project on every keystroke made editing lag. */
+function persistSoon(project: Project): void {
+  if (!storageReadable) return;
+  const now = Date.now();
+  if (!pendingSave) pendingSince = now;
+  pendingSave = project;
+  if (saveTimer !== undefined) clearTimeout(saveTimer);
+  const delay = Math.min(SAVE_DELAY_MS, Math.max(0, pendingSince + SAVE_MAX_WAIT_MS - now));
+  saveTimer = setTimeout(flushProjectSave, delay);
+}
+/** Discrete actions (open, import, archive) are written at once and supersede pending edits. */
+function persistNow(project: Project): void {
+  cancelPendingSave();
+  writeProject(project);
+}
+/** Writes pending edits immediately. Returns false when the browser rejected the write. */
+export function flushProjectSave(): boolean {
+  const project = pendingSave;
+  cancelPendingSave();
+  return project ? writeProject(project) : true;
+}
+if (typeof window !== 'undefined') {
+  // Leaving or hiding the page must not lose the last pause-pending edits.
+  window.addEventListener('pagehide', () => flushProjectSave());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushProjectSave();
+  });
+  window.addEventListener('beforeunload', (event) => {
+    if (!flushProjectSave()) event.preventDefault();
+  });
+}
+/**
+ * Equality as JSON would serialise it (omitted undefined/function values, toJSON,
+ * non-finite numbers as null), but without building strings and stopping at the
+ * first difference. Key order is ignored: reordering alone carries no edit.
+ */
+function sameJson(left: unknown, right: unknown): boolean {
+  if (left === right) return true;
+  if (!isPlainJsonObject(left) || !isPlainJsonObject(right)) return sameJsonLeaf(left, right);
+  if (Array.isArray(left) || Array.isArray(right)) {
+    if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) return false;
+    for (let index = 0; index < left.length; index++) {
+      const item = left[index];
+      const other = right[index];
+      if (item === other) continue;
+      // JSON writes omitted array items as null.
+      if (!sameJson(omittedInJson(item) ? null : item, omittedInJson(other) ? null : other))
+        return false;
+    }
+    return true;
+  }
+  const a = left as Record<string, unknown>;
+  const b = right as Record<string, unknown>;
+  let keys = 0;
+  for (const key in a) {
+    if (!Object.hasOwn(a, key) || omittedInJson(a[key])) continue;
+    keys++;
+    if (a[key] === b[key]) continue;
+    if (!Object.hasOwn(b, key) || omittedInJson(b[key]) || !sameJson(a[key], b[key])) return false;
+  }
+  for (const key in b) if (Object.hasOwn(b, key) && !omittedInJson(b[key])) keys--;
+  return keys === 0;
+}
+function isPlainJsonObject(value: unknown): value is object {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as { toJSON?: unknown }).toJSON !== 'function'
+  );
+}
+/** Primitives and toJSON objects; reached only after a cheap identity check failed. */
+function sameJsonLeaf(left: unknown, right: unknown): boolean {
+  const a = jsonValue(left);
+  const b = jsonValue(right);
+  if (a === b) return true;
+  if (isPlainJsonObject(a) && isPlainJsonObject(b)) return sameJson(a, b);
+  return false;
+}
+function jsonValue(value: unknown): unknown {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (
+    value &&
+    typeof value === 'object' &&
+    typeof (value as { toJSON?: unknown }).toJSON === 'function'
+  )
+    return (value as { toJSON: () => unknown }).toJSON();
+  return value;
+}
+function omittedInJson(value: unknown): boolean {
+  return value === undefined || typeof value === 'function' || typeof value === 'symbol';
 }
 export function initializeProject(embedded?: unknown): void {
   clearHistory();
@@ -101,13 +208,13 @@ export function changeProject(mutator: (draft: Project) => void): void {
   const next = structuredClone(previous);
   mutator(next);
   // A focus/blur without an edit must neither consume a step nor discard redo.
-  if (JSON.stringify(previous) === JSON.stringify(next)) return;
+  if (sameJson(previous, next)) return;
   historyStore.setState((history) => ({
     past: [...history.past, previous].slice(-HISTORY_LIMIT),
     future: [],
   }));
   projectStore.setState(() => next);
-  persist(next);
+  persistSoon(next);
 }
 /** One shared history covers edits on every page, not only board gestures. */
 export function undoProject(): void {
@@ -121,7 +228,7 @@ export function undoProject(): void {
     future: [...history.future, current].slice(-HISTORY_LIMIT),
   }));
   projectStore.setState(() => structuredClone(previous));
-  persist(projectStore.get());
+  persistSoon(projectStore.get());
 }
 export function redoProject(): void {
   const current = projectStore.get();
@@ -134,20 +241,20 @@ export function redoProject(): void {
     future: history.future.slice(0, -1),
   }));
   projectStore.setState(() => structuredClone(next));
-  persist(projectStore.get());
+  persistSoon(projectStore.get());
 }
 export function replaceProject(project: Project): void {
   const next = normalizeProject(project);
   clearHistory();
   projectStore.setState(() => next);
-  persist(next);
+  persistNow(next);
 }
 export function archiveCurrent(): void {
   const snapshot = archiveSnapshot(projectStore.get());
   saveArchive(snapshot); // Must succeed before changing the working copy.
   clearHistory();
   projectStore.setState(() => snapshot);
-  persist(snapshot);
+  persistNow(snapshot);
 }
 export function reopenCurrent(): void {
   const previous = projectStore.get();
