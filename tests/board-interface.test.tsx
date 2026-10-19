@@ -7,7 +7,7 @@ import { PROJECT_KEY } from '../src/io/storage';
 import { createDetachment, createProject } from '../src/model';
 import { getBoardPositions } from '../src/model/board';
 import PlanningPage from '../src/pages/PlanningPage';
-import { projectStore, replaceProject } from '../src/store';
+import { flushProjectSave, projectStore, replaceProject } from '../src/store';
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, className }: { children: ReactNode; to: string; className?: string }) => (
@@ -207,6 +207,7 @@ describe('interactive planning board with wholly fictional projects', () => {
     const moved = getBoardPositions(projectStore.get());
     expect(moved['fiction-early'].x).toBeGreaterThan(initial['fiction-early'].x);
     expect(moved['fiction-early'].y).toBe(initial['fiction-early'].y);
+    flushProjectSave();
     expect(JSON.parse(localStorage.getItem(PROJECT_KEY) ?? '{}').board.positions).toEqual(moved);
     mounted.unmount();
     render(<PlanningWithHistory />);

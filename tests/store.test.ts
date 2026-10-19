@@ -40,6 +40,7 @@ describe('local project state and persistence', () => {
     store.changeProject((draft) => {
       draft.name = 'Fiktive neue Arbeit';
     });
+    expect(store.flushProjectSave()).toBe(false);
     expect(store.projectStore.get().name).toBe('Fiktive neue Arbeit');
     expect(store.feedbackStore.get().saveError).toContain('JSON herunterladen');
     expect(localStorage.getItem(PROJECT_KEY)).toBe(saved);
@@ -81,6 +82,7 @@ describe('local project state and persistence', () => {
     store.changeProject((draft) => {
       draft.name = 'Fiktive neue Arbeit';
     });
+    store.flushProjectSave();
     expect(localStorage.getItem(PROJECT_KEY)).toBe(unreadable);
     expect(store.feedbackStore.get().saveError).toContain('Automatisches Speichern ist gesperrt');
     expect(store.projectStore.get().name).toBe('Fiktive neue Arbeit');
