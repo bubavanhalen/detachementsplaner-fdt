@@ -46,8 +46,10 @@ remote-data feature without an explicit change to this requirement by the owner.
 
 The owner explicitly decided on 20.10.2026 to allow sharing a project over the
 internet from a host service on the owner's own PC, reachable through Tailscale
-Funnel. This is the only exception to the rules above, and it is not yet
-implemented; until it is implemented and verified, the rules above apply
+Funnel. This exception covers sharing only. Any other owner-approved exception
+must stand in its own section here; none extends another, and everything not
+named in an exception stays governed by the rules above. This exception is not
+yet implemented; until it is implemented and verified, the rules above apply
 unchanged. Design: `docs/adr/0002-teilen-ueber-internet.md` and
 `docs/adr/0003-host-dienst-und-datenhaltung.md`.
 
@@ -57,9 +59,10 @@ unchanged. Design: `docs/adr/0002-teilen-ueber-internet.md` and
 - Sharing is off by default and switched on by the host. The local mode stays
   fully offline and makes no network request at all.
 - Traffic leaves a device only TLS-encrypted to the host PC, where TLS
-  terminates; guests and the host authenticate each other. Tailscale Funnel is
-  the only permitted third party and sees only ciphertext and connection
-  metadata. No other third-party relay, identity, hosting or cloud service.
+  terminates; guests and the host authenticate each other. For sharing,
+  Tailscale Funnel is the only permitted third party and sees only ciphertext
+  and connection metadata. No other third-party relay, identity, hosting or
+  cloud service.
 - The host service listens on 127.0.0.1 only; Funnel exposes only this
   service. The concrete Funnel address is local operating configuration and is
   never committed. Never write host names, IP addresses or the host's security
@@ -68,8 +71,9 @@ unchanged. Design: `docs/adr/0002-teilen-ueber-internet.md` and
   verification, granted by host invitation with out-of-band confirmation, for
   at most 60 days, revocable at once. A password alone or a MAC address is never
   sufficient.
-- Insurance numbers, ID documents and imported raw data never leave the host;
-  contact data only for roles the host grants it to. The host filters before
+- Insurance numbers, ID documents, imported raw data and any host-only
+  working data (e.g. Pendenzen with private communication) never leave the
+  host; contact data only for roles the host grants it to. The host filters before
   sending. Guests may export locally only what their role sees.
 - Analytics, telemetry, remote logging and all other prohibitions above still
   apply in full, including to the host service.

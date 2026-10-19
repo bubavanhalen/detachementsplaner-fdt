@@ -68,6 +68,7 @@ Gast-Browser ── HTTPS/WSS ──> Tailscale Funnel ──> Heim-PC: tailscal
 | Leser | lesen, exportieren | wie Bearbeiter, ohne Kontaktdaten |
 
 - Versicherten-Nr., Ausweise und importierte Rohdaten (`raw`) **verlassen den Host nie**. Der Host-Dienst filtert vor dem Senden, nicht der Gast.
+- **Pendenzen** (Seite «Pendenzen», mit privater Kommunikation: Absender, Betreffs, Anrufnotizen) sind ebenfalls **nur für den Host** und werden vor dem Senden entfernt. Eine Freigabe für weitere Rollen braucht einen eigenen Entscheid des Owners. Den Austauschordner des Pendenzen-Agenten gibt es nur beim Host.
 - Gäste halten das Projekt nur im Arbeitsspeicher; die App legt im Gast-Browser keine dauerhafte Kopie an.
 - **Exporte (Entscheid Owner 20.10.2026):** Alle Rollen dürfen lokal exportieren (Excel, PDF/Druck, Kontakt-CSV, Projektdatei).
   - Ein Export enthält nur, was die Rolle sieht.
