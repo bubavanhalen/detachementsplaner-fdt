@@ -40,7 +40,7 @@ function person(id: string, grad: string, patch: Partial<Person> = {}): Person {
 }
 function project(): Project {
   const value = createProject();
-  value.settings.eigeneEinheit = UNIT;
+  value.stamm.einheit = UNIT;
   value.persons = [
     person('a', 'Lt'),
     person('b', 'Oblt'),
@@ -106,7 +106,7 @@ describe('Tagesbefehl state normalisation', () => {
     const loaded = normalizeProject(input);
     const tb = loaded.tb as TbState;
     expect(tb.settings.lk).toBe('7');
-    expect(tb.settings.kdtName).toBe('');
+    expect(loaded.stamm.kader).toEqual([]);
     expect(tb.settings.gehtAn).toEqual(createTbState().settings.gehtAn);
     expect(tb.regeln).toEqual([...DEFAULT_TB_RULES]);
     const kvk = tb.wochen.KVK;
@@ -134,7 +134,7 @@ describe('Tagesbefehl state normalisation', () => {
 
   it('starts with empty personal data and the documented defaults', () => {
     const tb = createTbState();
-    expect(tb.settings.kdtName).toBe('');
+    expect(createProject().stamm.kader).toEqual([]);
     expect(tb.settings.lk).toBe('LK 1:50 000, Bl 217, 227');
     expect(tb.wochen).toEqual({});
     expect(tb.offiziere).toEqual([]);
@@ -277,7 +277,16 @@ describe('order builder', () => {
   function orderFixture() {
     const p = project(),
       tb = createTbState();
-    tb.settings.kdtName = 'Hptm Test Fiktiv';
+    p.stamm.kader = [
+      {
+        rolle: 'kdt',
+        personId: '',
+        grad: 'Hptm',
+        vorname: 'Test',
+        name: 'Fiktiv',
+        funktion: 'Kommandant',
+      },
+    ];
     tb.settings.zK = ['Kdt Fiktiv Bat 99'];
     const kvk = week('KVK', '2030-01-07', ['Mo', 'Mi', 'Sa']);
     kvk.firstNumber = 1;

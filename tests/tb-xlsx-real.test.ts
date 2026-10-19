@@ -7,6 +7,7 @@ import { strFromU8, unzipSync } from 'fflate';
 import { describe, expect, it } from 'vitest';
 import { buildTagesbefehlXlsx, xlsxFileName } from '../src/io/tagesbefehl/xlsx';
 import { XLSX } from '../src/io/workbook';
+import { commanderSignature } from '../src/model';
 import { emptyWeek, orderTitle } from '../src/model/tagesbefehl/state';
 import {
   TB_WEEKDAYS,
@@ -80,7 +81,12 @@ const entry = (e: ReviewedEntry, id: string): TbOrderBlock => ({
   ...e,
 });
 
-function reviewedOrders(reviewed: Reviewed, settings: TbSettings, einheit: string): TbOrder[] {
+function reviewedOrders(
+  reviewed: Reviewed,
+  settings: TbSettings,
+  einheit: string,
+  kdt: { name: string; funktion: string },
+): TbOrder[] {
   const verteiler = { gehtAn: settings.gehtAn, zK: settings.zK };
   return TB_WEEKDAYS.flatMap((day, i) => {
     const d = reviewed.days[day];
@@ -114,7 +120,7 @@ function reviewedOrders(reviewed: Reviewed, settings: TbSettings, einheit: strin
               label: 'Tagesoffizier',
               lines: [d.tagesoffizier?.name ?? '', d.tagesoffizier?.tel ?? ''].filter(Boolean),
             },
-        signature: { einheit, name: settings.kdtName, funktion: settings.kdtFunktion },
+        signature: { einheit, ...kdt },
         verteiler,
       },
     ];
@@ -128,11 +134,10 @@ describe.skipIf(!available)('xlsx export with the real template (local fixtures 
     const einheit = cellText(conf, 'B7');
     const settings: TbSettings = {
       lk: cellText(conf, 'B5'),
-      kdtName: cellText(conf, 'B8'),
-      kdtFunktion: cellText(conf, 'B9'),
       ...referenceVerteiler(expected.Sheets.Mo),
-      dienstleistung: 'FDT_2026',
     };
+    const kdt = { name: cellText(conf, 'B8'), funktion: cellText(conf, 'B9') };
+    const dateikuerzel = 'FDT_2026';
     const reviewed = JSON.parse(readFileSync(REVIEWED, 'utf8')) as Reviewed;
     const week = {
       ...emptyWeek('KVK'),
@@ -140,17 +145,19 @@ describe.skipIf(!available)('xlsx export with the real template (local fixtures 
       firstNumber: reviewed.first_tb_number,
       days: TB_WEEKDAYS.filter((d) => reviewed.days[d]),
     };
-    const orders = reviewedOrders(reviewed, settings, einheit);
+    const orders = reviewedOrders(reviewed, settings, einheit, kdt);
     const bytes = buildTagesbefehlXlsx({
       template: new Uint8Array(readFileSync(TEMPLATE)),
       week,
       orders,
       settings,
       einheit,
+      kdt,
+      dateikuerzel,
       now: new Date('2026-09-27T12:00:00Z'),
     });
     mkdirSync(OUT_DIR, { recursive: true });
-    writeFileSync(`${OUT_DIR}/${xlsxFileName(week.sheet, settings)}`, bytes);
+    writeFileSync(`${OUT_DIR}/${xlsxFileName(week.sheet, dateikuerzel)}`, bytes);
 
     // Every XML part is well-formed.
     const parts = unzipSync(bytes);
@@ -204,7 +211,9 @@ describe.skipIf(!available)('xlsx export with the real template (local fixtures 
         week,
         orders,
         settings: tb.settings,
-        einheit: project.settings.eigeneEinheit,
+        einheit: project.stamm.einheit,
+        kdt: commanderSignature(project.stamm),
+        dateikuerzel: project.stamm.dateikuerzel,
       }),
     );
     expect(files['xl/media/image2.png']).toEqual(SIGNATURE_PNG);

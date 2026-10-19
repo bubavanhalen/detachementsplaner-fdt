@@ -125,15 +125,12 @@ export interface TbRule {
 export interface TbSettings {
   /** "LK 1:50 000, Bl 217, 227" */
   lk: string;
-  /** Signing commander, e.g. "Hptm Muster Hans". Personal data: starts empty. */
-  kdtName: string;
-  kdtFunktion: string;
-  /** Verteiler lines; "{Einheit}" is replaced with project.settings.eigeneEinheit. */
+  /** Verteiler lines; "{Einheit}" is replaced with project.stamm.einheit. */
   gehtAn: string[];
   zK: string[];
-  /** Filename suffix, e.g. "FDT_2026" → Tagesbefehle_KVK_FDT_2026.xlsx */
-  dienstleistung: string;
 }
+// Commander, unit and file suffix come from project.stamm (ADR-0001); the
+// v5 fields kdtName, kdtFunktion and dienstleistung are migrated there.
 
 export interface TbState {
   settings: TbSettings;
@@ -184,9 +181,12 @@ export interface TbOrder {
 
 /** Locally stored binary assets (separate localStorage key, never in project JSON). */
 export interface TbAssets {
-  /** Official template (.xlsx) as base64. */
+  /** Official template (.xlsx) as base64. Stays a device value (ADR-0001). */
   template?: { name: string; base64: string; savedAt: string };
-  /** Signature PNG, already prepared (padded/thickened) as base64. */
+  /**
+   * Former device-wide signature PNG. The signature now belongs to the service
+   * (project.stamm.grafiken.unterschrift); this copy is only offered for transfer.
+   */
   signature?: { name: string; base64: string; savedAt: string };
 }
 

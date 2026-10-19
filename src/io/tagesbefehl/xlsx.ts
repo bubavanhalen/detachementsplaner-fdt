@@ -72,8 +72,12 @@ export interface TagesbefehlXlsxInput {
   week: TbWeek;
   /** buildOrders(project, tb, week) — the same orders the print view and PDFs render. */
   orders: TbOrder[];
-  settings: TbSettings;
+  settings: Pick<TbSettings, 'lk'>;
   einheit: string;
+  /** Signing commander from the master data (commanderSignature), used without orders. */
+  kdt: { name: string; funktion: string };
+  /** File suffix from the master data, e.g. "FDT_2026". */
+  dateikuerzel: string;
   now?: Date;
 }
 
@@ -82,9 +86,9 @@ const WEEKEND_SHEET = /^Sa\s*\+\s*So$/;
 /** Rows 2–10 (header, logos, title, LK) are kept; the order starts in row 11. */
 const HEADER_LAST_ROW = 10;
 
-/** Tagesbefehle_<Woche>_<Dienstleistung>.xlsx, e.g. Tagesbefehle_KVK_FDT_2026.xlsx */
-export function xlsxFileName(sheet: string, settings: Pick<TbSettings, 'dienstleistung'>): string {
-  const suffix = settings.dienstleistung
+/** Tagesbefehle_<Woche>_<Dateikürzel>.xlsx, e.g. Tagesbefehle_KVK_FDT_2026.xlsx */
+export function xlsxFileName(sheet: string, dateikuerzel: string): string {
+  const suffix = dateikuerzel
     .trim()
     .replace(/[\\/:*?"<>|\s]+/g, '_')
     .replace(/^_+|_+$/g, '');
@@ -121,8 +125,8 @@ function confValues(input: TagesbefehlXlsxInput, orders: TbOrder[]): ConfValues 
     firstNumber: first ? first.number - (first.index - 1) : input.week.firstNumber,
     lk: first?.lk ?? input.settings.lk,
     einheit: first?.einheit || input.einheit,
-    name: first?.signature.name ?? input.settings.kdtName,
-    funktion: first?.signature.funktion ?? input.settings.kdtFunktion,
+    name: first?.signature.name ?? input.kdt.name,
+    funktion: first?.signature.funktion ?? input.kdt.funktion,
   };
 }
 
@@ -455,7 +459,7 @@ export function buildTagesbefehlXlsx(input: TagesbefehlXlsxInput): Uint8Array {
     const title = [
       'Tagesbefehle',
       input.week.sheet,
-      input.settings.dienstleistung.replace(/_/g, ' '),
+      input.dateikuerzel.replace(/_/g, ' '),
       values.einheit,
     ]
       .map((part) => part.trim())

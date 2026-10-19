@@ -1,3 +1,4 @@
+import type { Stamm } from './stamm';
 import type { TbState } from './tagesbefehl/types';
 
 export type Participation = 'unreviewed' | 'included' | 'excluded';
@@ -86,8 +87,9 @@ export interface Confirmation {
 }
 export interface Project {
   [key: string]: unknown;
-  v: 5;
+  v: 6;
   id: string;
+  /** Name of the service, e.g. «WK 2027». */
   name: string;
   persons: Person[];
   dets: Detachment[];
@@ -98,7 +100,9 @@ export interface Project {
   service: { start: string; end: string; year?: string; note: string };
   src: Record<Source, { datei: string; zeit: string; anz: number } | null>;
   maps: Record<string, Record<string, string>>;
-  settings: { eigeneEinheit: string; puffer: number; nurMilo: boolean };
+  /** Master data maintained once per service (ADR-0001); v5 settings are migrated into it. */
+  stamm: Stamm;
+  settings: { puffer: number; nurMilo: boolean };
   pisa: { entered: Record<string, Confirmation>; verified: Confirmation | null };
   archive: { id: string; at: string } | null;
   migrationNotes: string[];

@@ -448,7 +448,18 @@ export function fictionalSetup(days: TbWeekday[] = DAY_SHEETS): {
   week: TbWeek;
 } {
   const project = createProject();
-  project.settings.eigeneEinheit = 'Muster Kp 1/1';
+  project.stamm.einheit = 'Muster Kp 1/1';
+  project.stamm.dateikuerzel = 'FDT_2026';
+  project.stamm.kader = [
+    {
+      rolle: 'kdt',
+      personId: '',
+      grad: 'Hptm',
+      vorname: 'Hans',
+      name: 'Muster',
+      funktion: 'Kommandant',
+    },
+  ];
   project.persons = [
     person('p1', 'Oblt', 'Anna', 'Muster', '000 000 00 01'),
     person('p2', 'Lt', 'Beat', 'Beispiel', '000 000 00 02'),
@@ -457,10 +468,7 @@ export function fictionalSetup(days: TbWeekday[] = DAY_SHEETS): {
   tb.settings = {
     ...tb.settings,
     lk: 'LK 1:25 000, Bl 1111',
-    kdtName: 'Hptm Hans Muster',
-    kdtFunktion: 'Kommandant',
     zK: ['Kdt Muster Bat 1'],
-    dienstleistung: 'FDT_2026',
   };
   tb.offiziere = ['p1', 'p2'];
   const week: TbWeek = {

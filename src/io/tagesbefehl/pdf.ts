@@ -1,7 +1,7 @@
 import { zipSync } from 'fflate';
 import { PDFDocument, type PDFImage, rgb, StandardFonts } from 'pdf-lib';
 import { swissDate, weekFileLabel } from '../../model/tagesbefehl/state';
-import { TB_WEEKDAY_NAMES, type TbOrder, type TbSettings } from '../../model/tagesbefehl/types';
+import { TB_WEEKDAY_NAMES, type TbOrder } from '../../model/tagesbefehl/types';
 import {
   layoutOrder,
   PAGE_HEIGHT,
@@ -43,8 +43,8 @@ const fileSafe = (value: string): string =>
     .replace(/^_+|_+$/g, '');
 
 /** Tagesbefehle_KVK_FDT_2026_PDF.zip */
-export function pdfZipName(sheet: string, settings: Pick<TbSettings, 'dienstleistung'>): string {
-  return ['Tagesbefehle', weekFileLabel(sheet), fileSafe(settings.dienstleistung), 'PDF']
+export function pdfZipName(sheet: string, dateikuerzel: string): string {
+  return ['Tagesbefehle', weekFileLabel(sheet), fileSafe(dateikuerzel), 'PDF']
     .filter(Boolean)
     .join('_')
     .concat('.zip');

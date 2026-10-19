@@ -1,3 +1,4 @@
+import { commanderSignature } from '../stamm';
 import type { Person, Project } from '../types';
 import {
   isWeekend,
@@ -19,11 +20,8 @@ import {
 
 export const DEFAULT_TB_SETTINGS: TbSettings = {
   lk: 'LK 1:50 000, Bl 217, 227',
-  kdtName: '',
-  kdtFunktion: 'Kommandant',
   gehtAn: ['Kader {Einheit}', '{Einheit} (via Anschlag)'],
   zK: [],
-  dienstleistung: 'FDT_2026',
 };
 
 const rule = (
@@ -192,11 +190,8 @@ export function normalizeTbState(input: unknown): TbState {
   return {
     settings: {
       lk: str(settings.lk, base.settings.lk),
-      kdtName: str(settings.kdtName),
-      kdtFunktion: str(settings.kdtFunktion, base.settings.kdtFunktion),
       gehtAn: strList(settings.gehtAn, base.settings.gehtAn),
       zK: strList(settings.zK, base.settings.zK),
-      dienstleistung: str(settings.dienstleistung, base.settings.dienstleistung),
     },
     regeln,
     wochen: Object.fromEntries(
@@ -299,7 +294,7 @@ export function sameUnit(a: string | undefined, b: string | undefined): boolean 
  * not taking part in the planning, without Kdt / Kdt Stv. Ordered by Zug, then name.
  */
 export function eligibleOfficers(project: Project): Person[] {
-  const unit = project.settings.eigeneEinheit;
+  const unit = project.stamm.einheit;
   return project.persons
     .filter(
       (p) =>
@@ -420,7 +415,7 @@ export function orderBlocks(week: TbWeek, day: TbWeekday): TbOrderBlock[] {
 export function buildOrder(project: Project, tb: TbState, week: TbWeek, day: TbWeekday): TbOrder {
   const date = dayDate(week, day),
     number = orderNumber(week, day),
-    einheit = project.settings.eigeneEinheit;
+    einheit = project.stamm.einheit;
   return {
     day,
     index: dayIndex(day),
@@ -435,7 +430,7 @@ export function buildOrder(project: Project, tb: TbState, week: TbWeek, day: TbW
       label: isWeekend(day) ? 'Wochenend Wacht Of' : 'Tagesoffizier',
       lines: officerLines(project, tb, week, day),
     },
-    signature: { einheit, name: tb.settings.kdtName, funktion: tb.settings.kdtFunktion },
+    signature: { einheit, ...commanderSignature(project.stamm) },
     verteiler: {
       gehtAn: tb.settings.gehtAn.map((line) => withUnit(line, einheit)).filter(Boolean),
       zK: tb.settings.zK.map((line) => withUnit(line, einheit)).filter(Boolean),

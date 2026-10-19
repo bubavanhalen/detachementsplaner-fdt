@@ -87,7 +87,7 @@ describe('local project boundary and historical files', () => {
       input.persons[0].raw.Preserve = 'yes';
       input.assign.wk.push('a');
       const result = normalizeProject(input);
-      expect(result.v).toBe(5);
+      expect(result.v).toBe(6);
       expect(result.persons).toHaveLength(3);
       expect(result.unknownExtension).toEqual({ keep: true });
       expect(result.persons[0].raw.Preserve).toBe('yes');
@@ -134,7 +134,7 @@ describe('local project boundary and historical files', () => {
     { persons: [{ id: '__proto__' }] },
     { persons: [], dets: 'wrong' },
     { persons: [], connections: {} },
-    { persons: [], v: 6 },
+    { persons: [], v: 7 },
   ])('rejects invalid structures atomically', (input) => {
     const before = structuredClone(input);
     expect(() => normalizeProject(input)).toThrow();

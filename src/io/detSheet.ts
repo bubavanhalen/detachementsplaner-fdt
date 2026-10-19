@@ -256,7 +256,7 @@ export function buildDetSheet(
       .filter(Boolean)
       .join(' · '),
     service: project.name,
-    unit: project.settings.eigeneEinheit,
+    unit: project.stamm.einheit,
     details: [
       ...(event.von || event.bis
         ? ([['Zeitraum', period(event.von, event.bis)]] as [string, string][])

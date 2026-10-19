@@ -8,8 +8,10 @@ import {
 import { readFileBytes } from '../../io/tagesbefehl/bytes';
 import { prepareSignature } from '../../io/tagesbefehl/signature';
 import { xlsxFileName } from '../../io/tagesbefehl/xlsx';
+import { commanderSignature, MAX_BILD_BYTES } from '../../model';
 import type { TbAssets } from '../../model/tagesbefehl';
-import { notify } from '../../store';
+import { changeProject, notify } from '../../store';
+import { openOverlay } from '../../ui';
 import { Icon } from '../Icon';
 import { Modal } from '../Modal';
 import { Field, InlineLines, InlineText } from './fields';
@@ -44,7 +46,15 @@ export function AssetsStep({
   onAssets,
 }: TbStepProps & { assets: TbAssets; onAssets: (assets: TbAssets) => void }) {
   const [removing, setRemoving] = useState<AssetKind | 'all' | null>(null);
-  const unit = project.settings.eigeneEinheit.trim();
+  const unit = project.stamm.einheit.trim();
+  // The template is a device value; the signature belongs to the service (ADR-0001).
+  const unterschrift = project.stamm.grafiken.unterschrift;
+  const legacySignature = assets.signature;
+  const shown: Partial<Record<AssetKind, TbAssets['template']>> = {
+    template: assets.template,
+    signature: unterschrift,
+  };
+  const kdt = commanderSignature(project.stamm);
 
   const receive = (kind: AssetKind) => (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget,
@@ -56,9 +66,18 @@ export function AssetsStep({
         throw new Error('Die Vorlage ist keine lesbare .xlsx-Datei.');
       if (kind === 'signature' && !isPng(bytes))
         throw new Error('Die Unterschrift muss eine PNG-Datei sein.');
-      const stored = kind === 'signature' ? await prepareSignature(bytes) : bytes;
+      if (kind === 'signature') {
+        const prepared = await prepareSignature(bytes);
+        if (prepared.length > MAX_BILD_BYTES)
+          throw new Error(`Die Unterschrift ist grösser als ${MAX_BILD_BYTES / 1024} KB.`);
+        changeProject((draft) => {
+          draft.stamm.grafiken.unterschrift = createTbAsset(file.name, prepared);
+        });
+        notify('Unterschrift für diesen Dienst gespeichert.');
+        return;
+      }
       // Merge with the device store so two quick uploads cannot drop each other.
-      onAssets(saveTbAssets({ ...readTbAssets(), [kind]: createTbAsset(file.name, stored) }));
+      onAssets(saveTbAssets({ ...readTbAssets(), template: createTbAsset(file.name, bytes) }));
       notify(`${ASSET_LABELS[kind]} lokal gespeichert.`);
     }).finally(() => {
       input.value = '';
@@ -71,6 +90,10 @@ export function AssetsStep({
       if (removing === 'all') {
         clearTbAssets();
         onAssets({});
+      } else if (removing === 'signature') {
+        changeProject((draft) => {
+          delete draft.stamm.grafiken.unterschrift;
+        });
       } else {
         const next = { ...readTbAssets() };
         delete next[removing];
@@ -79,6 +102,21 @@ export function AssetsStep({
     });
     setRemoving(null);
   };
+  /** The former device-wide signature, moved to this service only on request. */
+  const adoptLegacy = () =>
+    void run(() => {
+      if (!legacySignature) return;
+      changeProject((draft) => {
+        draft.stamm.grafiken.unterschrift = { ...legacySignature };
+      });
+      notify('Unterschrift diesem Dienst zugeordnet.');
+    });
+  const dropLegacy = () =>
+    void run(() => {
+      const next = { ...readTbAssets() };
+      delete next.signature;
+      onAssets(saveTbAssets(next));
+    });
 
   const settings = tb.settings;
   const saveSetting = <K extends keyof typeof settings>(key: K, value: (typeof settings)[K]) =>
@@ -95,16 +133,37 @@ export function AssetsStep({
           <h2 id="tb-assets-title">
             <Icon name="file" /> Vorlage & Unterschrift
           </h2>
-          <span className="muted tb-head-note">Einmal pro Gerät</span>
+          <span className="muted tb-head-note">Vorlage pro Gerät · Unterschrift pro Dienst</span>
         </header>
         <div className="card-body tb-card-stack">
           <p className="muted">
-            Die offizielle Vorlage (.xlsx) und die Unterschrift (PNG) werden nur in dieser
-            Browserablage gespeichert und in die private Offline-HTML übernommen. Kein Upload.
+            Die offizielle Vorlage (.xlsx) gilt für dieses Gerät. Die Unterschrift (PNG) gehört zum
+            Dienst und ist auch unter «Dienst und Einheit» sichtbar. Beides bleibt lokal; kein
+            Upload.
           </p>
+          {legacySignature && (
+            <div className="callout callout-warning" data-testid="tb-legacy-signature">
+              <Icon name="info" />
+              <div className="callout-body">
+                {unterschrift
+                  ? 'Auf diesem Gerät liegt noch eine Unterschrift aus der früheren Version. Sie wird nicht mehr verwendet.'
+                  : 'Auf diesem Gerät liegt noch eine Unterschrift aus der früheren Version. Die Unterschrift gehört jetzt zum Dienst.'}
+                <div className="actions">
+                  {!unterschrift && !archived && (
+                    <button type="button" className="btn btn-sm btn-primary" onClick={adoptLegacy}>
+                      Diesem Dienst zuordnen
+                    </button>
+                  )}
+                  <button type="button" className="btn btn-sm btn-ghost" onClick={dropLegacy}>
+                    Vom Gerät entfernen
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="tb-asset-list">
             {(['template', 'signature'] as const).map((kind) => {
-              const asset = assets[kind];
+              const asset = shown[kind];
               return (
                 <div className={`tb-asset ${asset ? 'is-loaded' : ''}`} key={kind}>
                   <span className="tb-asset-icon" aria-hidden="true">
@@ -166,13 +225,13 @@ export function AssetsStep({
               );
             })}
           </div>
-          {assets.template && assets.signature && (
+          {assets.template && legacySignature && (
             <button
               type="button"
               className="btn-link tb-remove-all"
               onClick={() => setRemoving('all')}
             >
-              Beide von diesem Gerät entfernen
+              Vorlage und alte Unterschrift von diesem Gerät entfernen
             </button>
           )}
         </div>
@@ -196,27 +255,28 @@ export function AssetsStep({
               />
             )}
           </Field>
-          <Field label="Name Kdt">
-            {(id) => (
-              <InlineText
-                id={id}
-                value={settings.kdtName}
-                placeholder="Grad Vorname Name"
-                disabled={archived}
-                onCommit={(value) => saveSetting('kdtName', value.trim())}
-              />
+          <div className="span-all tb-stamm" data-testid="tb-stamm">
+            <dl>
+              <dt>Unterzeichnet</dt>
+              <dd>{[kdt.name || 'Name Kdt fehlt', kdt.funktion].filter(Boolean).join(' · ')}</dd>
+              <dt>Einheit</dt>
+              <dd>{unit || 'fehlt'}</dd>
+              <dt>Dateikürzel</dt>
+              <dd>
+                {project.stamm.dateikuerzel || 'keines'} · z. B.{' '}
+                <span className="mono">{xlsxFileName('KVK', project.stamm.dateikuerzel)}</span>
+              </dd>
+            </dl>
+            {!archived && (
+              <button
+                type="button"
+                className="btn btn-sm"
+                onClick={() => openOverlay({ service: true })}
+              >
+                <Icon name="edit" size={15} /> Dienst und Einheit bearbeiten
+              </button>
             )}
-          </Field>
-          <Field label="Funktion">
-            {(id) => (
-              <InlineText
-                id={id}
-                value={settings.kdtFunktion}
-                disabled={archived}
-                onCommit={(value) => saveSetting('kdtFunktion', value.trim())}
-              />
-            )}
-          </Field>
+          </div>
           <Field label="Verteiler «Geht an»">
             {(id) => (
               <InlineLines
@@ -239,22 +299,9 @@ export function AssetsStep({
           </Field>
           <p className="muted span-all tb-hint">
             Eine Zeile pro Empfänger. <code>{'{Einheit}'}</code> wird durch die eigene Einheit
-            ersetzt (
-            {unit ? `«${unit}»` : 'noch nicht erfasst — Projektmenü → Bezeichnung & Zeitraum'}).
+            ersetzt ({unit ? `«${unit}»` : 'noch nicht erfasst — Projektmenü → Dienst und Einheit'}
+            ).
           </p>
-          <Field className="field span-all" label="Dienstleistung (Dateiname)">
-            {(id) => (
-              <>
-                <InlineText
-                  id={id}
-                  value={settings.dienstleistung}
-                  disabled={archived}
-                  onCommit={(value) => saveSetting('dienstleistung', value.trim())}
-                />
-                <small className="hint">Beispiel: {xlsxFileName('KVK', settings)}</small>
-              </>
-            )}
-          </Field>
         </div>
       </section>
 
@@ -278,8 +325,9 @@ export function AssetsStep({
           }
         >
           <p>
-            Die Datei wird aus der Browserablage dieses Geräts entfernt. Für weitere Ausgaben muss
-            sie erneut gewählt werden.
+            {removing === 'signature'
+              ? 'Die Unterschrift wird aus diesem Dienst entfernt. Ohne Unterschrift bleibt das Bild der Vorlage.'
+              : 'Die Datei wird aus der Browserablage dieses Geräts entfernt. Für weitere Ausgaben muss sie erneut gewählt werden.'}
           </p>
         </Modal>
       )}

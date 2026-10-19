@@ -1,10 +1,11 @@
+import { createStamm, normalizeStamm } from './stamm';
 import { normalizeTbState } from './tagesbefehl/state';
 import type { Detachment, OnsiteEvent, Person, Project, SubDetachment } from './types';
 
 export const newId = (prefix: string): string => `${prefix}_${crypto.randomUUID()}`;
 export function createProject(): Project {
   return {
-    v: 5,
+    v: 6,
     id: newId('project'),
     name: 'Neue Dienstleistung',
     persons: [],
@@ -16,7 +17,8 @@ export function createProject(): Project {
     service: { start: '', end: '', year: '', note: '' },
     src: { pisa: null, milo: null },
     maps: { fkt: {}, lic: {} },
-    settings: { eigeneEinheit: '', puffer: 60, nurMilo: false },
+    stamm: createStamm(),
+    settings: { puffer: 60, nurMilo: false },
     pisa: { entered: {}, verified: null },
     archive: null,
     migrationNotes: [],
@@ -46,6 +48,8 @@ export function assertWritable(project: Project): void {
   if (project.archive)
     throw new Error('Archivstände sind schreibgeschützt. Zuerst eine Arbeitskopie öffnen.');
 }
+/** Default file suffix of the v5 Tagesbefehl settings, kept for projects that relied on it. */
+const LEGACY_TB_DIENSTLEISTUNG = 'FDT_2026';
 const invalid = (): never => {
   throw new Error('Die Datei enthält kein gültiges Projekt. Der bisherige Stand bleibt erhalten.');
 };
@@ -214,7 +218,7 @@ export function normalizeProject(input: unknown): Project {
     base = createProject();
   if (!Array.isArray(value.persons) || (value.dets != null && !Array.isArray(value.dets)))
     return invalid();
-  if (typeof value.v === 'number' && value.v > 5)
+  if (typeof value.v === 'number' && value.v > 6)
     throw new Error('Diese Projektversion benötigt eine neuere Anwendung.');
   const service = optionalRecord(value.service),
     settings = optionalRecord(value.settings),
@@ -248,15 +252,29 @@ export function normalizeProject(input: unknown): Project {
     value.subDets == null ? undefined : unique((value.subDets as unknown[]).map(subDetachment));
   const events = onsiteEvents(value, dets, subDets);
   const migrationNotes = value.migrationNotes == null ? [] : strings(value.migrationNotes);
-  if (dets.some((d) => d.zusatzIds.length) && value.v !== 5)
+  if (dets.some((d) => d.zusatzIds.length) && !(typeof value.v === 'number' && value.v >= 5))
     migrationNotes.push(
       'Bestehende Haupt-/Zusatz-MB wurden unverändert übernommen. Die bisherigen Zuteilungen bleiben erhalten; neue Planungsverbindungen werden getrennt geführt.',
     );
   const archive = value.archive == null ? null : record(value.archive);
+  // v5 kept the unit in the planning settings and the commander/file suffix in the
+  // Tagesbefehl settings; v6 holds them once in the master data.
+  const loose = (item: unknown): Record<string, unknown> | null =>
+    item && typeof item === 'object' && !Array.isArray(item)
+      ? (item as Record<string, unknown>)
+      : null;
+  const tbInput = value.tb == null ? null : (loose(value.tb) ?? {}),
+    tbSettings = loose(tbInput?.settings) ?? {};
+  const stamm = normalizeStamm(value.stamm, {
+    eigeneEinheit: settings.eigeneEinheit,
+    kdtName: tbSettings.kdtName,
+    kdtFunktion: tbSettings.kdtFunktion,
+    dienstleistung: tbInput ? (tbSettings.dienstleistung ?? LEGACY_TB_DIENSTLEISTUNG) : '',
+  });
   const normalized: Project = {
     ...base,
     ...value,
-    v: 5,
+    v: 6,
     id: value.id == null ? base.id : identifier(value.id),
     name: text(value.name, base.name),
     persons: unique(value.persons.map(person)),
@@ -285,9 +303,9 @@ export function normalizeProject(input: unknown): Project {
         Object.entries(optionalRecord(value.maps)).map(([key, item]) => [key, dictionary(item)]),
       ),
     },
+    stamm,
     settings: {
       ...settings,
-      eigeneEinheit: text(settings.eigeneEinheit),
       puffer:
         typeof settings.puffer === 'number' && Number.isFinite(settings.puffer)
           ? settings.puffer
@@ -317,6 +335,7 @@ export function normalizeProject(input: unknown): Project {
     ...(events ? { onsiteEvents: events } : {}),
   };
   delete normalized.onsiteUnits;
+  delete (normalized.settings as Record<string, unknown>).eigeneEinheit;
   for (const source of ['pisa', 'milo'] as const) {
     if (src[source] != null) {
       const sourceValue = record(src[source]);

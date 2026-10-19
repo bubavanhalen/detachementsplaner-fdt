@@ -782,3 +782,24 @@ small.tb-warning-text {
     display: none;
   }
 }
+
+/* Master data summary in step 1 (maintained under «Dienst und Einheit»). */
+.tb-stamm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.tb-stamm dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 0;
+}
+.tb-stamm dt {
+  color: var(--text-3);
+}
+.tb-stamm dd {
+  margin: 0;
+}

@@ -475,7 +475,7 @@ describe('local storage and archives', () => {
     expect(ARCHIVE_KEY).toBe('detplaner.archives.v1');
     expect(readProject(storage)).toBeNull();
     storage.setItem(PROJECT_KEY, historical);
-    expect(readProject(storage)?.v).toBe(5);
+    expect(readProject(storage)?.v).toBe(6);
     expect(readProject(storage)?.persons[0].name).toBe('Alex Muster');
     expect(storage.getItem(PROJECT_KEY)).toBe(historical);
   });

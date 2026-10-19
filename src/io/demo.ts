@@ -5,7 +5,7 @@ import type { Project } from '../model/types';
 export function demoProject(): Project {
   const project = createProject();
   project.name = 'Beispiel · WK 2027';
-  project.settings.eigeneEinheit = 'Demo Kp';
+  project.stamm.einheit = 'Demo Kp';
   project.service = {
     start: '2027-05-03',
     end: '2027-05-21',

@@ -16,7 +16,7 @@
 | | Lokal (wie heute) | Host |
 |---|---|---|
 | Wo | Browser auf irgendeinem Gerät, auch Dienstlaptop | Host-Dienst auf dem Heim-PC |
-| Ablage | Browser (IndexedDB, ab S2) | eine SQLite-Datei |
+| Ablage | Browser (heute localStorage, später IndexedDB) | eine SQLite-Datei |
 | Netz | keines, keine einzige Anfrage | nur über Funnel zum Host-Dienst |
 | Teilen | nein | ja (ADR-0002) |
 

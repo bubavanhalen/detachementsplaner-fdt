@@ -1,6 +1,6 @@
 # ADR-0001: Stammdatenmodell der WK Util Suite (Etappe S1)
 
-- **Status:** Entwurf, 20.10.2026. Entscheide (a) und (b) vom Owner am 20.10.2026 getroffen; (c) siehe ADR-0003 Abschnitt «Auslieferung» (Export «HTML mit Daten» entfällt zugunsten der Projektdatei).
+- **Status:** S2 umgesetzt (20.10.2026); S3–S5 Entwurf. Entscheide (a) und (b) vom Owner am 20.10.2026 getroffen; (c) siehe ADR-0003 Abschnitt «Auslieferung» (Export «HTML mit Daten» entfällt zugunsten der Projektdatei).
 - **Grundlage:** Bestandsaufnahme «Stammdaten-Doppelungen der WK Util Suite» vom 20.10.2026 (Stand `wap-codex` cd21877; nur Code und Doku, keine echten Daten). Auftrag des Owners: «Alles was doppelt ist von Grunddaten stört mich».
 - **Abhängigkeit:** Der WAP-Planer liegt auf `wap-codex` und ist nicht in `main`. Etappen S3–S5 beginnen erst nach Gate B des WAP-Planers (WAP-Beschrieb 9.1, 12). S2 betrifft nur Suite-Dateien.
 
@@ -36,39 +36,43 @@ Jedes Grunddatum hat genau eine Quelle. Andere Teile halten höchstens ein Abbil
 
 ### Modell `Project.stamm` (Projekt-JSON v6, additiv)
 
+Umgesetzt in `src/model/stamm.ts` (S2, 20.10.2026):
+
 ```ts
 interface Stamm {
   einheit: string;
   uebergeordneteEinheit: string;
-  dienst: string;
   uebungsname: string;
   dateikuerzel: string;
   standort: string;
   klassifizierung: string;
   motto: string;
-  nameOrder: 'nameVorname' | 'vornameName';
-  kader: Array<{
-    rolle: 'kdt' | 'kdtStv';
-    personId: string | null; // Verweis auf Project.persons, sonst Freitext unten
-    grad: string;
-    name: string;
-    vorname: string;
-    funktion: string;
-  }>;
-  grafiken: { unterschrift: AssetRef | null; wappen: AssetRef | null };
+  nameOrder: 'vornameName' | 'nameVorname';
+  kader: KaderEintrag[]; // höchstens ein Eintrag je Rolle
+  grafiken: { unterschrift?: StammBild; wappen?: StammBild };
 }
-type AssetRef = { id: string; sha256: string; mime: 'image/png' };
+interface KaderEintrag {
+  rolle: 'kdt' | 'kdtStv';
+  personId: string; // Verweis auf Project.persons, '' = von Hand erfasst
+  grad: string;
+  vorname: string;
+  name: string;
+  funktion: string;
+  pruefen?: boolean; // aus dem früheren Freitext übernommen, bis zum Speichern der Maske
+}
+type StammBild = { name: string; base64: string; savedAt: string }; // PNG
 ```
 
-- Der Zeitraum bleibt in `service.start/end` und wird nicht verdoppelt.
-- Bilder liegen in der IndexedDB der Suite (Store `assets`, Schlüssel Projekt-ID + Art), nicht im localStorage. `Project` enthält nur den Verweis. Die Projektdatei (`.json`) bettet die Bilder beim Sichern ein.
-- v5-Projekte bleiben lesbar. Beim Speichern entsteht v6. Die alten Felder (`settings.eigeneEinheit`, `tb.settings.kdtName/kdtFunktion/dienstleistung`) werden eine Version lang mitgeschrieben und danach entfernt.
+- **Dienst = `Project.name`, Zeitraum = `service.start/end`.** Beides gibt es schon; `stamm` verdoppelt es nicht (ein Feld `dienst` hätte die nächste Doppelung erzeugt).
+- **Bilder im Projekt (Abweichung vom Entwurf):** Unterschrift und Wappen liegen als PNG im Projekt, höchstens 512 KB je Bild. Damit reisen sie ohne Zusatzmechanik mit Projektdatei, Archiv und Offline-HTML, und es gibt keinen zweiten Speicher, der auseinanderlaufen kann. Der Wechsel in IndexedDB erfolgt zusammen mit dem Projekt selbst (ADR-0003, lokale Betriebsart), nicht vorher getrennt.
+- **Keine mitgeschriebenen Altfelder (Abweichung vom Entwurf):** Ältere Versionen lehnen v6 ohnehin ab («benötigt eine neuere Anwendung»). Altfelder mitzuschreiben würde nur eine neue Doppelung schaffen. v5-Projekte werden beim Lesen migriert; die Altfelder (`settings.eigeneEinheit`, `tb.settings.kdtName/kdtFunktion/dienstleistung`) entfallen danach.
+- Ein Kader-Eintrag mit `personId` ist eine Kopie mit Verweis. Weicht die Personenliste ab, zeigt die Maske einen Hinweis und übernimmt die Werte nur auf Klick («Quelle + Abbild», nie still).
 
 ### Tagesbefehle auf Verweis
 
-- `kdtName`/`kdtFunktion` werden aus `stamm.kader` (Rolle `kdt`) gebildet, `dienstleistung` aus `stamm.dateikuerzel`.
-- Die Unterschrift kommt aus `stamm.grafiken.unterschrift`. Die TB-Vorlage (.xlsx) bleibt ein amtlicher Gerätewert.
-- Das Wappen kann anstelle des Vorlagenlogos verwendet werden.
+- Name und Funktion der Unterschrift werden aus `stamm.kader` (Rolle `kdt`) gebildet (`commanderSignature`), der Dateiname aus `stamm.dateikuerzel`, die Einheit aus `stamm.einheit`. Schritt 1 der Tagesbefehle zeigt diese Werte nur an und verweist auf «Dienst und Einheit».
+- Die Unterschrift kommt aus `stamm.grafiken.unterschrift`. Sie kann in «Dienst und Einheit» oder in Schritt 1 der Tagesbefehle gewählt werden; beides schreibt dasselbe Feld. Die TB-Vorlage (.xlsx) bleibt ein amtlicher Gerätewert; das Offline-HTML bettet nur noch die Vorlage ein.
+- Offen (später): Das Wappen ist erfasst, ersetzt das Vorlagenlogo aber noch nicht.
 
 ### WAP-Verweis (Plan-Format v2, additiv, erst nach Gate B)
 
@@ -80,8 +84,10 @@ type AssetRef = { id: string; sha256: string; mime: 'image/png' };
 
 ### Migration (lokal, nur mit Bestätigung)
 
-1. **Projekt v5 → v6:** `stamm` wird aus `eigeneEinheit`, `name`/`service` und `tb.settings.dienstleistung` gebildet. `kdtName` wird in Grad/Name/Vorname zerlegt und vor der Übernahme angezeigt.
-2. **Unterschrift:** Die gerätweite TB-Unterschrift wird nach Rückfrage dem offenen Projekt zugeordnet. Ohne Bestätigung bleibt sie unverändert erhalten.
+1. **Projekt v5 → v6 (umgesetzt):** `stamm` wird aus `settings.eigeneEinheit` und `tb.settings.kdtName/kdtFunktion/dienstleistung` gebildet. Ein v5-TB-Zustand ohne gespeichertes Kürzel erhält wie bisher `FDT_2026`.
+   - `kdtName` wird verlustfrei in Grad/Vorname/Name zerlegt: In der Reihenfolge «Grad Vorname Name» zusammengesetzt ergibt sich derselbe Text. Bestehende Tagesbefehle ändern sich also nicht.
+   - Statt einer Vorschau vor der Übernahme markiert `pruefen` den Eintrag. Die Maske bittet um Prüfung, bis sie einmal gespeichert wurde.
+2. **Unterschrift (umgesetzt):** Eine gerätweit gespeicherte TB-Unterschrift wird nie still verwendet. Schritt 1 der Tagesbefehle bietet «Diesem Dienst zuordnen» und «Vom Gerät entfernen» an.
 3. **WAP v1 → v2:** Zuerst eine Sicherung im alten Format, dann der Dialog «Mit Suite verknüpfen» mit Suite-Wert und Plan-Wert je Feld. Personen werden über Grad + Nachname + Vorname zugeordnet, sonst von Hand.
 
 ## Etappen
@@ -89,7 +95,7 @@ type AssetRef = { id: string; sha256: string; mime: 'image/png' };
 | Etappe | Inhalt | Zweig | Aufwand (AT) |
 |---|---|---|---|
 | S1 | dieses ADR und ADR-0002 | `main` | ≈1 |
-| S2 | Suite: Maske «Dienst und Einheit» (Kader, Bilder), Projekt v6, Bild-IndexedDB, TB auf Verweis | `main` | 4–6 |
+| S2 | Suite: Maske «Dienst und Einheit» (Kader, Bilder), Projekt v6, TB auf Verweis (umgesetzt 20.10.2026) | `main` | 4–6 |
 | S3 | WAP: Format v2, Verknüpfung/Abgleich, Befunde, Weitergabe ohne Verknüpfung | nach Gate B | 5–7 |
 | S4 | Personen, Züge, Detachemente aus der Suite (R-9.1-01..06) | nach Gate B | 6–9 |
 | S5 | Übergabe WAP → TB (9.2), TB-Excel-Pfad und Enum `TbLeitung` ablösen | nach Gate B | 6–10 |

@@ -2,9 +2,10 @@ import type { TbAssets } from '../../model/tagesbefehl/types';
 import { toBase64 } from './bytes';
 
 /**
- * Template and signature are stored once per device, separate from the project
- * JSON (they are binary and not part of a planning state). They never leave the
- * device except inside the private self-contained HTML export.
+ * The template is stored once per device, separate from the project JSON. The
+ * signature now belongs to the service (project.stamm); a signature stored here by
+ * an earlier version is only kept until the user assigns or removes it. Nothing
+ * leaves the device except the template inside the private self-contained HTML export.
  */
 export const TB_ASSETS_KEY = 'detplaner.tb.assets';
 
@@ -87,9 +88,13 @@ export function seedTbAssets(embedded: unknown, storage?: Storage): boolean {
   }
 }
 
-/** Script fragment for the boot-data script of the self-contained HTML export. */
+/**
+ * Script fragment for the boot-data script of the self-contained HTML export. Only
+ * the template is embedded: the signature travels with the project (stamm), so a
+ * former device-wide signature of another service never ends up in this export.
+ */
 export function embeddedTbAssetsScript(assets: TbAssets | undefined): string {
-  const clean = normalizeTbAssets(assets);
+  const clean = normalizeTbAssets({ template: assets?.template });
   if (!hasTbAssets(clean)) return '';
   return `window.__TBASSETS=${JSON.stringify(clean).replace(/</g, '\\u003c')};`;
 }

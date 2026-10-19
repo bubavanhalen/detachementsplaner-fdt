@@ -114,13 +114,9 @@ describe('Tagesbefehl PDF file names', () => {
   });
 
   it('names the zip after week and service', () => {
-    expect(pdfZipName('KVK', { dienstleistung: 'FDT_2031' })).toBe(
-      'Tagesbefehle_KVK_FDT_2031_PDF.zip',
-    );
-    expect(pdfZipName('Wo 2', { dienstleistung: 'WK 2031' })).toBe(
-      'Tagesbefehle_Wo_2_WK_2031_PDF.zip',
-    );
-    expect(pdfZipName('Wo 1', { dienstleistung: '' })).toBe('Tagesbefehle_Wo_1_PDF.zip');
+    expect(pdfZipName('KVK', 'FDT_2031')).toBe('Tagesbefehle_KVK_FDT_2031_PDF.zip');
+    expect(pdfZipName('Wo 2', 'WK 2031')).toBe('Tagesbefehle_Wo_2_WK_2031_PDF.zip');
+    expect(pdfZipName('Wo 1', '')).toBe('Tagesbefehle_Wo_1_PDF.zip');
   });
 
   it('derives the metadata title from the order', () => {
