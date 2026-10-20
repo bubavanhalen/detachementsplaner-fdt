@@ -5,7 +5,7 @@ import {
   readTbAssets,
   saveTbAssets,
 } from '../../io/tagesbefehl/assets';
-import { readFileBytes } from '../../io/tagesbefehl/bytes';
+import { fromBase64, readFileBytes } from '../../io/tagesbefehl/bytes';
 import { prepareSignature } from '../../io/tagesbefehl/signature';
 import { xlsxFileName } from '../../io/tagesbefehl/xlsx';
 import { commanderSignature, MAX_BILD_BYTES } from '../../model';
@@ -106,6 +106,11 @@ export function AssetsStep({
   const adoptLegacy = () =>
     void run(() => {
       if (!legacySignature) return;
+      // Earlier versions had no size limit; the project must stay within it.
+      if (fromBase64(legacySignature.base64).length > MAX_BILD_BYTES)
+        throw new Error(
+          `Die gespeicherte Unterschrift ist grösser als ${MAX_BILD_BYTES / 1024} KB. Bitte eine kleinere PNG-Datei wählen.`,
+        );
       changeProject((draft) => {
         draft.stamm.grafiken.unterschrift = { ...legacySignature };
       });

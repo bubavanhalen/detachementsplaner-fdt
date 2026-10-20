@@ -22,7 +22,7 @@ import {
   seedTbAssets,
   TB_ASSETS_KEY,
 } from '../src/io/tagesbefehl/assets';
-import { createProject, normalizeProject } from '../src/model';
+import { createProject, MAX_BILD_BYTES, normalizeProject } from '../src/model';
 import {
   createTbState,
   emptyWeek,
@@ -319,6 +319,25 @@ describe('Vorlage & Unterschrift', () => {
     expect(readTbAssets()).toEqual({ template: expect.anything() });
     expect(screen.queryByTestId('tb-legacy-signature')).not.toBeInTheDocument();
     expect(projectStore.get().stamm.grafiken.unterschrift?.name).toBe('alte-unterschrift.png');
+  });
+
+  it('refuses to adopt a legacy signature above the project image limit', async () => {
+    const user = userEvent.setup();
+    const large = new Uint8Array(MAX_BILD_BYTES + 1);
+    large.set(PNG_BYTES);
+    saveTbAssets({
+      template: createTbAsset('fiktive-vorlage.xlsx', ZIP_BYTES),
+      signature: createTbAsset('alte-grosse-unterschrift.png', large),
+    });
+    const project = projectWithWeek();
+    delete project.stamm.grafiken.unterschrift;
+    projectStore.setState(() => project);
+    render(<TagesbefehlePage />);
+    await openStep(user, /Vorlage & Unterschrift/);
+    await user.click(screen.getByRole('button', { name: 'Diesem Dienst zuordnen' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('grösser als 512 KB');
+    expect(projectStore.get().stamm.grafiken.unterschrift).toBeUndefined();
+    expect(readTbAssets().signature?.name).toBe('alte-grosse-unterschrift.png');
   });
 
   it('edits the Tagesbefehl settings in the project with a commit on blur', async () => {
@@ -738,10 +757,19 @@ describe('local asset storage and self-contained export', () => {
     const empty = memoryStorage();
     expect(seedTbAssets(target.__TBASSETS, empty)).toBe(true);
     expect(readTbAssets(empty)).toEqual({ template: assets.template });
+    // A leftover legacy signature never blocks the embedded template.
+    const legacy = memoryStorage();
+    const local = saveTbAssets({ signature: createTbAsset('eigene.png', PNG_BYTES) }, legacy);
+    expect(seedTbAssets(target.__TBASSETS, legacy)).toBe(true);
+    expect(readTbAssets(legacy)).toEqual({ ...local, template: assets.template });
+    // An own template always wins.
     const own = memoryStorage();
-    const local = saveTbAssets({ signature: createTbAsset('eigene.png', PNG_BYTES) }, own);
+    const ownTemplate = saveTbAssets(
+      { template: createTbAsset('eigene-vorlage.xlsx', ZIP_BYTES) },
+      own,
+    );
     expect(seedTbAssets(target.__TBASSETS, own)).toBe(false);
-    expect(readTbAssets(own)).toEqual(local);
+    expect(readTbAssets(own)).toEqual(ownTemplate);
     expect(seedTbAssets(undefined, memoryStorage())).toBe(false);
 
     // Without assets the export stays exactly as before.
