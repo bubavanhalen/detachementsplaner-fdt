@@ -283,7 +283,7 @@ describe('buildDayPdf', () => {
       vi.spyOn(XMLHttpRequest.prototype, 'send'),
     ].filter(Boolean);
     await buildPdfZip([fictionalOrder('Mo'), fictionalOrder('Sa')], {
-      logos: logos(),
+      logos: withWappen(logos(), makePng(3, 6)),
       signature: makePng(10, 3),
     });
     for (const spy of spies) expect(spy).not.toHaveBeenCalled();

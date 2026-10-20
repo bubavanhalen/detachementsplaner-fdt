@@ -486,6 +486,7 @@ describe('buildTagesbefehlXlsx with a fictional template', () => {
       buildTagesbefehlXlsx({ ...base, wappen: new Uint8Array([0xff, 0xd8, 0xff]) }),
     ).toThrow('Das Wappen muss als PNG-Bild vorliegen.');
     buildTagesbefehlXlsx(base);
+    buildTagesbefehlXlsx({ ...base, wappen: makePng(3, 6, () => [200, 30, 30, 255]) });
     expect(network).not.toHaveBeenCalled();
     vi.unstubAllGlobals();
   });
