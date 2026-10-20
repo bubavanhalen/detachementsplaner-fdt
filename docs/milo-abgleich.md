@@ -1,8 +1,9 @@
 # MILO-Abgleich, Personaldaten und Standardlisten
 
-Status: erste Umsetzung (20.10.2026) auf Branch `claude/personaldaten-milo-sync-c94509`,
-mit fiktiven Daten geprüft, noch nicht gemergt. Offen sind die echten
-MILO-Spaltenüberschriften und die Abhak-Funktion über das Pendenz-Modell (unten).
+Status: umgesetzt (20.10.2026) auf Branch `claude/personaldaten-milo-sync-c94509`,
+mit fiktiven Daten geprüft, noch nicht gemergt. Der Branch enthält auch den Commit
+des Pendenz-Modells (413216c), auf dem die Wache-Nachführung aufbaut. Offen sind die
+echten MILO-Spaltenüberschriften und die NZL-Zählregel (unten).
 
 Die harte Offline-Grenze in [AGENTS.md](../AGENTS.md) gilt uneingeschränkt:
 MILO-Daten werden nur als lokale Datei im Browser gelesen, nie hochgeladen, nie
@@ -118,6 +119,17 @@ Bestandesliste gelten als verfügbar und werden gezählt.
   Kommandierungsliste **abgeleitet** (offen / in MILO erfasst / nur in MILO) und nicht
   als zweite Liste gespeichert. Jeder Eintrag hat einen stabilen Schlüssel
   `wache:<detId>:<personId>` für eine spätere Pendenz.
+- Jede Nachführung ist eine **Pendenz** (`quellen.kanal = 'milo'`, Upsert über
+  `ref`, Verlauf-Autor `agent: 'MILO-Abgleich'`, `src/model/miloPendenzen.ts`) und wird
+  in der Pendenzenliste abgehakt. Abgeglichen wird beim Markieren eines
+  Wachdetachements, beim Import der Kommandierungsliste und per «Pendenzen
+  aktualisieren»:
+  - in MILO gefunden → erledigt;
+  - abgehakt, aber in einer **neueren** Kommandierungsliste nicht gefunden → wieder offen;
+  - Zuteilung oder Markierung entfernt → verworfen, nie gelöscht;
+  - Titel und Fälligkeit folgen der Planung, solange der User den Titel nicht umformuliert hat.
+  Der Abgleich öffnet und schliesst immer mit dem zuletzt gesehenen Status (`vorher`);
+  hat der User etwas anderes gesetzt, entsteht ein Vorschlag statt einer Überschreibung.
 - Keine automatische Übermittlung: MILO hat keine Schnittstelle, und die
   Offline-Grenze verbietet sie.
 
@@ -128,10 +140,10 @@ Bestandesliste gelten als verfügbar und werden gezählt.
   `ImportDialog`, `PeoplePage`, `PersonEditor`, `store.ts`. `types.ts` und
   `project.ts` werden nur additiv geändert. `verfuegbarkeit` soll später auch die
   Tagesoffizier-Rotation (`eligibleOfficers`) nutzen.
-- **Pendenzen-Konsolidierung:** Statt einer eigenen abhakbaren Liste wird die
-  Wache-Nachführung über das Pendenz-Modell abgebildet (`quellen.kanal = 'milo'`,
-  Upsert über `ref`). Angefragt; umgesetzt, sobald das Modell auf main ist.
-  `replacePersonId` deckt `pendenzen[*].personIds` bereits ab.
+- **Pendenzen-Konsolidierung:** Die Wache-Nachführung nutzt deren Pendenz-Modell
+  (`upsertPendenz`, Kanal `milo`); Pendenzen mit Kanal `milo` legt nur die App an,
+  nicht der externe Agent. `replacePersonId` hängt `pendenzen[*].personIds` und
+  `pendenzen[*].vorschlag.felder.personIds` um.
 
 ## Offen
 
@@ -139,7 +151,6 @@ Bestandesliste gelten als verfügbar und werden gezählt.
    Urlaubs- und Kommandierungsliste (Owner liefert nach); danach Muster der
    Spaltenerkennung anpassen.
 2. NZL-Zählregel bestätigen (siehe Annahme oben).
-3. Abhaken «in MILO erfasst» über das Pendenz-Modell.
-4. Später: Verfügbarkeit in der Personenauswahl und als Warnung auf den
+3. Später: Verfügbarkeit in der Personenauswahl und als Warnung auf den
    Planungskarten; eine Oberfläche zum Zusammenführen von Duplikaten auf Basis von
    `replacePersonId`.

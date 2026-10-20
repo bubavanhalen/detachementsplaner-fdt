@@ -16,14 +16,17 @@ import {
   listName,
   type NachfuehrungStatus,
   nzlInfo,
+  PENDENZ_STATUS,
   sortByRank,
+  syncWachePendenzen,
   today,
   verfuegbarkeit,
   wacheNachfuehrung,
+  wachePendenz,
   zuteilungskonflikte,
 } from '../model';
 import type { Person, Project } from '../model/types';
-import { changeProject, notify, useProject } from '../store';
+import { changeProject, notify, notifyUndoable, useProject } from '../store';
 import './pages.css';
 import './personal.css';
 
@@ -510,13 +513,17 @@ function WacheTab({ project, heute }: { project: Project; heute: string }) {
     note: project.milo?.listen.kommandierung
       ? `Abgeglichen mit Kommandierungsliste vom ${new Date(project.milo.listen.kommandierung.zeit).toLocaleDateString('de-CH')}`
       : 'Noch keine Kommandierungsliste aus MILO abgeglichen',
-    columns: ['Grad Name', 'Detachement', 'Von', 'Bis', 'MILO'],
+    columns: ['Grad Name', 'Detachement', 'Von', 'Bis', 'MILO', 'Pendenz'],
     rows: items.map((item) => [
       label(item.person),
       item.det?.name ?? '—',
       displayDate(item.von),
       displayDate(item.bis),
       NACHFUEHRUNG[item.status],
+      (() => {
+        const pendenz = wachePendenz(project, item.ref);
+        return pendenz ? PENDENZ_STATUS[pendenz.status] : '—';
+      })(),
     ]),
   };
   return (
@@ -541,6 +548,7 @@ function WacheTab({ project, heute }: { project: Project; heute: string }) {
                       if (!target) return;
                       if (event.target.checked) target.miloKommandierung = true;
                       else delete target.miloKommandierung;
+                      syncWachePendenzen(draft);
                     })
                   }
                 />
@@ -560,12 +568,32 @@ function WacheTab({ project, heute }: { project: Project; heute: string }) {
           <p className="muted">Noch keine Detachemente geplant.</p>
         )}
       </section>
-      {open > 0 && (
-        <p className="muted no-print">
-          {open} Kommandierungen noch in MILO erfassen. Nach dem Erfassen die Kommandierungsliste
-          aus MILO abgleichen; erfasste Einträge erscheinen dann als «in MILO erfasst».
+      <div className="toolbar no-print">
+        <p className="muted grow">
+          {open > 0
+            ? `${open} Kommandierungen noch in MILO erfassen. Jede ist eine Pendenz und wird dort abgehakt; der nächste Abgleich der Kommandierungsliste prüft sie.`
+            : 'Jede Kommandierung ist eine Pendenz (Kanal MILO) und wird bei den Pendenzen abgehakt.'}
         </p>
-      )}
+        <button
+          type="button"
+          className="btn btn-sm"
+          disabled={archived}
+          onClick={() => {
+            let changed = 0;
+            changeProject((draft) => {
+              const result = syncWachePendenzen(draft);
+              changed = result.neu + result.geaendert;
+            });
+            if (changed) notifyUndoable(`${changed} Pendenzen nachgeführt.`);
+            else notify('Pendenzen sind bereits aktuell.');
+          }}
+        >
+          <Icon name="check" size={15} /> Pendenzen aktualisieren
+        </button>
+        <a href="#/pendenzen" className="btn btn-sm">
+          Zu den Pendenzen
+        </a>
+      </div>
       <SheetView sheet={sheet} empty="Keine Wachdetachemente markiert." />
     </>
   );

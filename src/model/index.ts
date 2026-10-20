@@ -29,6 +29,12 @@ export {
   zuteilungskonflikte,
 } from './milo';
 export {
+  MILO_AGENT,
+  syncWachePendenzen,
+  type WacheSyncResult,
+  wachePendenz,
+} from './miloPendenzen';
+export {
   addSubDets,
   copyEvent,
   createEvent,

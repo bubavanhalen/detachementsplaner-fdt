@@ -105,6 +105,11 @@ describe('personnel page', () => {
     });
     expect(projectStore.get().dets[0].miloKommandierung).toBe(true);
     expect(screen.getByText('in MILO kommandieren')).toBeTruthy();
+    // The command became a Pendenz in the one Pendenzen list.
+    expect(projectStore.get().pendenzen).toMatchObject([
+      { status: 'offen', personIds: ['a'], quellen: [{ kanal: 'milo' }] },
+    ]);
+    expect(screen.getByText('Offen')).toBeTruthy();
   });
 
   it('shows the comparison before a MILO roster is taken over', () => {

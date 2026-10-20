@@ -7,7 +7,13 @@ import {
   importMiloList,
   importRows,
 } from '../src/io/import';
-import { createDetachment, createProject, normalizeProject } from '../src/model';
+import {
+  createDetachment,
+  createProject,
+  normalizeProject,
+  syncWachePendenzen,
+  updatePendenz,
+} from '../src/model';
 import { parseListDate } from '../src/model/dates';
 import {
   dienstvollender,
@@ -353,5 +359,96 @@ describe('shared person rules', () => {
     expect(personRefs(project, 'old')).toEqual([]);
     expect(project.assign.det).toEqual(['new']);
     expect(project.subDets[0]).toMatchObject({ chefId: 'new', personIds: ['new'] });
+  });
+});
+
+describe('guard commands as Pendenzen', () => {
+  function guard(): Project {
+    const project = service();
+    project.persons = [person('a'), person('b')];
+    project.dets = [
+      createDetachment({
+        id: 'wache',
+        name: 'Wache',
+        datum: '2026-11-09',
+        bisDatum: '2026-11-10',
+        miloKommandierung: true,
+      }),
+    ];
+    project.assign = { wache: ['a', 'b'] };
+    project.milo = {
+      stand: '',
+      listen: {},
+      absences: [],
+      commands: [],
+      statusEingerueckt: {},
+    };
+    return project;
+  }
+  const wache = (project: Project) =>
+    (project.pendenzen ?? []).map((item) => [item.personIds[0], item.status]);
+
+  it('creates one Pendenz per person, idempotently, and closes it once MILO lists it', () => {
+    const project = guard();
+    expect(syncWachePendenzen(project, '2026-11-03T08:00:00.000Z')).toMatchObject({ neu: 2 });
+    expect(syncWachePendenzen(project, '2026-11-03T08:05:00.000Z')).toEqual({
+      neu: 0,
+      geaendert: 0,
+      vorschlaege: 0,
+    });
+    expect(wache(project)).toEqual([
+      ['a', 'offen'],
+      ['b', 'offen'],
+    ]);
+    expect(project.pendenzen?.[0]).toMatchObject({
+      faellig: '2026-11-09',
+      detIds: ['wache'],
+      quellen: [{ kanal: 'milo', ref: 'wache:wache:a' }],
+    });
+    project.milo?.commands.push({
+      id: 'k',
+      personId: 'a',
+      text: 'Wache',
+      von: '2026-11-09',
+      bis: '2026-11-10',
+    });
+    syncWachePendenzen(project, '2026-11-04T08:00:00.000Z');
+    expect(wache(project)).toEqual([
+      ['a', 'erledigt'],
+      ['b', 'offen'],
+    ]);
+  });
+  it('reopens a ticked Pendenz only when a newer MILO list still lacks it', () => {
+    const project = guard();
+    syncWachePendenzen(project, '2026-11-03T08:00:00.000Z');
+    const b = project.pendenzen?.[1];
+    if (!b) throw new Error('missing');
+    updatePendenz(project, b.id, { status: 'erledigt' }, { now: '2026-11-03T09:00:00.000Z' });
+    syncWachePendenzen(project, '2026-11-03T09:05:00.000Z');
+    expect(wache(project)[1]).toEqual(['b', 'erledigt']);
+    if (project.milo)
+      project.milo.listen.kommandierung = {
+        datei: 'fiktiv.xlsx',
+        zeit: '2026-11-04T07:00:00.000Z',
+        anz: 0,
+      };
+    syncWachePendenzen(project, '2026-11-04T07:01:00.000Z');
+    expect(wache(project)[1]).toEqual(['b', 'offen']);
+    expect(project.pendenzen?.[1].verlauf.at(-1)?.text).toContain('nicht gefunden');
+  });
+  it('discards Pendenzen of removed assignments and never overrides the user', () => {
+    const project = guard();
+    syncWachePendenzen(project, '2026-11-03T08:00:00.000Z');
+    const a = project.pendenzen?.[0];
+    if (!a) throw new Error('missing');
+    updatePendenz(project, a.id, { status: 'wartet' }, { now: '2026-11-03T09:00:00.000Z' });
+    project.assign.wache = [];
+    const result = syncWachePendenzen(project, '2026-11-03T10:00:00.000Z');
+    expect(wache(project)).toEqual([
+      ['a', 'wartet'],
+      ['b', 'verworfen'],
+    ]);
+    expect(result.vorschlaege).toBe(1);
+    expect(project.pendenzen?.[0].vorschlag?.felder.status).toBe('verworfen');
   });
 });

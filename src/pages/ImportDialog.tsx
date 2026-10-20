@@ -20,7 +20,14 @@ import {
 } from '../io/import';
 import { displayDate, localError } from '../io/text';
 import { sheetRows, type XLSX } from '../io/workbook';
-import { createMilo, FIELD_LABELS, guessEingerueckt, statusKey, today } from '../model';
+import {
+  createMilo,
+  FIELD_LABELS,
+  guessEingerueckt,
+  statusKey,
+  syncWachePendenzen,
+  today,
+} from '../model';
 import type { MiloListe } from '../model/milo';
 import type { Project, Source } from '../model/types';
 import { changeProject, notifyUndoable, useProject } from '../store';
@@ -507,6 +514,8 @@ function ListImport({
       let count = 0;
       changeProject((draft) => {
         count = importMiloList(draft, kind, rows, header, mapping, filename, allowNames).count;
+        // A new command list confirms or reopens the guard Pendenzen.
+        if (kind === 'kommandierung') syncWachePendenzen(draft);
       });
       notifyUndoable(`${LIST_LABELS[kind]} lokal übernommen: ${count} Einträge.`);
       onClose();

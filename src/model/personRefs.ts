@@ -44,10 +44,21 @@ function visit(project: Project, visitor: Visitor): void {
         typeof item === 'object' &&
         Array.isArray((item as { personIds?: unknown }).personIds)
       ) {
-        const holder = item as { personIds: unknown[] };
+        const holder = item as {
+          personIds: unknown[];
+          vorschlag?: { felder?: { personIds?: unknown } };
+        };
         holder.personIds = unique(
           holder.personIds.map((id) => (typeof id === 'string' ? visitor(id, 'Pendenz') : id)),
         );
+        // A pending proposal may name people too.
+        const proposal = holder.vorschlag?.felder;
+        if (proposal && Array.isArray(proposal.personIds))
+          proposal.personIds = unique(
+            proposal.personIds.map((id) =>
+              typeof id === 'string' ? visitor(id, 'Pendenz (Vorschlag)') : id,
+            ),
+          );
       }
 }
 function unique<T>(values: T[]): T[] {
