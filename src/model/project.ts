@@ -1,3 +1,4 @@
+import { normalizeMilo } from './milo';
 import { createStamm, normalizeStamm } from './stamm';
 import { normalizeTbState } from './tagesbefehl/state';
 import type { Detachment, OnsiteEvent, Person, Project, SubDetachment } from './types';
@@ -126,6 +127,10 @@ function person(input: unknown): Person {
         'nachname',
         'wohnort',
         'identityReview',
+        'geburtsdatum',
+        'miloStatus',
+        'dtStand',
+        'nichtInMilo',
       ]
         .filter((key) => p[key] != null)
         .map((key) => [key, text(p[key])]),
@@ -156,6 +161,8 @@ function detachment(input: unknown): Detachment {
   ] as const)
     normalized[key] = text(d[key]);
   if (d.generatedFrom != null) normalized.generatedFrom = text(d.generatedFrom);
+  if (d.miloKommandierung === true) normalized.miloKommandierung = true;
+  else delete normalized.miloKommandierung;
   return normalized;
 }
 function subDetachment(input: unknown): SubDetachment {
@@ -334,6 +341,9 @@ export function normalizeProject(input: unknown): Project {
     ...(subDets ? { subDets } : {}),
     ...(events ? { onsiteEvents: events } : {}),
   };
+  const milo = normalizeMilo(value.milo);
+  if (milo) normalized.milo = milo;
+  else delete normalized.milo;
   delete normalized.onsiteUnits;
   delete (normalized.settings as Record<string, unknown>).eigeneEinheit;
   for (const source of ['pisa', 'milo'] as const) {

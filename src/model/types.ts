@@ -1,3 +1,4 @@
+import type { MiloState } from './milo';
 import type { Stamm } from './stamm';
 import type { TbState } from './tagesbefehl/types';
 
@@ -22,6 +23,14 @@ export interface Person {
   nachname?: string;
   wohnort?: string;
   identityReview?: string;
+  /** ISO birth date from MILO. Host-only personal data, never part of a WAP plan. */
+  geburtsdatum?: string;
+  /** Status text from the MILO roster (Bestandesliste), e.g. «eingerückt». Host-only. */
+  miloStatus?: string;
+  /** ISO date the NZL in `dt` was valid on (date of the MILO list). */
+  dtStand?: string;
+  /** ISO date of the MILO import that no longer listed this person; never deletes them. */
+  nichtInMilo?: string;
   pisa?: boolean;
   milo?: boolean;
   rawSources?: Partial<Record<Source, Record<string, string>>>;
@@ -45,6 +54,8 @@ export interface Detachment {
   fahrzeug: string;
   zusatzIds: string[];
   generatedFrom?: string;
+  /** A guard detachement whose people must be entered as a command (Kommandierung) in MILO. */
+  miloKommandierung?: boolean;
 }
 /**
  * On-site detachement of an event (e.g. «Det Mat» during the KVK). Purely for the service
@@ -113,6 +124,8 @@ export interface Project {
   onsiteEvents?: OnsiteEvent[];
   /** Optional Tagesbefehl state; old saves have none. */
   tb?: TbState;
+  /** Optional MILO comparison data (leave, commands, list origins); old saves have none. */
+  milo?: MiloState;
 }
 export interface PisaEntry {
   id: string;

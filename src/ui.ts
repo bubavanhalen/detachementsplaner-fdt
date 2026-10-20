@@ -1,5 +1,6 @@
 import { createStore, useSelector } from '@tanstack/react-store';
 import type { XLSX } from './io/workbook';
+import type { MiloListe } from './model/milo';
 import type { Participation, Project, Source } from './model/types';
 
 /**
@@ -47,7 +48,8 @@ export interface Overlays {
   shortcuts: boolean;
   service: boolean;
   incoming: Project | null;
-  workbook: { value: XLSX.WorkBook; source: Source; filename: string } | null;
+  /** A local list to import: a PISA/MILO personnel list or a MILO leave/command list. */
+  workbook: { value: XLSX.WorkBook; source: Source | MiloListe; filename: string } | null;
   /** A one-shot request for the planning page, e.g. from the command palette. */
   planningIntent: { kind: 'add' } | { kind: 'focus'; id: string } | null;
   /** A one-shot preset for the people page. Never placed in the URL. */

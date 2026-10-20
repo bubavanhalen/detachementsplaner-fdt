@@ -32,6 +32,7 @@ import { pickLocalFile } from './projectActions';
 const tools = [
   { to: '/persons', label: 'Personen', icon: 'users', hint: 'Nachschlagen & bearbeiten' },
   { to: '/contacts', label: 'Kontakte', icon: 'contact', hint: 'CSV lokal erstellen' },
+  { to: '/personal', label: 'Personal', icon: 'shield', hint: 'MILO-Abgleich & Listen' },
   {
     to: '/tagesbefehle',
     label: 'Tagesbefehle',
@@ -43,6 +44,10 @@ const tools = [
 const titles: Record<string, { title: string; description: string; step?: number }> = {
   '/persons': { title: 'Personen', description: 'Suchen, prüfen und Angaben ergänzen' },
   '/contacts': { title: 'Kontakte', description: 'Kontakt-CSV lokal vorbereiten' },
+  '/personal': {
+    title: 'Personal',
+    description: 'MILO abgleichen, Dienstvollender, Geburtstage, Fahrer, Wache',
+  },
   '/tagesbefehle': {
     title: 'Tagesbefehle',
     description: 'Kp-WAP prüfen, drucken, .xlsx und PDF je Tag',

@@ -1,14 +1,17 @@
 import { localError } from '../io/text';
 import { readWorkbook } from '../io/workbook';
 import { normalizeProject } from '../model';
+import type { MiloListe } from '../model/milo';
 import type { Source } from '../model/types';
 import { notify } from '../store';
 import { openOverlay } from '../ui';
 
 export type LocalFileKind = Source | 'json';
+/** Also the MILO leave and command lists, which only the personnel page offers. */
+export type LocalListKind = LocalFileKind | MiloListe;
 
 /** Reads a file chosen on this device. Nothing is uploaded; the file stays local. */
-export async function receiveLocalFile(file: File, kind: LocalFileKind): Promise<void> {
+export async function receiveLocalFile(file: File, kind: LocalListKind): Promise<void> {
   try {
     if (kind === 'json') {
       let value: unknown;
@@ -27,7 +30,7 @@ export async function receiveLocalFile(file: File, kind: LocalFileKind): Promise
   }
 }
 
-export function pickLocalFile(kind: LocalFileKind): void {
+export function pickLocalFile(kind: LocalListKind): void {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = kind === 'json' ? '.json,application/json' : '.xlsx,.xls,.csv';

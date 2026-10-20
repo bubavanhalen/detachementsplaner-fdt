@@ -13,6 +13,7 @@ import ContactsPage from './pages/ContactsPage';
 import FinishPage from './pages/FinishPage';
 import OnsitePage from './pages/OnsitePage';
 import PeoplePage from './pages/PeoplePage';
+import PersonalPage from './pages/PersonalPage';
 import PisaPage from './pages/PisaPage';
 import PlanningPage from './pages/PlanningPage';
 import SourcesPage from './pages/SourcesPage';
@@ -48,6 +49,7 @@ const routes = [
   createRoute({ getParentRoute: () => rootRoute, path: '/finish', component: FinishPage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/persons', component: PeoplePage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/contacts', component: ContactsPage }),
+  createRoute({ getParentRoute: () => rootRoute, path: '/personal', component: PersonalPage }),
   createRoute({
     getParentRoute: () => rootRoute,
     path: '/tagesbefehle',

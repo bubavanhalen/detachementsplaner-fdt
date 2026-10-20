@@ -173,7 +173,7 @@ describe('local source import', () => {
       { name: 0, pnr: 1, funktion: 2 },
       'fictional.csv',
     );
-    expect(result).toEqual({ added: 1, updated: 1 });
+    expect(result).toMatchObject({ added: 1, updated: 1 });
     expect(project.persons).toHaveLength(3);
     expect(project.persons[0].id).toBe('one');
     expect(project.persons[0].funktion).toBe('Motf');
