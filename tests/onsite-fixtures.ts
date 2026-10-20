@@ -25,7 +25,7 @@ export function person(
 export function onsiteFixture(): Project {
   const project = createProject();
   project.name = 'Fiktiver WK';
-  project.settings.eigeneEinheit = 'Fiktiv Kp 1';
+  project.stamm.einheit = 'Fiktiv Kp 1';
   project.persons = [
     person('p-lt', 'Oblt', 'Anton', 'Fiktiv', { funktion: 'Zugführer' }),
     person('p-wm', 'Wm', 'Berta', 'Beispiel', {

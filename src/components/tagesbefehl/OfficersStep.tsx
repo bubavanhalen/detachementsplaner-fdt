@@ -92,11 +92,11 @@ export function OfficersStep({
             jederzeit möglich. Die Reihenfolge läuft Mo–Fr über alle geladenen Wochen (nach
             Startdatum) weiter.
           </p>
-          {!project.settings.eigeneEinheit.trim() && (
+          {!project.stamm.einheit.trim() && (
             <div className="callout callout-warning">
               <Icon name="info" />
               <p className="callout-body">
-                Eigene Einheit noch nicht erfasst (Projektmenü → Bezeichnung & Zeitraum). Bis dahin
+                Eigene Einheit noch nicht erfasst (Projektmenü → Dienst und Einheit). Bis dahin
                 werden alle eingeplanten Lt/Oblt aufgenommen.
               </p>
             </div>
@@ -106,7 +106,7 @@ export function OfficersStep({
               <Icon name="info" />
               <p className="callout-body">
                 {lieutenants.length
-                  ? `${lieutenants.length} eingeplante Lt/Oblt gehören laut Personenliste zu einer anderen Einheit als «${project.settings.eigeneEinheit.trim()}». Einheit prüfen oder unten von Hand hinzufügen.`
+                  ? `${lieutenants.length} eingeplante Lt/Oblt gehören laut Personenliste zu einer anderen Einheit als «${project.stamm.einheit.trim()}». Einheit prüfen oder unten von Hand hinzufügen.`
                   : 'Keine eingeplanten Lt/Oblt in der Personenliste gefunden (Grad prüfen). Offiziere können unten von Hand hinzugefügt werden.'}
               </p>
             </div>

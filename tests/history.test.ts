@@ -36,16 +36,16 @@ describe('shared local project history', () => {
       draft.dets.push(createDetachment({ name: 'Fiktives DET' }));
     });
     store.changeProject((draft) => {
-      draft.settings.eigeneEinheit = 'Fiktive Einheit';
+      draft.stamm.einheit = 'Fiktive Einheit';
     });
     store.changeProject((draft) => {
       draft.dets[0].name = 'Fiktives DET verschoben';
     });
     store.undoProject();
-    expect(store.projectStore.get().settings.eigeneEinheit).toBe('Fiktive Einheit');
+    expect(store.projectStore.get().stamm.einheit).toBe('Fiktive Einheit');
     expect(store.projectStore.get().dets[0].name).toBe('Fiktives DET');
     store.undoProject();
-    expect(store.projectStore.get().settings.eigeneEinheit).toBe('');
+    expect(store.projectStore.get().stamm.einheit).toBe('');
     expect(store.projectStore.get().dets).toHaveLength(1);
   });
 

@@ -194,7 +194,7 @@ export default function SourcesPage() {
           <span className="eyebrow">Dienstleistung</span>
           <strong>{project.name}</strong>
           <p className="muted">
-            {[project.settings.eigeneEinheit, servicePeriod(project)].filter(Boolean).join(' · ') ||
+            {[project.stamm.einheit, servicePeriod(project)].filter(Boolean).join(' · ') ||
               'Einheit und Zeitraum sind optional.'}
           </p>
         </div>

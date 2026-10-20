@@ -48,6 +48,25 @@ export {
   resumeProject,
 } from './project';
 export { licenseCategories, shortFunction, shortLicense } from './shortForms';
+export {
+  commanderSignature,
+  createStamm,
+  KADER_LABELS,
+  KADER_ROLLEN,
+  type KaderEintrag,
+  type KaderRolle,
+  kaderAbweichungen,
+  kaderFromPerson,
+  kaderName,
+  kaderOf,
+  MAX_BILD_BYTES,
+  type NameOrder,
+  normalizeStamm,
+  type Stamm,
+  type StammBild,
+  splitLegacyName,
+  unitOf,
+} from './stamm';
 export type {
   Confirmation,
   Connection,

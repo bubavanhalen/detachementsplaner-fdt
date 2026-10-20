@@ -14,6 +14,7 @@ import {
 import { evaluateFormula, formatDate, isoToSerial } from '../src/io/tagesbefehl/xlsx/formula';
 import { wrappedLines } from '../src/io/tagesbefehl/xlsx/wrap';
 import { XLSX } from '../src/io/workbook';
+import { commanderSignature } from '../src/model';
 import { buildOrders } from '../src/model/tagesbefehl/state';
 import type { TbWeekday } from '../src/model/tagesbefehl/types';
 import {
@@ -42,7 +43,9 @@ function exportWeek(
     week: setup.week,
     orders,
     settings: setup.tb.settings,
-    einheit: setup.project.settings.eigeneEinheit,
+    einheit: setup.project.stamm.einheit,
+    kdt: commanderSignature(setup.project.stamm),
+    dateikuerzel: setup.project.stamm.dateikuerzel,
     now: NOW,
     ...patch,
   });
@@ -395,7 +398,9 @@ describe('buildTagesbefehlXlsx with a fictional template', () => {
       week,
       orders,
       settings: tb.settings,
-      einheit: project.settings.eigeneEinheit,
+      einheit: project.stamm.einheit,
+      kdt: commanderSignature(project.stamm),
+      dateikuerzel: project.stamm.dateikuerzel,
     };
     expect(() => buildTagesbefehlXlsx({ ...base, template: new Uint8Array([1, 2, 3]) })).toThrow(
       'Die Vorlage ist keine gültige Tagesbefehl-Vorlage (.xlsx).',
@@ -412,13 +417,9 @@ describe('buildTagesbefehlXlsx with a fictional template', () => {
   });
 
   it('names the file after the week and the service', () => {
-    expect(xlsxFileName('KVK', { dienstleistung: 'FDT_2026' })).toBe(
-      'Tagesbefehle_KVK_FDT_2026.xlsx',
-    );
-    expect(xlsxFileName('Wo 1', { dienstleistung: 'FDT_2026' })).toBe(
-      'Tagesbefehle_Wo_1_FDT_2026.xlsx',
-    );
-    expect(xlsxFileName('Wo 2', { dienstleistung: ' ' })).toBe('Tagesbefehle_Wo_2.xlsx');
+    expect(xlsxFileName('KVK', 'FDT_2026')).toBe('Tagesbefehle_KVK_FDT_2026.xlsx');
+    expect(xlsxFileName('Wo 1', 'FDT_2026')).toBe('Tagesbefehle_Wo_1_FDT_2026.xlsx');
+    expect(xlsxFileName('Wo 2', ' ')).toBe('Tagesbefehle_Wo_2.xlsx');
   });
 });
 

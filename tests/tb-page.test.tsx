@@ -22,7 +22,7 @@ import {
   seedTbAssets,
   TB_ASSETS_KEY,
 } from '../src/io/tagesbefehl/assets';
-import { createProject, normalizeProject } from '../src/model';
+import { createProject, MAX_BILD_BYTES, normalizeProject } from '../src/model';
 import {
   createTbState,
   emptyWeek,
@@ -160,7 +160,9 @@ function officer(id: string, grad: string, patch: Partial<Person> = {}): Person 
 
 function projectWithWeek(patch: (tb: TbState) => void = () => {}): Project {
   const project = createProject();
-  project.settings.eigeneEinheit = UNIT;
+  project.stamm.einheit = UNIT;
+  project.stamm.dateikuerzel = 'FDT_2026';
+  project.stamm.grafiken.unterschrift = createTbAsset('fiktive-unterschrift.png', PNG_BYTES);
   project.persons = [
     officer('a', 'Lt'),
     officer('b', 'Oblt'),
@@ -174,11 +176,9 @@ function projectWithWeek(patch: (tb: TbState) => void = () => {}): Project {
   return project;
 }
 
-function storeTemplateAndSignature(): TbAssets {
-  return saveTbAssets({
-    template: createTbAsset('fiktive-vorlage.xlsx', ZIP_BYTES),
-    signature: createTbAsset('fiktive-unterschrift.png', PNG_BYTES),
-  });
+/** The template is a device value; the signature comes with projectWithWeek (stamm). */
+function storeTemplate(): TbAssets {
+  return saveTbAssets({ template: createTbAsset('fiktive-vorlage.xlsx', ZIP_BYTES) });
 }
 
 function memoryStorage(failOnWrite = false): Storage {
@@ -269,7 +269,7 @@ describe('Tagesbefehle navigation and stepper', () => {
 });
 
 describe('Vorlage & Unterschrift', () => {
-  it('stores template and prepared signature once on this device', async () => {
+  it('stores the template on this device and the prepared signature in the service', async () => {
     const user = userEvent.setup({ applyAccept: false });
     projectStore.setState(() => createProject());
     render(<TagesbefehlePage />);
@@ -293,21 +293,61 @@ describe('Vorlage & Unterschrift', () => {
     expect(mocks.prepareSignature).toHaveBeenCalledOnce();
     const stored = readTbAssets();
     expect(stored.template?.name).toBe('fiktive-vorlage.xlsx');
-    expect(stored.signature?.name).toBe('fiktive-unterschrift.png');
-    // Binary assets never enter the project JSON.
+    expect(stored.signature).toBeUndefined();
+    expect(projectStore.get().stamm.grafiken.unterschrift?.name).toBe('fiktive-unterschrift.png');
+    // The official template never enters the project JSON.
     expect(JSON.stringify(projectStore.get())).not.toContain(stored.template?.base64 ?? '---');
+  });
+
+  it('offers a former device-wide signature to the service and never uses it silently', async () => {
+    const user = userEvent.setup();
+    saveTbAssets({
+      template: createTbAsset('fiktive-vorlage.xlsx', ZIP_BYTES),
+      signature: createTbAsset('alte-unterschrift.png', PNG_BYTES),
+    });
+    const project = projectWithWeek();
+    delete project.stamm.grafiken.unterschrift;
+    projectStore.setState(() => project);
+    render(<TagesbefehlePage />);
+    await openStep(user, /Vorlage & Unterschrift/);
+    expect(screen.getByTestId('tb-legacy-signature')).toHaveTextContent('gehört jetzt zum Dienst');
+    expect(screen.getByTestId('tb-asset-signature')).toHaveTextContent('Noch nicht gespeichert');
+    await user.click(screen.getByRole('button', { name: 'Diesem Dienst zuordnen' }));
+    expect(projectStore.get().stamm.grafiken.unterschrift?.name).toBe('alte-unterschrift.png');
+    expect(screen.getByTestId('tb-legacy-signature')).toHaveTextContent('nicht mehr verwendet');
+    await user.click(screen.getByRole('button', { name: 'Vom Gerät entfernen' }));
+    expect(readTbAssets()).toEqual({ template: expect.anything() });
+    expect(screen.queryByTestId('tb-legacy-signature')).not.toBeInTheDocument();
+    expect(projectStore.get().stamm.grafiken.unterschrift?.name).toBe('alte-unterschrift.png');
+  });
+
+  it('refuses to adopt a legacy signature above the project image limit', async () => {
+    const user = userEvent.setup();
+    const large = new Uint8Array(MAX_BILD_BYTES + 1);
+    large.set(PNG_BYTES);
+    saveTbAssets({
+      template: createTbAsset('fiktive-vorlage.xlsx', ZIP_BYTES),
+      signature: createTbAsset('alte-grosse-unterschrift.png', large),
+    });
+    const project = projectWithWeek();
+    delete project.stamm.grafiken.unterschrift;
+    projectStore.setState(() => project);
+    render(<TagesbefehlePage />);
+    await openStep(user, /Vorlage & Unterschrift/);
+    await user.click(screen.getByRole('button', { name: 'Diesem Dienst zuordnen' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('grösser als 512 KB');
+    expect(projectStore.get().stamm.grafiken.unterschrift).toBeUndefined();
+    expect(readTbAssets().signature?.name).toBe('alte-grosse-unterschrift.png');
   });
 
   it('edits the Tagesbefehl settings in the project with a commit on blur', async () => {
     const user = userEvent.setup();
     projectStore.setState(() => projectWithWeek());
     render(<TagesbefehlePage />);
-    const name = screen.getByLabelText('Name Kdt');
-    expect(name).toHaveValue('');
-    await user.type(name, 'Hptm Test Fiktiv');
-    expect(tbOf().settings.kdtName).toBe('');
-    await user.tab();
-    expect(tbOf().settings.kdtName).toBe('Hptm Test Fiktiv');
+    // Commander, unit and file suffix are only shown here; they are kept in the master data.
+    expect(screen.queryByLabelText('Name Kdt')).not.toBeInTheDocument();
+    expect(screen.getByTestId('tb-stamm')).toHaveTextContent('Name Kdt fehlt');
+    expect(screen.getByTestId('tb-stamm')).toHaveTextContent('Tagesbefehle_KVK_FDT_2026.xlsx');
     const zk = screen.getByLabelText('Verteiler «z K an»');
     await user.type(zk, 'Kdt Fiktiv Bat 99{Enter}{Enter}Fiktiv S3');
     await user.tab();
@@ -597,7 +637,7 @@ describe('Ausgabe', () => {
 
   it('also requires a start date', async () => {
     const user = userEvent.setup();
-    storeTemplateAndSignature();
+    storeTemplate();
     projectStore.setState(() =>
       projectWithWeek((tb) => {
         tb.wochen.KVK.startDate = '';
@@ -611,12 +651,24 @@ describe('Ausgabe', () => {
 
   it('prints and downloads xlsx, the PDF zip and single-day PDFs locally', async () => {
     const user = userEvent.setup();
-    storeTemplateAndSignature();
-    projectStore.setState(() =>
-      projectWithWeek((tb) => {
-        tb.settings.kdtName = 'Hptm Test Fiktiv';
-      }),
-    );
+    storeTemplate();
+    projectStore.setState(() => projectWithWeek());
+    projectStore.setState((project) => ({
+      ...project,
+      stamm: {
+        ...project.stamm,
+        kader: [
+          {
+            rolle: 'kdt',
+            personId: '',
+            grad: 'Hptm',
+            vorname: 'Test',
+            name: 'Fiktiv',
+            funktion: 'Kommandant',
+          },
+        ],
+      },
+    }));
     render(<TagesbefehlePage />);
     await openStep(user, /Ausgabe/);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -648,7 +700,7 @@ describe('Ausgabe', () => {
 
   it('shows a generic error when an export fails', async () => {
     const user = userEvent.setup();
-    storeTemplateAndSignature();
+    storeTemplate();
     mocks.buildXlsx.mockImplementation(() => {
       throw new Error('xlsx-Export fehlgeschlagen.');
     });
@@ -699,15 +751,25 @@ describe('local asset storage and self-contained export', () => {
     const target: Record<string, unknown> = {};
     new Function('window', parsed.getElementById('boot-data')?.textContent ?? '')(target);
     expect(normalizeProject(target.__BOOTDATA)).toEqual(project);
-    expect(target.__TBASSETS).toEqual(assets);
+    // Only the device template is embedded; the signature travels with the project.
+    expect(target.__TBASSETS).toEqual({ template: assets.template });
 
     const empty = memoryStorage();
     expect(seedTbAssets(target.__TBASSETS, empty)).toBe(true);
-    expect(readTbAssets(empty)).toEqual(assets);
+    expect(readTbAssets(empty)).toEqual({ template: assets.template });
+    // A leftover legacy signature never blocks the embedded template.
+    const legacy = memoryStorage();
+    const local = saveTbAssets({ signature: createTbAsset('eigene.png', PNG_BYTES) }, legacy);
+    expect(seedTbAssets(target.__TBASSETS, legacy)).toBe(true);
+    expect(readTbAssets(legacy)).toEqual({ ...local, template: assets.template });
+    // An own template always wins.
     const own = memoryStorage();
-    const local = saveTbAssets({ signature: createTbAsset('eigene.png', PNG_BYTES) }, own);
+    const ownTemplate = saveTbAssets(
+      { template: createTbAsset('eigene-vorlage.xlsx', ZIP_BYTES) },
+      own,
+    );
     expect(seedTbAssets(target.__TBASSETS, own)).toBe(false);
-    expect(readTbAssets(own)).toEqual(local);
+    expect(readTbAssets(own)).toEqual(ownTemplate);
     expect(seedTbAssets(undefined, memoryStorage())).toBe(false);
 
     // Without assets the export stays exactly as before.

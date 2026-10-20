@@ -110,9 +110,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         {
           id: 'service',
           group: 'Aktionen',
-          label: 'Dienstleistung bearbeiten',
+          label: 'Dienst und Einheit bearbeiten',
           icon: 'edit',
-          keywords: 'name einheit datum projekt',
+          keywords: 'name einheit datum projekt kommandant kdt unterschrift wappen dateikürzel',
           run: () => openOverlay({ service: true }),
         },
         { id: 'undo', group: 'Aktionen', label: 'Rückgängig', icon: 'undo', run: undoProject },

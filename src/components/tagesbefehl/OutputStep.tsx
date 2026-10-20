@@ -4,6 +4,7 @@ import { fromBase64 } from '../../io/tagesbefehl/bytes';
 import { buildDayPdf, buildPdfZip, pdfFileName, pdfZipName } from '../../io/tagesbefehl/pdf';
 import { extractTemplateLogos, type TbTemplateLogo } from '../../io/tagesbefehl/template';
 import { buildTagesbefehlXlsx, xlsxFileName } from '../../io/tagesbefehl/xlsx';
+import { commanderSignature } from '../../model';
 import { buildOrders, type TbAssets, type TbOrder, type TbWeek } from '../../model/tagesbefehl';
 import { notify } from '../../store';
 import { Icon } from '../Icon';
@@ -30,9 +31,11 @@ export function OutputStep({
     () => (assets.template ? fromBase64(assets.template.base64) : undefined),
     [assets.template],
   );
+  // The signature belongs to the service (ADR-0001), not to the device.
+  const unterschrift = project.stamm.grafiken.unterschrift;
   const signature = useMemo(
-    () => (assets.signature ? fromBase64(assets.signature.base64) : undefined),
-    [assets.signature],
+    () => (unterschrift ? fromBase64(unterschrift.base64) : undefined),
+    [unterschrift],
   );
   const logos = useMemo<TbTemplateLogo[]>(() => {
     if (!template) return [];
@@ -42,9 +45,9 @@ export function OutputStep({
       return [];
     }
   }, [template]);
-  const signatureUrl = assets.signature
-    ? `data:image/png;base64,${assets.signature.base64}`
-    : undefined;
+  const signatureUrl = unterschrift ? `data:image/png;base64,${unterschrift.base64}` : undefined;
+  const kdt = commanderSignature(project.stamm),
+    dateikuerzel = project.stamm.dateikuerzel;
   const open = openConflicts(week, weekConflicts(week));
 
   const missing: { text: string; step: number }[] = [];
@@ -56,10 +59,13 @@ export function OutputStep({
     missing.push({ text: 'Keine Tage mit Tagesbefehl — in Schritt 2 wählen.', step: 2 });
   const blocked = missing.length > 0 || !!busy;
   const hints: string[] = [];
-  if (!assets.signature) hints.push('Ohne gespeicherte Unterschrift bleibt das Bild der Vorlage.');
-  if (!tb.settings.kdtName.trim()) hints.push('Name Kdt fehlt (Schritt 1, Einstellungen).');
-  if (!project.settings.eigeneEinheit.trim())
-    hints.push('Eigene Einheit fehlt (Projektmenü → Bezeichnung & Zeitraum).');
+  if (!unterschrift)
+    hints.push(
+      'Ohne Unterschrift des Dienstes bleibt das Bild der Vorlage (Projektmenü → Dienst und Einheit).',
+    );
+  if (!kdt.name) hints.push('Name Kdt fehlt (Projektmenü → Dienst und Einheit).');
+  if (!project.stamm.einheit.trim())
+    hints.push('Eigene Einheit fehlt (Projektmenü → Dienst und Einheit).');
   const pdfAssets = { logos, signature };
 
   const exportFile = (label: string, action: () => Promise<void>) => {
@@ -75,16 +81,18 @@ export function OutputStep({
         week,
         orders,
         settings: tb.settings,
-        einheit: project.settings.eigeneEinheit,
+        einheit: project.stamm.einheit,
+        kdt,
+        dateikuerzel,
       });
-      const name = xlsxFileName(week.sheet, tb.settings);
+      const name = xlsxFileName(week.sheet, dateikuerzel);
       download(name, blobBytes(bytes), XLSX_MIME);
       notify(`${name} lokal erstellt.`);
     });
   const zip = () =>
     exportFile('zip', async () => {
       const bytes = await buildPdfZip(orders, pdfAssets);
-      const name = pdfZipName(week.sheet, tb.settings);
+      const name = pdfZipName(week.sheet, dateikuerzel);
       download(name, blobBytes(bytes), 'application/zip');
       notify(`${name} lokal erstellt.`);
     });
@@ -165,8 +173,8 @@ export function OutputStep({
             </button>
           </div>
           <p className="muted tb-hint">
-            Dateien: <span className="mono">{xlsxFileName(week.sheet, tb.settings)}</span> ·{' '}
-            <span className="mono">{pdfZipName(week.sheet, tb.settings)}</span>. Alles entsteht
+            Dateien: <span className="mono">{xlsxFileName(week.sheet, dateikuerzel)}</span> ·{' '}
+            <span className="mono">{pdfZipName(week.sheet, dateikuerzel)}</span>. Alles entsteht
             lokal auf diesem Gerät und enthält private Daten.
           </p>
         </div>

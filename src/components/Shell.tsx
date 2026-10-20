@@ -328,8 +328,7 @@ function ProjectMenu() {
           <span className="sb-project-text sb-hide">
             <strong>{project.name}</strong>
             <small>
-              {[project.settings.eigeneEinheit, period].filter(Boolean).join(' · ') ||
-                'Details ergänzen'}
+              {[project.stamm.einheit, period].filter(Boolean).join(' · ') || 'Details ergänzen'}
             </small>
           </span>
           <Icon name="chevronDown" size={15} className="sb-hide" />
@@ -342,7 +341,7 @@ function ProjectMenu() {
         disabled={Boolean(project.archive)}
         onSelect={() => openOverlay({ service: true })}
       >
-        Bezeichnung & Zeitraum …
+        Dienst und Einheit …
       </MenuItem>
       <MenuItem icon="download" shortcut={`${modKey} S`} onSelect={() => exportJson(project)}>
         Als JSON sichern

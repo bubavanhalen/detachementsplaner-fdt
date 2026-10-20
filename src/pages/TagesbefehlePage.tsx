@@ -61,7 +61,7 @@ export default function TagesbefehlePage() {
   };
   const status: Record<Step, string> = {
     1: assets.template
-      ? assets.signature
+      ? project.stamm.grafiken.unterschrift
         ? 'Gespeichert'
         : 'Unterschrift fehlt'
       : 'Vorlage fehlt',
