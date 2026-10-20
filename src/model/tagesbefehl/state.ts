@@ -192,6 +192,7 @@ export function normalizeTbState(input: unknown): TbState {
       lk: str(settings.lk, base.settings.lk),
       gehtAn: strList(settings.gehtAn, base.settings.gehtAn),
       zK: strList(settings.zK, base.settings.zK),
+      ...(settings.wappenAlsLogo === true ? { wappenAlsLogo: true } : {}),
     },
     regeln,
     wochen: Object.fromEntries(

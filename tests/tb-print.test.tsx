@@ -7,8 +7,9 @@ import PrintView, {
   TB_PRINT_CLASS,
   TB_PRINT_DAY_ATTRIBUTE,
 } from '../src/components/tagesbefehl/PrintView';
+import { toBase64 } from '../src/io/tagesbefehl/bytes';
 import { layoutOrder } from '../src/io/tagesbefehl/sheet-layout';
-import type { TbTemplateLogo } from '../src/io/tagesbefehl/template';
+import { type TbTemplateLogo, withWappen } from '../src/io/tagesbefehl/template';
 import { TB_WEEKDAYS } from '../src/model/tagesbefehl/types';
 import { fictionalOrder, makePng } from './tb-fixtures';
 
@@ -116,6 +117,16 @@ describe('OrderSheet', () => {
     expect(screen.getByAltText('Unterschrift')).toHaveAttribute('src', SIGNATURE);
     rerender(<OrderSheet order={fictionalOrder('Mo')} logos={[]} />);
     expect(document.querySelectorAll('img')).toHaveLength(0);
+  });
+
+  it('shows the coat of arms in place of the right-hand logo when chosen', () => {
+    const wappen = makePng(3, 6);
+    render(<OrderSheet order={fictionalOrder('Mo')} logos={withWappen(logos, wappen)} />);
+    const shown = Array.from(document.querySelectorAll<HTMLImageElement>('img.tb-sheet-logo'));
+    expect(shown.map((img) => img.getAttribute('src'))).toEqual([
+      `data:image/png;base64,${toBase64(logos[0].data)}`,
+      `data:image/png;base64,${toBase64(wappen)}`,
+    ]);
   });
 
   it('renders weekend orders with the Wacht Of line and without Rapporte', () => {

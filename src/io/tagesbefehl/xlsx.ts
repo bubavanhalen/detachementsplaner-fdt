@@ -1,6 +1,7 @@
 // xlsx export from the official template, edited at XML level (port of the
 // reference build). Drawings, logos, styles and page setup of the template stay;
-// only cell content, a few workbook settings and the signature picture change.
+// only cell content, a few workbook settings, the signature picture and, on request,
+// the right-hand logo (coat of arms of the service) change.
 // Everything runs locally; nothing is logged or sent anywhere.
 import { unzipSync, zipSync } from 'fflate';
 import { weekFileLabel } from '../../model/tagesbefehl/state';
@@ -14,6 +15,7 @@ import {
 } from '../../model/tagesbefehl/types';
 import {
   isPng,
+  placeWappen,
   pngSize,
   sheetDrawing,
   signatureMediaPath,
@@ -69,6 +71,8 @@ export interface TagesbefehlXlsxInput {
   template: Uint8Array;
   /** Prepared signature PNG (see signature.ts); omitted → template picture stays. */
   signature?: Uint8Array;
+  /** Coat of arms PNG shown instead of the right-hand header logo; omitted → template logo. */
+  wappen?: Uint8Array;
   week: TbWeek;
   /** buildOrders(project, tb, week) — the same orders the print view and PDFs render. */
   orders: TbOrder[];
@@ -358,6 +362,29 @@ export function buildTagesbefehlXlsx(input: TagesbefehlXlsxInput): Uint8Array {
     for (const g of regions) xml = dropMergesFrom(xml, g.top, g.clearEnd);
     writePart(files, weekend.path, xml);
     if (!sa && !so) hidden.add(weekend.index);
+  }
+
+  // Coat of arms instead of the right-hand logo, on every sheet whose header has one.
+  if (input.wappen) {
+    const size = pngSize(input.wappen);
+    if (!size) throw new Error('Das Wappen muss als PNG-Bild vorliegen.');
+    let wappenPath = 'xl/media/wappen.png';
+    for (let n = 2; files[wappenPath]; n++) wappenPath = `xl/media/wappen${n}.png`;
+    const drawings = new Set(
+      sheets.flatMap(
+        (info) =>
+          partRels(files, info.path).find((r) => relTypeIs(r, 'drawing') && r.path)?.path ?? [],
+      ),
+    );
+    let placed = false;
+    for (const drawing of drawings)
+      placed =
+        placeWappen(files, drawing, { mediaPath: wappenPath, signatureMedia: mediaPath, size }) ||
+        placed;
+    if (placed) {
+      files[wappenPath] = input.wappen;
+      ensureDefaultContentType(files, 'png', 'image/png');
+    }
   }
 
   // Remaining sheets: cached values and broken leftovers only.

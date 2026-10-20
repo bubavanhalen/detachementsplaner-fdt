@@ -72,6 +72,11 @@ const UNIT = 'Fiktiv Kp 99/9';
 const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 const ZIP_BYTES = new Uint8Array([0x50, 0x4b, 0x03, 0x04, 0, 0, 0, 0]);
 const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 1]);
+/** Fictional 3 × 6 px PNG header (signature, IHDR length and type, width, height). */
+const WAPPEN_BYTES = new Uint8Array([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52, 0, 0, 0, 3,
+  0, 0, 0, 6, 8, 6, 0, 0, 0,
+]);
 
 function fictionalParse(sheet: string): WapParseResult {
   return {
@@ -338,6 +343,51 @@ describe('Vorlage & Unterschrift', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('grösser als 512 KB');
     expect(projectStore.get().stamm.grafiken.unterschrift).toBeUndefined();
     expect(readTbAssets().signature?.name).toBe('alte-grosse-unterschrift.png');
+  });
+
+  it('lets the service use its coat of arms instead of the template logo', async () => {
+    const user = userEvent.setup();
+    storeTemplate();
+    projectStore.setState(() => projectWithWeek());
+    render(<TagesbefehlePage />);
+    const toggle = () =>
+      within(screen.getByTestId('tb-wappen')).getByRole('checkbox', {
+        name: 'Wappen statt Logo der Vorlage (rechts oben)',
+      });
+    await openStep(user, /Vorlage & Unterschrift/);
+    // Without a coat of arms the template logo stays and the switch is off.
+    expect(toggle()).toBeDisabled();
+    expect(toggle()).not.toBeChecked();
+    expect(screen.getByTestId('tb-wappen')).toHaveTextContent('Kein Wappen erfasst');
+
+    act(() =>
+      projectStore.setState((project) => ({
+        ...project,
+        stamm: {
+          ...project.stamm,
+          grafiken: {
+            ...project.stamm.grafiken,
+            wappen: createTbAsset('fiktives-wappen.png', WAPPEN_BYTES),
+          },
+        },
+      })),
+    );
+    expect(screen.getByTestId('tb-wappen')).toHaveTextContent('fiktives-wappen.png');
+    await user.click(toggle());
+    // Stored per service in the project, not on the device.
+    expect(tbOf().settings.wappenAlsLogo).toBe(true);
+    expect(localStorage.getItem(TB_ASSETS_KEY)).not.toContain('wappen');
+
+    await openStep(user, /Ausgabe/);
+    // The fictional template here has no logos (extraction is mocked).
+    expect(screen.getByText(/Die Vorlage hat rechts kein Logo/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '.xlsx herunterladen' }));
+    await waitFor(() => expect(mocks.download).toHaveBeenCalledTimes(1));
+    expect(Array.from(mocks.buildXlsx.mock.calls[0][0].wappen)).toEqual(Array.from(WAPPEN_BYTES));
+
+    await openStep(user, /Vorlage & Unterschrift/);
+    await user.click(toggle());
+    expect(tbOf().settings).not.toHaveProperty('wappenAlsLogo');
   });
 
   it('edits the Tagesbefehl settings in the project with a commit on blur', async () => {
@@ -682,6 +732,8 @@ describe('Ausgabe', () => {
     expect(input.einheit).toBe(UNIT);
     expect(Array.from(input.template)).toEqual(Array.from(ZIP_BYTES));
     expect(Array.from(input.signature)).toEqual(Array.from(PNG_BYTES));
+    // Default: the template logo stays.
+    expect(input.wappen).toBeUndefined();
     expect(mocks.download.mock.calls[0][0]).toBe('Tagesbefehle_KVK_FDT_2026.xlsx');
 
     await user.click(screen.getByRole('button', { name: 'PDF je Tag herunterladen' }));

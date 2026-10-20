@@ -73,7 +73,7 @@ type StammBild = { name: string; base64: string; savedAt: string }; // PNG
 
 - Name und Funktion der Unterschrift werden aus `stamm.kader` (Rolle `kdt`) gebildet (`commanderSignature`), der Dateiname aus `stamm.dateikuerzel`, die Einheit aus `stamm.einheit`. Schritt 1 der Tagesbefehle zeigt diese Werte nur an und verweist auf «Dienst und Einheit».
 - Die Unterschrift kommt aus `stamm.grafiken.unterschrift`. Sie kann in «Dienst und Einheit» oder in Schritt 1 der Tagesbefehle gewählt werden; beides schreibt dasselbe Feld. Die TB-Vorlage (.xlsx) bleibt ein amtlicher Gerätewert; das Offline-HTML bettet nur noch die Vorlage ein.
-- Offen (später): Das Wappen ist erfasst, ersetzt das Vorlagenlogo aber noch nicht.
+- **Wappen statt Vorlagenlogo (umgesetzt):** Pro Dienst wählbar in Schritt 1 der Tagesbefehle; die Wahl liegt im Projekt (`tb.settings.wappenAlsLogo`), nicht auf dem Gerät. Ist sie gesetzt und `stamm.grafiken.wappen` vorhanden, ersetzt das Wappen das rechte Kopflogo der Vorlage in Druckansicht, Tages-PDFs und .xlsx (alle Tagesblätter). Es behält sein Seitenverhältnis und sitzt oben rechts in der Box des Vorlagenlogos; im .xlsx erhält es ein eigenes Bild, das Vorlagenbild bleibt unverändert im Paket. Ohne Wahl, ohne Wappen oder ohne rechtes Logo in der Vorlage bleibt das Vorlagenlogo (Standard).
 
 ### WAP-Verweis (Plan-Format v2, additiv, erst nach Gate B)
 

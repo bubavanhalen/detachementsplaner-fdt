@@ -128,6 +128,11 @@ export interface TbSettings {
   /** Verteiler lines; "{Einheit}" is replaced with project.stamm.einheit. */
   gehtAn: string[];
   zK: string[];
+  /**
+   * Service choice: the coat of arms (project.stamm.grafiken.wappen) replaces the
+   * right-hand logo of the template in print view, PDFs and xlsx. Absent = template logo.
+   */
+  wappenAlsLogo?: boolean;
 }
 // Commander, unit and file suffix come from project.stamm (ADR-0001); the
 // v5 fields kdtName, kdtFunktion and dienstleistung are migrated there.
