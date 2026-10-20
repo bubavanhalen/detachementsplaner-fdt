@@ -39,9 +39,29 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   }, []);
   const commands = useMemo<Command[]>(() => {
     const go =
-      (to: '/' | '/sources' | '/pisa' | '/finish' | '/persons' | '/contacts' | '/vor-ort') => () =>
+      (
+        to:
+          | '/'
+          | '/sources'
+          | '/pisa'
+          | '/finish'
+          | '/persons'
+          | '/contacts'
+          | '/vor-ort'
+          | '/pendenzen',
+      ) =>
+      () =>
         void navigate({ to });
     const list: Command[] = [
+      {
+        id: 'n0',
+        group: 'Ablauf',
+        label: 'Pendenzen',
+        icon: 'checkCircle',
+        keywords: 'todo aufgabe mail whatsapp sms anruf planner agent eingang',
+        run: go('/pendenzen'),
+        hint: 'Alt 0',
+      },
       {
         id: 'n1',
         group: 'Ablauf',

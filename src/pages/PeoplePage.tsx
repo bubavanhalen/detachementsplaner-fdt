@@ -5,8 +5,17 @@ import { type DataColumn, DataTable } from '../components/DataTable';
 import { personInitials } from '../components/format';
 import { Icon } from '../components/Icon';
 import { displayDate, searchText } from '../io/text';
-import { derivePisa, directGroupIds, groupPeople, validateProject } from '../model';
-import type { Person } from '../model/types';
+import {
+  derivePisa,
+  directGroupIds,
+  eingerueckt,
+  groupPeople,
+  nzlInfo,
+  today,
+  validateProject,
+  verfuegbarkeit,
+} from '../model';
+import type { Person, Project } from '../model/types';
 import { changeProject, notifyUndoable, useProject } from '../store';
 import { isTyping, overlayStore, useOverlays } from '../ui';
 import { PersonEditor } from './PersonEditor';
@@ -362,6 +371,7 @@ export default function PeoplePage() {
                     <dd>{person.mail || '—'}</dd>
                   </dl>
                 </div>
+                <MiloSection project={project} person={person} />
                 {Object.keys(person.raw).length > 0 && (
                   <div className="dossier-section">
                     <details className="disclosure">
@@ -395,6 +405,72 @@ export default function PeoplePage() {
           onClose={() => setEditing(null)}
         />
       )}
+    </div>
+  );
+}
+
+/** MILO data of one person: service days, roster status and absences. Local view only. */
+function MiloSection({ project, person }: { project: Project; person: Person }) {
+  const heute = today();
+  const info = nzlInfo(project, person, heute);
+  const present = eingerueckt(project, person);
+  const state = verfuegbarkeit(project, person, heute);
+  const absences = (project.milo?.absences ?? []).filter((item) => item.personId === person.id);
+  const commands = (project.milo?.commands ?? []).filter((item) => item.personId === person.id);
+  if (!person.milo && !info && !person.geburtsdatum && !absences.length && !commands.length)
+    return null;
+  return (
+    <div className="dossier-section">
+      <h3>MILO</h3>
+      <div className="row wrap">
+        {state.status !== 'verfuegbar' && (
+          <span className="badge badge-warning">{state.grund}</span>
+        )}
+        {person.nichtInMilo && (
+          <span className="badge badge-danger">
+            Nicht mehr in MILO seit {displayDate(person.nichtInMilo)}
+          </span>
+        )}
+        {info && info.veraltetTage > 0 && (
+          <span className="badge badge-outline">
+            NZL {info.veraltetTage} Tag{info.veraltetTage === 1 ? '' : 'e'} out of date
+          </span>
+        )}
+      </div>
+      <dl className="kv">
+        <dt>NZL</dt>
+        <dd>
+          {info
+            ? `${info.heute} heute · MILO ${info.milo} am ${displayDate(info.stand)}`
+            : person.dt || '—'}
+        </dd>
+        <dt>Dienstvollend ab</dt>
+        <dd>{info?.dienstvollendAb ? `${displayDate(info.dienstvollendAb)} (Prognose)` : '—'}</dd>
+        <dt>Status</dt>
+        <dd>
+          {person.miloStatus
+            ? `${person.miloStatus}${present === undefined ? ' · offen' : present ? ' · eingerückt' : ' · nicht eingerückt'}`
+            : '—'}
+        </dd>
+        <dt>Geburtsdatum</dt>
+        <dd>{person.geburtsdatum ? displayDate(person.geburtsdatum) : '—'}</dd>
+        {absences.map((item) => (
+          <div key={item.id} style={{ display: 'contents' }}>
+            <dt>{item.art || 'Urlaub'}</dt>
+            <dd>
+              {displayDate(item.von)} – {displayDate(item.bis)}
+            </dd>
+          </div>
+        ))}
+        {commands.map((item) => (
+          <div key={item.id} style={{ display: 'contents' }}>
+            <dt>{item.text || 'Kommandierung'}</dt>
+            <dd>
+              {displayDate(item.von)} – {displayDate(item.bis)}
+            </dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }

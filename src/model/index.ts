@@ -1,3 +1,39 @@
+export { addDays, daysBetween, isIsoDate, parseListDate, today } from './dates';
+export { FELDHOHEIT, FIELD_LABELS, leads, type PersonField } from './feldhoheit';
+export {
+  createMilo,
+  detDays,
+  dienstvollender,
+  eingerueckt,
+  type Fahrer,
+  fahrerliste,
+  type Geburtstag,
+  geburtstage,
+  guessEingerueckt,
+  type MiloAbsence,
+  type MiloCommand,
+  type MiloHerkunft,
+  type MiloListe,
+  type MiloState,
+  type Nachfuehrung,
+  type NachfuehrungStatus,
+  type NzlInfo,
+  normalizeMilo,
+  nzlInfo,
+  statusKey,
+  type Verfuegbarkeit,
+  type VerfuegbarkeitStatus,
+  verfuegbarkeit,
+  wacheNachfuehrung,
+  type Zuteilungskonflikt,
+  zuteilungskonflikte,
+} from './milo';
+export {
+  MILO_AGENT,
+  syncWachePendenzen,
+  type WacheSyncResult,
+  wachePendenz,
+} from './miloPendenzen';
 export {
   addSubDets,
   copyEvent,
@@ -28,6 +64,9 @@ export {
   subDetsOf,
   updateEvent,
 } from './onsite';
+export * from './pendenzen';
+export { type MatchQuery, type MatchResult, matchPerson, NAME_ONLY_REVIEW } from './personMatch';
+export { type PersonRef, personRefs, replacePersonId } from './personRefs';
 export { derivePisa, entrySignature, generatedEntryId, projectSignature, validEc } from './pisa';
 export {
   assignPeople,

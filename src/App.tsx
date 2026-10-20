@@ -12,7 +12,9 @@ import { Shell } from './components/Shell';
 import ContactsPage from './pages/ContactsPage';
 import FinishPage from './pages/FinishPage';
 import OnsitePage from './pages/OnsitePage';
+import PendenzenPage from './pages/PendenzenPage';
 import PeoplePage from './pages/PeoplePage';
+import PersonalPage from './pages/PersonalPage';
 import PisaPage from './pages/PisaPage';
 import PlanningPage from './pages/PlanningPage';
 import SourcesPage from './pages/SourcesPage';
@@ -48,12 +50,14 @@ const routes = [
   createRoute({ getParentRoute: () => rootRoute, path: '/finish', component: FinishPage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/persons', component: PeoplePage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/contacts', component: ContactsPage }),
+  createRoute({ getParentRoute: () => rootRoute, path: '/personal', component: PersonalPage }),
   createRoute({
     getParentRoute: () => rootRoute,
     path: '/tagesbefehle',
     component: TagesbefehlePage,
   }),
   createRoute({ getParentRoute: () => rootRoute, path: '/vor-ort', component: OnsitePage }),
+  createRoute({ getParentRoute: () => rootRoute, path: '/pendenzen', component: PendenzenPage }),
   // Earlier versions kept imports and archives under one page.
   createRoute({
     getParentRoute: () => rootRoute,

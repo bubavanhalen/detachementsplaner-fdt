@@ -1,3 +1,14 @@
+import { isIsoDate, parseListDate, today } from '../model/dates';
+import { FELDHOHEIT, leads, type PersonField } from '../model/feldhoheit';
+import {
+  createMilo,
+  type MiloAbsence,
+  type MiloCommand,
+  type MiloListe,
+  type MiloState,
+} from '../model/milo';
+import { matchPerson } from '../model/personMatch';
+import { newId } from '../model/project';
 import type { Person, Project, Source } from '../model/types';
 import { identifier, searchText } from './text';
 
@@ -25,6 +36,12 @@ export const IMPORT_FIELDS = [
   { key: 'tel', label: 'Mobiltelefon', pattern: /tel|natel|mobile|handy/i },
   { key: 'mail', label: 'E-Mail', pattern: /mail/i },
   { key: 'wohnort', label: 'Wohnort', pattern: /wohnort|ort$/i },
+  { key: 'geburtsdatum', label: 'Geburtsdatum', pattern: /geburt|geb\.?\s*dat/i },
+  {
+    key: 'miloStatus',
+    label: 'Status (Bestandesliste)',
+    pattern: /^status|bestand|präsenz|anwesenheit|eingerückt/i,
+  },
 ] as const;
 export type ImportKey = (typeof IMPORT_FIELDS)[number]['key'];
 export type ImportMapping = Partial<Record<ImportKey, number>>;
@@ -35,15 +52,21 @@ export function findHeader(rows: string[][]): number {
   }
   return 0;
 }
-export function guessMapping(headers: string[]): ImportMapping {
-  const mapping: ImportMapping = {};
-  for (const field of IMPORT_FIELDS) {
+function guess<K extends string>(
+  fields: readonly { key: K; pattern: RegExp }[],
+  headers: string[],
+): Partial<Record<K, number>> {
+  const mapping: Partial<Record<K, number>> = {};
+  for (const field of fields) {
     const column = headers.findIndex(
       (text, i) => field.pattern.test(text) && !Object.values(mapping).includes(i),
     );
     if (column >= 0) mapping[field.key] = column;
   }
   return mapping;
+}
+export function guessMapping(headers: string[]): ImportMapping {
+  return guess(IMPORT_FIELDS, headers);
 }
 export function splitName(raw: string): { first: string; last: string; name: string } {
   const clean = raw.replace(/\s+/g, ' ').trim();
@@ -69,18 +92,45 @@ export function normalizePhone(value: string): string {
   if (national.length !== 9 || !/^[1-9]/.test(national)) return value.trim();
   return `+41 ${national.slice(0, 2)} ${national.slice(2, 5)} ${national.slice(5, 7)} ${national.slice(7)}`;
 }
-/** Parses into the supplied draft; caller commits only after the whole import succeeds. */
-export function importRows(
-  project: Project,
-  source: Source,
+export interface ImportOptions {
+  /** ISO date the list was valid on (MILO: date of the export). Defaults to today. */
+  stand?: string;
+}
+export interface Abweichung {
+  personId: string;
+  feld: PersonField;
+  /** Value kept from the leading source. */
+  wert: string;
+  /** Differing value of this list, not taken over. */
+  liste: string;
+}
+export interface ImportResult {
+  added: number;
+  updated: number;
+  /** Values the other source leads; shown, never written. */
+  abweichungen: Abweichung[];
+  /** MILO only: people with the MILO mark that this list no longer contains. */
+  nichtMehr: string[];
+}
+const TEXT_FIELDS = [
+  'grad',
+  'pnr',
+  'funktion',
+  'dt',
+  'einteilung',
+  'zug',
+  'mail',
+  'wohnort',
+] as const;
+function miloState(project: Project): MiloState {
+  project.milo ??= createMilo();
+  return project.milo;
+}
+function checkMapping(
   rows: string[][],
   header: number,
-  mapping: ImportMapping,
-  filename: string,
-  allowNames = false,
-): { added: number; updated: number } {
-  if (project.archive) throw new Error('Archivstand ist schreibgeschützt.');
-  if (mapping.name === undefined) throw new Error('Bitte die Namensspalte zuordnen.');
+  mapping: Partial<Record<string, number>>,
+): string[] {
   if (!Number.isInteger(header) || header < 0 || header >= rows.length)
     throw new Error('Bitte eine gültige Kopfzeile wählen.');
   const headers = rows[header].map((name, i) => name.trim() || `Spalte ${i + 1}`);
@@ -92,8 +142,35 @@ export function importRows(
   ) {
     throw new Error('Spaltenzuordnung ungültig. Bitte eine vorhandene Spalte auswählen.');
   }
+  return headers;
+}
+/** Parses into the supplied draft; caller commits only after the whole import succeeds. */
+export function importRows(
+  project: Project,
+  source: Source,
+  rows: string[][],
+  header: number,
+  mapping: ImportMapping,
+  filename: string,
+  allowNames = false,
+  options: ImportOptions = {},
+): ImportResult {
+  if (project.archive) throw new Error('Archivstand ist schreibgeschützt.');
+  if (mapping.name === undefined) throw new Error('Bitte die Namensspalte zuordnen.');
+  const headers = checkMapping(rows, header, mapping);
+  const stand = isIsoDate(options.stand) ? options.stand : today();
   let added = 0,
     updated = 0;
+  const abweichungen: Abweichung[] = [];
+  const seen = new Set<string>();
+  // The leading source overwrites; the other one only fills an empty field and reports a difference.
+  const take = (person: Person, field: PersonField, value: string, current: string) => {
+    if (!value) return false;
+    if (leads(source, field) || !current) return true;
+    const same = field === 'pnr' ? identifier(current) === identifier(value) : current === value;
+    if (!same) abweichungen.push({ personId: person.id, feld: field, wert: current, liste: value });
+    return false;
+  };
   for (const row of rows.slice(header + 1)) {
     const get = (key: ImportKey) => {
       const i = mapping[key];
@@ -101,22 +178,9 @@ export function importRows(
     };
     const names = splitName(get('name'));
     if (!names.name) continue;
-    const number = identifier(get('pnr'));
-    const matches = number
-      ? project.persons.filter((person) => identifier(person.pnr) === number)
-      : [];
-    let person: Person | undefined = matches.length === 1 ? matches[0] : undefined;
-    if (!person && !matches.length && allowNames) {
-      const candidates = project.persons.filter(
-        (item) =>
-          searchText(item.name) === searchText(names.name) &&
-          (!number || !identifier(item.pnr) || number === identifier(item.pnr)),
-      );
-      if (candidates.length === 1) {
-        person = candidates[0];
-        person.identityReview = 'Nur über den Namen zugeordnet. Identität prüfen.';
-      }
-    }
+    const match = matchPerson(project.persons, { name: names.name, pnr: get('pnr') }, allowNames);
+    let person = match.person;
+    if (person && match.review) person.identityReview = match.review;
     if (!person) {
       person = {
         id: crypto.randomUUID(),
@@ -130,23 +194,25 @@ export function importRows(
       project.persons.push(person);
       added++;
     } else updated++;
-    const master = source === 'pisa';
-    for (const key of [
-      'grad',
-      'pnr',
-      'funktion',
-      'dt',
-      'einteilung',
-      'zug',
-      'mail',
-      'wohnort',
-    ] as const) {
+    seen.add(person.id);
+    for (const key of TEXT_FIELDS) {
       const value = get(key);
-      if (value && (master || !person[key])) person[key] = value;
+      if (take(person, key, value, String(person[key] ?? ''))) {
+        person[key] = value;
+        if (key === 'dt') person.dtStand = stand;
+      }
     }
     const phone = get('tel');
-    if (phone && (master || !person.tel)) person.tel = normalizePhone(phone);
-    if (master || (!person.vorname && !person.nachname)) {
+    if (phone) {
+      const value = normalizePhone(phone);
+      if (take(person, 'tel', value, person.tel ?? '')) person.tel = value;
+    }
+    const born = parseListDate(get('geburtsdatum'));
+    if (take(person, 'geburtsdatum', born, person.geburtsdatum ?? '')) person.geburtsdatum = born;
+    const status = get('miloStatus');
+    if (source === 'milo' && take(person, 'miloStatus', status, person.miloStatus ?? ''))
+      person.miloStatus = status;
+    if (leads(source, 'name') || (!person.vorname && !person.nachname)) {
       person.name = names.name;
       person.vorname = names.first;
       person.nachname = names.last;
@@ -155,7 +221,7 @@ export function importRows(
       .split(/[;\n]/)
       .map((item) => item.trim())
       .filter(Boolean);
-    if (licenses.length && (master || !person.lics.length)) person.lics = licenses;
+    if (take(person, 'lics', licenses.join('; '), person.lics.join('; '))) person.lics = licenses;
     const raw: Record<string, string> = Object.fromEntries(
       headers.map((name, i) => [name, String(row[i] ?? '').trim()]).filter(([, value]) => value),
     );
@@ -164,6 +230,177 @@ export function importRows(
     person[source] = true;
     person.key = searchText(person.name);
   }
+  const nichtMehr: string[] = [];
+  if (source === 'milo') {
+    // MILO is the roster: a person missing from it is marked, never deleted.
+    for (const person of project.persons) {
+      if (seen.has(person.id)) delete person.nichtInMilo;
+      else if (person.milo) {
+        person.nichtInMilo ??= stand;
+        nichtMehr.push(person.id);
+      }
+    }
+    miloState(project).stand = stand;
+  }
   project.src[source] = { datei: filename, zeit: new Date().toISOString(), anz: added + updated };
-  return { added, updated };
+  return { added, updated, abweichungen, nichtMehr };
+}
+
+// ---- MILO leave and command lists ------------------------------------------------------
+
+export const LIST_FIELDS = [
+  { key: 'name', label: 'Name / Vorname', pattern: /name/i },
+  {
+    key: 'pnr',
+    label: 'Versicherten-Nr.',
+    pattern: /versicherten|ahv|pers.*nr|personalnr|sozial/i,
+  },
+  { key: 'von', label: 'Von (oder Zeitraum)', pattern: /^von|beginn|^ab\b|start|zeitraum|datum/i },
+  { key: 'bis', label: 'Bis', pattern: /^bis|ende|^end\b/i },
+  {
+    key: 'art',
+    label: 'Art / Kommando',
+    pattern: /art|typ|grund|kommand|bezeichnung|auftrag|text/i,
+  },
+] as const;
+export type ListKey = (typeof LIST_FIELDS)[number]['key'];
+export type ListMapping = Partial<Record<ListKey, number>>;
+export const LIST_LABELS: Record<MiloListe, string> = {
+  urlaub: 'Urlaubsliste',
+  kommandierung: 'Kommandierungsliste',
+};
+export function guessListMapping(headers: string[]): ListMapping {
+  return guess(LIST_FIELDS, headers);
+}
+/** «01.11.2026 – 05.11.2026» in one cell, or two cells. */
+export function dateRange(von: string, bis: string): { von: string; bis: string } {
+  if (!bis) {
+    const parts = von.split(/\s*(?:–|—|\sbis\s|\s-\s)\s*/).filter(Boolean);
+    if (parts.length === 2) {
+      const first = parseListDate(parts[0]),
+        second = parseListDate(parts[1]);
+      if (first && second) return { von: first, bis: second };
+    }
+  }
+  const start = parseListDate(von),
+    end = parseListDate(bis) || start;
+  return { von: start, bis: end };
+}
+export interface ListImportResult {
+  count: number;
+  /** Names of rows no person could be matched to; shown only in the local interface. */
+  ohnePerson: string[];
+  /** Rows without a readable date. */
+  ohneDatum: number;
+}
+/**
+ * Replaces the leave or command list with the MILO list: MILO is the source, so an
+ * entry missing from a newer list is gone. People are never created from these lists.
+ */
+export function importMiloList(
+  project: Project,
+  kind: MiloListe,
+  rows: string[][],
+  header: number,
+  mapping: ListMapping,
+  filename: string,
+  allowNames = false,
+): ListImportResult {
+  if (project.archive) throw new Error('Archivstand ist schreibgeschützt.');
+  if (mapping.name === undefined && mapping.pnr === undefined)
+    throw new Error('Bitte die Namens- oder Nummernspalte zuordnen.');
+  if (mapping.von === undefined) throw new Error('Bitte die Datumsspalte «Von» zuordnen.');
+  checkMapping(rows, header, mapping);
+  const entries: (MiloAbsence | MiloCommand)[] = [];
+  const ohnePerson: string[] = [];
+  let ohneDatum = 0;
+  for (const row of rows.slice(header + 1)) {
+    const get = (key: ListKey) => {
+      const i = mapping[key];
+      return i === undefined ? '' : String(row[i] ?? '').trim();
+    };
+    const name = splitName(get('name')).name;
+    if (!name && !get('pnr')) continue;
+    const range = dateRange(get('von'), get('bis'));
+    if (!range.von) {
+      ohneDatum++;
+      continue;
+    }
+    const { person } = matchPerson(project.persons, { name, pnr: get('pnr') }, allowNames);
+    if (!person) {
+      ohnePerson.push(name || get('pnr'));
+      continue;
+    }
+    const base = { personId: person.id, von: range.von, bis: range.bis };
+    entries.push(
+      kind === 'urlaub'
+        ? { id: newId('urlaub'), ...base, art: get('art') }
+        : { id: newId('kdo'), ...base, text: get('art') },
+    );
+  }
+  const state = miloState(project);
+  if (kind === 'urlaub') state.absences = entries as MiloAbsence[];
+  else state.commands = entries as MiloCommand[];
+  state.listen[kind] = { datei: filename, zeit: new Date().toISOString(), anz: entries.length };
+  return { count: entries.length, ohnePerson, ohneDatum };
+}
+
+// ---- Comparison before taking over a list ----------------------------------------------
+
+export interface FieldChange {
+  personId: string;
+  feld: PersonField;
+  alt: string;
+  neu: string;
+}
+export interface ImportComparison {
+  neu: string[];
+  geaendert: FieldChange[];
+  nichtMehr: string[];
+  wiederInMilo: string[];
+  eintraegeNeu: number;
+  eintraegeEntfallen: number;
+}
+const COMPARED = Object.keys(FELDHOHEIT) as PersonField[];
+function fieldText(person: Person, field: PersonField): string {
+  const value = person[field];
+  return Array.isArray(value) ? value.join('; ') : String(value ?? '');
+}
+function entryKeys(state: MiloState | undefined): Set<string> {
+  return new Set(
+    [...(state?.absences ?? []), ...(state?.commands ?? [])].map((entry) =>
+      [entry.personId, entry.von, entry.bis, 'art' in entry ? entry.art : entry.text].join('|'),
+    ),
+  );
+}
+/** What a list would change: computed on a draft so the user confirms before anything is kept. */
+export function compareImport(before: Project, after: Project): ImportComparison {
+  const old = new Map(before.persons.map((person) => [person.id, person]));
+  const result: ImportComparison = {
+    neu: [],
+    geaendert: [],
+    nichtMehr: [],
+    wiederInMilo: [],
+    eintraegeNeu: 0,
+    eintraegeEntfallen: 0,
+  };
+  for (const person of after.persons) {
+    const previous = old.get(person.id);
+    if (!previous) {
+      result.neu.push(person.id);
+      continue;
+    }
+    for (const feld of COMPARED) {
+      const alt = fieldText(previous, feld),
+        neu = fieldText(person, feld);
+      if (alt !== neu) result.geaendert.push({ personId: person.id, feld, alt, neu });
+    }
+    if (person.nichtInMilo && !previous.nichtInMilo) result.nichtMehr.push(person.id);
+    if (!person.nichtInMilo && previous.nichtInMilo) result.wiederInMilo.push(person.id);
+  }
+  const was = entryKeys(before.milo),
+    now = entryKeys(after.milo);
+  for (const key of now) if (!was.has(key)) result.eintraegeNeu++;
+  for (const key of was) if (!now.has(key)) result.eintraegeEntfallen++;
+  return result;
 }

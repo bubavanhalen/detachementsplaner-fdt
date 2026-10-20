@@ -1,0 +1,67 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: while a personnel list prints, the print
+   must override every layout rule of the application shell around the list. */
+.personal-page {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.personal-sources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.personal-source {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+.personal-day {
+  max-width: 220px;
+}
+.personal-output .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border, #ddd);
+}
+.personal-sheet {
+  padding: 12px 16px 16px;
+}
+.personal-sheet-title {
+  margin: 0;
+}
+.personal-sheet-note {
+  margin: 2px 0 10px;
+  color: var(--text-2, inherit);
+}
+.import-compare-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+@media print {
+  /* Only while a personnel list prints: hide everything except the list. */
+  html.personal-print body :not(:has(.personal-sheet)):not(.personal-sheet):not(.personal-sheet *) {
+    display: none !important;
+  }
+  html.personal-print body :has(.personal-sheet) {
+    display: block !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    overflow: visible !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+  html.personal-print .personal-sheet .table-scroll {
+    overflow: visible !important;
+  }
+}
