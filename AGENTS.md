@@ -85,6 +85,50 @@ unchanged. Design: `docs/adr/0002-teilen-ueber-internet.md` and
   (information protection), covering storage on a private PC and Tailscale;
   without it, sharing stays limited to fictional data.
 
+### Owner-confirmed exception: Pendenzen agent exchange folder
+
+On 2026-10-20 the owner explicitly allowed one exception for the Pendenzen
+feature. A personal assistant agent that the owner runs and instructs may read
+the **complete** local project state from the local exchange folder the owner
+connects in the app. That state includes persons, detachements, Pendenzen and
+everything else in the project, so that the agent knows all context, also if the
+storage changes later (e.g. to SQL). The agent may also write change files into
+that folder's `eingang/` directory, and the app applies them directly, marked as
+agent changes and undoable. The agent reads mail, WhatsApp, SMS, call notes and
+Teams Planner outside the app, on the owner's instruction.
+
+This is remote AI processing in the sense of the hard rule. The only permitted
+third party for it is the AI model provider that runs the owner's assistant agent
+(Anthropic, Claude). The owner accepts that the project state reaches that
+provider. No other third party is permitted by this exception. The sharing
+exception and this exception are separate; neither extends the other.
+
+- The application itself still makes **no network requests**. It only reads and
+  writes local files in the folder the user picked (File System Access API), or
+  offers local download/import as a fallback. The protocol is in
+  `docs/pendenzen-agent.md`.
+- The exchange folder must not be in a cloud-synchronised location (OneDrive,
+  Dropbox, iCloud, Google Drive; note that «Documents»/«Desktop» are synchronised
+  when OneDrive backup is on). Otherwise the whole project reaches that cloud. The
+  app warns before connecting; `docs/pendenzen-agent.md` tells the agent to stop
+  and report such a folder.
+- Intake files are untrusted content (mail and chats may contain prompt
+  injection). They may change Pendenzen fields only, never persons, detachements,
+  master data or Tagesbefehle; the app rejects any file with other keys or values.
+  Changes carry the `basis` the agent saw; a Pendenz the user changed since is not
+  silently overwritten, conflicting fields become a proposal to check.
+- The reference file contains the complete project including the signature and
+  coat of arms images (owner decision 2026-10-20, against the recommendation to omit
+  them). The agent must never use, forward or embed them.
+- In shared operation (ADR-0002) Pendenzen are host-only, filtered by the host
+  service before sending, and never part of guest exports. The exchange folder
+  exists only at the host.
+- The exception covers only that owner-run assistant and the exchange folder. It
+  does not cover coding agents, CI, tests, issues, PRs or commits: they keep the
+  full boundary above. Never read a real exchange folder during development, and
+  never commit its contents. Tests use wholly fictional fixtures.
+- No other remote processing, telemetry or upload is authorised by this exception.
+
 Every nested `AGENTS.md` or agent instruction file must retain this boundary and
 may not relax it. Keep the prominent rule in the root README and link it from
 other contributor/readme instructions.

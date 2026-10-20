@@ -28,6 +28,7 @@ export {
   subDetsOf,
   updateEvent,
 } from './onsite';
+export * from './pendenzen';
 export { derivePisa, entrySignature, generatedEntryId, projectSignature, validEc } from './pisa';
 export {
   assignPeople,

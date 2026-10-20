@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { startExchange } from './components/pendenzen/exchange';
 import { setOfflineTemplate } from './io/offline';
 import { seedTbAssets } from './io/tagesbefehl/assets';
 import { initializeProject, notify } from './store';
@@ -14,6 +15,8 @@ function start() {
   // Assets from a self-contained export only fill an empty device store.
   seedTbAssets(window.__TBASSETS);
   initializeProject(window.__BOOTDATA);
+  // Reconnects a local exchange folder chosen earlier; no network involved.
+  startExchange();
   const root = document.getElementById('root');
   if (!root) return;
   createRoot(root, {

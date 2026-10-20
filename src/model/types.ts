@@ -1,3 +1,4 @@
+import type { Pendenz, PendenzImport } from './pendenzen';
 import type { Stamm } from './stamm';
 import type { TbState } from './tagesbefehl/types';
 
@@ -113,6 +114,10 @@ export interface Project {
   onsiteEvents?: OnsiteEvent[];
   /** Optional Tagesbefehl state; old saves have none. */
   tb?: TbState;
+  /** Optional Pendenzen of this service; old saves have none. Not part of the PISA handover. */
+  pendenzen?: Pendenz[];
+  /** Agent change files already applied (newest first). */
+  pendenzenImporte?: PendenzImport[];
 }
 export interface PisaEntry {
   id: string;
