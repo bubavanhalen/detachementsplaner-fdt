@@ -16,7 +16,7 @@ import {
   type TbSettings,
   type TbWeekday,
 } from '../src/model/tagesbefehl/types';
-import { fictionalOrders, SIGNATURE_PNG } from './fixtures/tb-template';
+import { fictionalOrders, makePng, SIGNATURE_PNG } from './fixtures/tb-template';
 
 const DIR = 'fixtures-private/fixtures';
 const TEMPLATE = `${DIR}/Tagesbefehle_Vorlage.xlsx`;
@@ -236,5 +236,40 @@ describe.skipIf(!available)('xlsx export with the real template (local fixtures 
     for (const [path, data] of Object.entries(files))
       if (path.startsWith('xl/worksheets/sheet'))
         expect(strFromU8(data).includes(`<v>${sample}</v>`), path).toBe(false);
+  });
+
+  it('shows a fictional coat of arms instead of the right-hand logo of every sheet', () => {
+    const template = new Uint8Array(readFileSync(TEMPLATE));
+    const wappen = makePng(3, 6, () => [200, 30, 30, 255]);
+    const { week, orders, tb, project } = fictionalOrders();
+    const files = unzipSync(
+      buildTagesbefehlXlsx({
+        template,
+        wappen,
+        week,
+        orders,
+        settings: tb.settings,
+        einheit: project.stamm.einheit,
+        kdt: commanderSignature(project.stamm),
+        dateikuerzel: project.stamm.dateikuerzel,
+      }),
+    );
+    expect(files['xl/media/wappen.png']).toEqual(wappen);
+    const original = unzipSync(template);
+    for (let i = 2; i <= 9; i++) {
+      const rels = strFromU8(files[`xl/worksheets/_rels/sheet${i}.xml.rels`]);
+      const drawing = /Target="\.\.\/drawings\/(drawing\d+\.xml)"/.exec(rels)?.[1];
+      const xml = strFromU8(files[`xl/drawings/${drawing}`]);
+      const before = strFromU8(original[`xl/drawings/${drawing}`]);
+      const one = /<xdr:oneCellAnchor>[\s\S]*?<\/xdr:oneCellAnchor>/.exec(xml)?.[0] ?? '';
+      expect(one, `sheet${i}`).toMatch(/<xdr:from><xdr:col>4<\/xdr:col>/);
+      expect(one, `sheet${i}`).toMatch(/r:embed="rIdWappen"/);
+      // Left logo and signature anchors stay; only the right-hand logo is gone.
+      const count = (text: string) => text.split('</xdr:twoCellAnchor>').length - 1;
+      expect(count(xml), `sheet${i}`).toBe(count(before) - 1);
+      expect(strFromU8(files[`xl/drawings/_rels/${drawing}.rels`])).toMatch(
+        /Id="rIdWappen"[^>]*Target="\.\.\/media\/wappen\.png"/,
+      );
+    }
   });
 });

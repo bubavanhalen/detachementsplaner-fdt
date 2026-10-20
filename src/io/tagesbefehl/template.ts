@@ -1,4 +1,5 @@
 import { strFromU8, unzipSync } from 'fflate';
+import { pngSize } from './xlsx/drawing';
 
 /** A logo picture from the template header, for the print view and PDFs. */
 export interface TbTemplateLogo {
@@ -225,4 +226,38 @@ function readLogos(files: Record<string, Uint8Array>): TbTemplateLogo[] {
     });
   }
   return logos.sort((a, b) => a.x - b.x).map(({ x: _x, ...logo }) => logo);
+}
+
+/** Index of the logo the coat of arms replaces: the right-most right-aligned one, else -1. */
+export function wappenSlot(logos: readonly TbTemplateLogo[]): number {
+  for (let index = logos.length - 1; index >= 0; index--)
+    if (logos[index].align === 'right') return index;
+  return -1;
+}
+
+/**
+ * Puts the service's coat of arms (PNG) in place of the template's right-hand logo.
+ * It keeps its aspect ratio inside the logo's box, aligned to the box's top right
+ * like the xlsx export (xlsx/drawing.ts placeWappen). Without such a logo, or
+ * without a readable PNG, the template logos are returned unchanged.
+ */
+export function withWappen(
+  logos: TbTemplateLogo[],
+  wappen: Uint8Array | undefined,
+): TbTemplateLogo[] {
+  const slot = wappenSlot(logos),
+    size = pngSize(wappen);
+  if (!wappen || slot < 0 || !size) return logos;
+  const logo = logos[slot];
+  const scale = Math.min(logo.widthMm / size.width, logo.heightMm / size.height);
+  const next = logos.slice();
+  next[slot] = {
+    ...logo,
+    name: 'Wappen',
+    mime: 'image/png',
+    data: wappen,
+    widthMm: round(size.width * scale),
+    heightMm: round(size.height * scale),
+  };
+  return next;
 }

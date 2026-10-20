@@ -1,5 +1,5 @@
 // xlsx export from the template, checked against a wholly fictional template.
-import { strFromU8, unzipSync } from 'fflate';
+import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
 import { describe, expect, it, vi } from 'vitest';
 import {
   prepareSignature,
@@ -24,6 +24,8 @@ import {
   fictionalSetup,
   LOGO_ANCHOR,
   makePng,
+  RIGHT_LOGO_FROM,
+  RIGHT_LOGO_TO,
   SIGNATURE_PNG,
 } from './fixtures/tb-template';
 
@@ -282,6 +284,75 @@ describe('buildTagesbefehlXlsx with a fictional template', () => {
     expect(without['xl/media/image2.png']).toEqual(template['xl/media/image2.png']);
   });
 
+  it('shows the coat of arms instead of the right-hand logo on request', () => {
+    // Fictional coat of arms, 3 × 6 px: fits the 972 000 × 844 500 EMU box by its height.
+    const wappen = makePng(3, 6, () => [200, 30, 30, 255]);
+    const { files } = exportWeek(undefined, { wappen, signature: SIGNATURE_PNG });
+    const template = unzipSync(TEMPLATE);
+    expect(files['xl/media/wappen.png']).toEqual(wappen);
+    expect(files['xl/media/image3.png']).toEqual(template['xl/media/image3.png']);
+    expect(files['xl/media/image2.png']).toEqual(SIGNATURE_PNG);
+    expect(strFromU8(files['[Content_Types].xml'])).toMatch(/Extension="png"/);
+    const height = 844_500,
+      width = Math.round((3 / 6) * height);
+    // Every sheet drawing (Mo–So and "Sa + So"), the hidden weekend sheets included.
+    for (let d = 1; d <= 8; d++) {
+      const path = `xl/drawings/drawing${d}.xml`;
+      const doc = xml(files, path);
+      const rels = strFromU8(files[`xl/drawings/_rels/drawing${d}.xml.rels`]);
+      expect(rels, path).toMatch(/Id="rIdWappen"[^>]*Target="\.\.\/media\/wappen\.png"/);
+      expect(rels, path).toMatch(/Id="rId3"[^>]*Target="\.\.\/media\/image3\.png"/);
+      const one = Array.from(doc.getElementsByTagName('xdr:oneCellAnchor'));
+      expect(one, path).toHaveLength(1);
+      const n = (tag: string) => Number(one[0].getElementsByTagName(tag)[0].textContent);
+      // Top right of the template logo's box, own aspect ratio.
+      expect([n('xdr:col'), n('xdr:colOff'), n('xdr:row'), n('xdr:rowOff')]).toEqual([
+        RIGHT_LOGO_FROM[0],
+        RIGHT_LOGO_TO[1] - width,
+        RIGHT_LOGO_FROM[2],
+        RIGHT_LOGO_FROM[3],
+      ]);
+      for (const ext of Array.from(one[0].getElementsByTagName('xdr:ext')).concat(
+        Array.from(one[0].getElementsByTagName('a:ext')).filter((e) => e.hasAttribute('cx')),
+      ))
+        expect([ext.getAttribute('cx'), ext.getAttribute('cy')]).toEqual([
+          String(width),
+          String(height),
+        ]);
+      expect(one[0].getElementsByTagName('a:blip')[0].getAttribute('r:embed')).toBe('rIdWappen');
+      // The left logo and the signature keep their template pictures.
+      const rest = anchors(doc);
+      expect(rest.some((a) => a.embed === 'rId3')).toBe(false);
+      expect(rest.find((a) => a.from.join() === LOGO_ANCHOR.join())).toBeDefined();
+    }
+
+    // Default: the template logo stays and no extra picture is written.
+    const without = exportWeek().files;
+    expect(without['xl/media/wappen.png']).toBeUndefined();
+    expect(strFromU8(without['xl/drawings/drawing1.xml'])).not.toMatch(/oneCellAnchor|rIdWappen/);
+    expect(anchors(xml(without, 'xl/drawings/drawing1.xml')).map((a) => a.embed)).toContain('rId3');
+  });
+
+  it('keeps the template unchanged when it has no right-hand logo', () => {
+    const files = unzipSync(TEMPLATE);
+    for (let d = 1; d <= 8; d++) {
+      const path = `xl/drawings/drawing${d}.xml`;
+      files[path] = strToU8(
+        strFromU8(files[path]).replace(
+          /<xdr:twoCellAnchor\b(?:(?!<\/xdr:twoCellAnchor>)[\s\S])*?r:embed="rId3"[\s\S]*?<\/xdr:twoCellAnchor>/,
+          '',
+        ),
+      );
+    }
+    const { files: out } = exportWeek(undefined, {
+      template: zipSync(files),
+      wappen: makePng(3, 6, () => [200, 30, 30, 255]),
+    });
+    expect(out['xl/media/wappen.png']).toBeUndefined();
+    expect(strFromU8(out['xl/drawings/drawing1.xml'])).not.toMatch(/rIdWappen/);
+    expect(strFromU8(out['xl/drawings/_rels/drawing1.xml.rels'])).not.toMatch(/rIdWappen/);
+  });
+
   it('fills the fixed rows of "Sa + So" and keeps the page structure', () => {
     const { files } = exportWeek();
     const doc = sheetDoc(files, 'Sa + So');
@@ -411,6 +482,9 @@ describe('buildTagesbefehlXlsx with a fictional template', () => {
     expect(() =>
       buildTagesbefehlXlsx({ ...base, signature: new Uint8Array([0xff, 0xd8, 0xff]) }),
     ).toThrow('Die Unterschrift muss als PNG-Bild vorliegen.');
+    expect(() =>
+      buildTagesbefehlXlsx({ ...base, wappen: new Uint8Array([0xff, 0xd8, 0xff]) }),
+    ).toThrow('Das Wappen muss als PNG-Bild vorliegen.');
     buildTagesbefehlXlsx(base);
     expect(network).not.toHaveBeenCalled();
     vi.unstubAllGlobals();

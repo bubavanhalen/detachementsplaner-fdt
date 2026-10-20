@@ -253,6 +253,9 @@ const rels = (items: [string, string, string, string?][]) =>
     .join('')}</Relationships>`;
 
 export const LOGO_ANCHOR: [number, number, number, number] = [1, 38100, 1, 65422];
+/** Right-hand logo in column E: a 972 000 × 844 500 EMU box within one cell. */
+export const RIGHT_LOGO_FROM: [number, number, number, number] = [4, 238125, 1, 0];
+export const RIGHT_LOGO_TO: [number, number, number, number] = [4, 1210125, 1, 844500];
 export const SIGNATURE_PNG = makePng(34, 10, (x, y) =>
   y > 3 && y < 6 && x > 2 ? [0, 0, 0, 255] : [0, 0, 0, 0],
 );
@@ -384,12 +387,15 @@ export function buildSyntheticTemplate(): Uint8Array {
   for (let d = 1; d <= 8; d++) {
     const sigRid = d === 2 ? 'rId5' : 'rId2';
     const logoRid = d === 2 ? 'rId2' : 'rId1';
+    const right = picture(3, 'rId3', RIGHT_LOGO_FROM, RIGHT_LOGO_TO);
     const anchors =
       d === 8
         ? picture(2, logoRid, LOGO_ANCHOR, [2, 990600, 1, 477503]) +
+          right +
           picture(7, sigRid, [3, 0, 25, 24849], [3, 959518, 26, 141628]) +
           picture(8, sigRid, [3, 0, 56, 24849], [3, 959518, 57, 141627])
         : picture(2, logoRid, LOGO_ANCHOR, [2, 990600, 1, 477503]) +
+          right +
           picture(5, sigRid, [3, 8283, 50, 24846], [3, 967801, 51, 141625]);
     put(`xl/drawings/drawing${d}.xml`, drawingXml(anchors));
     put(
@@ -397,11 +403,13 @@ export function buildSyntheticTemplate(): Uint8Array {
       rels([
         [logoRid, `${REL}/image`, '../media/image1.png'],
         [sigRid, `${REL}/image`, '../media/image2.png'],
+        ['rId3', `${REL}/image`, '../media/image3.png'],
       ]),
     );
   }
   files['xl/media/image1.png'] = makePng(20, 6, () => [40, 80, 160, 255]);
   files['xl/media/image2.png'] = makePng(34, 10, () => [200, 200, 200, 255]);
+  files['xl/media/image3.png'] = makePng(10, 9, () => [0, 120, 60, 255]);
   files['[trash]/0000.dat'] = new Uint8Array([1, 2, 3]);
   return zipSync(files);
 }

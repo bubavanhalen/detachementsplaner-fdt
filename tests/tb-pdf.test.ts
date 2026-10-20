@@ -24,7 +24,12 @@ import {
   textWidth,
   wrapText,
 } from '../src/io/tagesbefehl/sheet-layout';
-import { extractTemplateLogos, type TbTemplateLogo } from '../src/io/tagesbefehl/template';
+import {
+  extractTemplateLogos,
+  type TbTemplateLogo,
+  wappenSlot,
+  withWappen,
+} from '../src/io/tagesbefehl/template';
 import { TB_WEEKDAYS, type TbOrder } from '../src/model/tagesbefehl/types';
 import { fictionalOrder, makePng, syntheticTemplate } from './tb-fixtures';
 
@@ -352,5 +357,55 @@ describe('extractTemplateLogos', () => {
     );
     const pdf = await inspectPdf(await buildDayPdf(fictionalOrder('Mo'), { logos: found }));
     expect(pdf.images).toBe(2);
+  });
+});
+
+describe('withWappen', () => {
+  // Fictional coat of arms, 3 × 6 px (taller than the 27 × 23.46 mm logo box).
+  const wappen = makePng(3, 6, [200, 30, 30, 255]);
+
+  it('replaces only the right-hand logo, fitted into its box with its own aspect ratio', () => {
+    const template = logos();
+    expect(wappenSlot(template)).toBe(1);
+    const next = withWappen(template, wappen);
+    expect(next[0]).toBe(template[0]);
+    expect(next[1]).toMatchObject({
+      name: 'Wappen',
+      mime: 'image/png',
+      data: wappen,
+      align: 'right',
+      heightMm: 23.46,
+      widthMm: 11.73,
+      topMm: 0,
+    });
+    expect(template[1].name).toBe('rechts.png');
+    // Top right of the template logo's box, like the xlsx export.
+    const before = layoutOrder(fictionalOrder('Mo'), template).logos[1];
+    const after = layoutOrder(fictionalOrder('Mo'), next).logos[1];
+    expect(after.x + after.width).toBeCloseTo(before.x + before.width, 6);
+    expect(after.top).toBeCloseTo(before.top, 6);
+    expect(after.width).toBeLessThan(before.width);
+  });
+
+  it('keeps the template logos without coat of arms, right-hand logo or readable PNG', () => {
+    const template = logos();
+    expect(withWappen(template, undefined)).toBe(template);
+    expect(withWappen(template, new Uint8Array([0xff, 0xd8, 0xff, 0xe0]))).toBe(template);
+    const leftOnly = template.slice(0, 1);
+    expect(wappenSlot(leftOnly)).toBe(-1);
+    expect(withWappen(leftOnly, wappen)).toBe(leftOnly);
+  });
+
+  it('draws the coat of arms in the PDF instead of the right-hand logo', async () => {
+    const sizes = async (list: TbTemplateLogo[]) => {
+      const { doc } = await inspectPdf(await buildDayPdf(fictionalOrder('Mo'), { logos: list }));
+      const xObjects = doc.getPage(0).node.Resources()?.lookup(PDFName.of('XObject'), PDFDict);
+      return (xObjects?.keys() ?? []).map((key) => {
+        const image = doc.context.lookup(xObjects?.get(key)) as PDFRawStream;
+        return `${image.dict.get(PDFName.of('Width'))}x${image.dict.get(PDFName.of('Height'))}`;
+      });
+    };
+    expect((await sizes(logos())).sort()).toEqual(['4x4', '8x2']);
+    expect((await sizes(withWappen(logos(), wappen))).sort()).toEqual(['3x6', '8x2']);
   });
 });

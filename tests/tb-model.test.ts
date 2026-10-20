@@ -130,6 +130,15 @@ describe('Tagesbefehl state normalisation', () => {
     expect(tb.rotationStart).toBe(0);
     expect(normalizeTbState(null)).toEqual(createTbState());
     expect(normalizeTbState('kaputt')).toEqual(createTbState());
+    // The coat of arms replaces the template logo only on an explicit choice.
+    expect(tb.settings).not.toHaveProperty('wappenAlsLogo');
+    for (const value of ['ja', 1, null])
+      expect(normalizeTbState({ settings: { wappenAlsLogo: value } }).settings).not.toHaveProperty(
+        'wappenAlsLogo',
+      );
+    expect(normalizeTbState({ settings: { wappenAlsLogo: true } }).settings.wappenAlsLogo).toBe(
+      true,
+    );
   });
 
   it('starts with empty personal data and the documented defaults', () => {

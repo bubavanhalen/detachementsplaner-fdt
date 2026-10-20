@@ -1,6 +1,14 @@
 // Signature picture: find it via the drawing relationships and move its anchor
 // into the two empty rows between "Einheit" and "Name" of a rebuilt day sheet.
-import { type PackageFiles, partRels, readPart, relTypeIs, writePart } from './package';
+// Coat of arms: optionally shown in place of the right-hand header logo.
+import {
+  type PackageFiles,
+  partRels,
+  readPart,
+  relsPathFor,
+  relTypeIs,
+  writePart,
+} from './package';
 
 const EMU_PER_POINT = 12_700;
 /** Aspect of the template's signature picture (1026 × 302 px). */
@@ -147,4 +155,137 @@ export function updateDrawing(
 ): void {
   const xml = readPart(files, drawing.path);
   if (xml) writePart(files, drawing.path, placeSignature(xml, drawing.signatureRids, placement));
+}
+
+// ---------------------------------------------------------------------------
+// Coat of arms in place of the template's right-hand header logo.
+
+const IMAGE_REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image';
+/** Template rows 1–10 (0-based 0–9) form the header; pictures there are logos. */
+const HEADER_ROWS = 10;
+/** The right-hand logo starts in column D or further right (0-based 3). */
+const RIGHT_LOGO_MIN_COL = 3;
+
+interface Marker {
+  col: number;
+  colOff: number;
+  row: number;
+  rowOff: number;
+}
+
+function readMarker(anchor: string, p: string, tag: string): Marker | null {
+  const body = new RegExp(`<${p}${tag}>([\\s\\S]*?)</${p}${tag}>`).exec(anchor)?.[1];
+  if (!body) return null;
+  const n = (name: string) =>
+    Number(new RegExp(`<${p}${name}>(-?\\d+)</${p}${name}>`).exec(body)?.[1] ?? Number.NaN);
+  const marker = { col: n('col'), colOff: n('colOff'), row: n('row'), rowOff: n('rowOff') };
+  return Object.values(marker).every(Number.isFinite) ? marker : null;
+}
+
+/** Box of a picture in EMU: from the markers where they share a cell, else its stated size. */
+function anchorSize(anchor: string, p: string, from: Marker): { cx: number; cy: number } | null {
+  const to = readMarker(anchor, p, 'to');
+  const stated =
+    new RegExp(`<${p}ext\\b[^>]*cx="(\\d+)"[^>]*cy="(\\d+)"`).exec(anchor) ??
+    /<a:ext\b[^>]*cx="(\d+)"[^>]*cy="(\d+)"/.exec(anchor);
+  const cx = to && to.col === from.col ? to.colOff - from.colOff : Number(stated?.[1]);
+  const cy = to && to.row === from.row ? to.rowOff - from.rowOff : Number(stated?.[2]);
+  return cx > 0 && cy > 0 ? { cx, cy } : null;
+}
+
+/** Relationship target of `path` as seen from `part` (both package paths). */
+function relativeTarget(part: string, path: string): string {
+  const from = part.split('/').slice(0, -1),
+    to = path.split('/');
+  let common = 0;
+  while (common < from.length && common < to.length - 1 && from[common] === to[common]) common++;
+  return [...from.slice(common).map(() => '..'), ...to.slice(common)].join('/');
+}
+
+export interface WappenPlacement {
+  /** Package path of the coat of arms picture, e.g. xl/media/wappen.png. */
+  mediaPath: string;
+  /** Signature media part; never treated as a logo. */
+  signatureMedia: string | null;
+  size: { width: number; height: number };
+}
+
+/**
+ * Shows the coat of arms instead of the right-most header logo of a drawing. The
+ * picture gets its own relationship, so the template's logo part stays as it is, and
+ * a one-cell anchor at the top right of the logo's box, scaled to fit the box with
+ * its own aspect ratio. Returns false when the drawing has no such logo.
+ */
+export function placeWappen(
+  files: PackageFiles,
+  drawingPath: string,
+  placement: WappenPlacement,
+): boolean {
+  const xml = readPart(files, drawingPath);
+  if (!xml) return false;
+  const p = drawingPrefix(xml);
+  const images = partRels(files, drawingPath).filter((r) => relTypeIs(r, 'image'));
+  let best: { anchor: string; from: Marker } | undefined;
+  for (const anchor of anchors(xml, p)) {
+    const from = readMarker(anchor, p, 'from');
+    const embed = /r:embed="([^"]+)"/.exec(anchor)?.[1];
+    const image = images.find((r) => r.id === embed);
+    if (!from || !image?.path || image.path === placement.signatureMedia) continue;
+    if (from.row >= HEADER_ROWS || from.col < RIGHT_LOGO_MIN_COL) continue;
+    if (
+      !best ||
+      from.col > best.from.col ||
+      (from.col === best.from.col && from.colOff > best.from.colOff)
+    )
+      best = { anchor, from };
+  }
+  if (!best) return false;
+  const box = anchorSize(best.anchor, p, best.from);
+  const pic = new RegExp(`<${p}pic>[\\s\\S]*?</${p}pic>`).exec(best.anchor)?.[0];
+  if (!box || !pic) return false;
+
+  const relsPath = relsPathFor(drawingPath);
+  const relsXml = readPart(files, relsPath);
+  if (!relsXml) return false;
+  let rid = 'rIdWappen';
+  for (let n = 2; relsXml.includes(`Id="${rid}"`); n++) rid = `rIdWappen${n}`;
+  const target = relativeTarget(drawingPath, placement.mediaPath);
+  writePart(
+    files,
+    relsPath,
+    relsXml.replace(
+      /<\/Relationships>\s*$/,
+      `<Relationship Id="${rid}" Type="${IMAGE_REL}" Target="${target}"/></Relationships>`,
+    ),
+  );
+
+  const { size } = placement;
+  const scale = Math.min(box.cx / size.width, box.cy / size.height);
+  const width = Math.max(1, Math.round(size.width * scale)),
+    height = Math.max(1, Math.round(size.height * scale));
+  // Right aligned while the box lies within one column, so the offset stays in that cell.
+  const to = readMarker(best.anchor, p, 'to');
+  const dx = !to || to.col === best.from.col ? box.cx - width : 0;
+  const { col, colOff, row, rowOff } = best.from;
+  const from = `<${p}from><${p}col>${col}</${p}col><${p}colOff>${colOff + dx}</${p}colOff><${p}row>${row}</${p}row><${p}rowOff>${rowOff}</${p}rowOff></${p}from>`;
+  const picture = pic
+    .replace(/r:embed="[^"]+"/, `r:embed="${rid}"`)
+    .replace(
+      /(<a:off\b[^>]*\bx=")(\d+)"/,
+      (_, head: string, x: string) => `${head}${Number(x) + dx}"`,
+    )
+    .replace(/<a:ext\b[^>]*\bcx="\d+"[^>]*\/>/, `<a:ext cx="${width}" cy="${height}"/>`);
+  const clientData =
+    new RegExp(`<${p}clientData\\b[^>]*?(?:/>|>[\\s\\S]*?</${p}clientData>)`).exec(
+      best.anchor,
+    )?.[0] ?? `<${p}clientData/>`;
+  writePart(
+    files,
+    drawingPath,
+    xml.replace(
+      best.anchor,
+      `<${p}oneCellAnchor>${from}<${p}ext cx="${width}" cy="${height}"/>${picture}${clientData}</${p}oneCellAnchor>`,
+    ),
+  );
+  return true;
 }

@@ -2,7 +2,12 @@ import { useMemo, useState } from 'react';
 import { download } from '../../io/exports';
 import { fromBase64 } from '../../io/tagesbefehl/bytes';
 import { buildDayPdf, buildPdfZip, pdfFileName, pdfZipName } from '../../io/tagesbefehl/pdf';
-import { extractTemplateLogos, type TbTemplateLogo } from '../../io/tagesbefehl/template';
+import {
+  extractTemplateLogos,
+  type TbTemplateLogo,
+  wappenSlot,
+  withWappen,
+} from '../../io/tagesbefehl/template';
 import { buildTagesbefehlXlsx, xlsxFileName } from '../../io/tagesbefehl/xlsx';
 import { commanderSignature } from '../../model';
 import { buildOrders, type TbAssets, type TbOrder, type TbWeek } from '../../model/tagesbefehl';
@@ -37,7 +42,14 @@ export function OutputStep({
     () => (unterschrift ? fromBase64(unterschrift.base64) : undefined),
     [unterschrift],
   );
-  const logos = useMemo<TbTemplateLogo[]>(() => {
+  // The service may show its coat of arms instead of the template's right-hand logo.
+  const wappenBild = project.stamm.grafiken.wappen,
+    wappenGewaehlt = !!tb.settings.wappenAlsLogo;
+  const wappen = useMemo(
+    () => (wappenGewaehlt && wappenBild ? fromBase64(wappenBild.base64) : undefined),
+    [wappenGewaehlt, wappenBild],
+  );
+  const templateLogos = useMemo<TbTemplateLogo[]>(() => {
     if (!template) return [];
     try {
       return extractTemplateLogos(template);
@@ -45,6 +57,7 @@ export function OutputStep({
       return [];
     }
   }, [template]);
+  const logos = useMemo(() => withWappen(templateLogos, wappen), [templateLogos, wappen]);
   const signatureUrl = unterschrift ? `data:image/png;base64,${unterschrift.base64}` : undefined;
   const kdt = commanderSignature(project.stamm),
     dateikuerzel = project.stamm.dateikuerzel;
@@ -63,6 +76,12 @@ export function OutputStep({
     hints.push(
       'Ohne Unterschrift des Dienstes bleibt das Bild der Vorlage (Projektmenü → Dienst und Einheit).',
     );
+  if (wappenGewaehlt && !wappenBild)
+    hints.push(
+      'Wappen statt Vorlagenlogo gewählt, aber kein Wappen erfasst: Das Logo der Vorlage bleibt (Projektmenü → Dienst und Einheit).',
+    );
+  else if (wappen && template && wappenSlot(templateLogos) < 0)
+    hints.push('Die Vorlage hat rechts kein Logo; das Wappen wird nicht eingesetzt.');
   if (!kdt.name) hints.push('Name Kdt fehlt (Projektmenü → Dienst und Einheit).');
   if (!project.stamm.einheit.trim())
     hints.push('Eigene Einheit fehlt (Projektmenü → Dienst und Einheit).');
@@ -78,6 +97,7 @@ export function OutputStep({
       const bytes = await buildTagesbefehlXlsx({
         template,
         signature,
+        wappen,
         week,
         orders,
         settings: tb.settings,

@@ -130,6 +130,15 @@ export function AssetsStep({
         draft.settings[key] = value;
       }),
     );
+  // A per-service choice stored in the project; the picture itself is master data.
+  const wappen = project.stamm.grafiken.wappen;
+  const saveWappenAlsLogo = (checked: boolean) =>
+    void run(() =>
+      changeTb((draft) => {
+        if (checked) draft.settings.wappenAlsLogo = true;
+        else delete draft.settings.wappenAlsLogo;
+      }),
+    );
 
   return (
     <div className="tb-step-grid">
@@ -138,13 +147,15 @@ export function AssetsStep({
           <h2 id="tb-assets-title">
             <Icon name="file" /> Vorlage & Unterschrift
           </h2>
-          <span className="muted tb-head-note">Vorlage pro Gerät · Unterschrift pro Dienst</span>
+          <span className="muted tb-head-note">
+            Vorlage pro Gerät · Unterschrift und Wappen pro Dienst
+          </span>
         </header>
         <div className="card-body tb-card-stack">
           <p className="muted">
             Die offizielle Vorlage (.xlsx) gilt für dieses Gerät. Die Unterschrift (PNG) gehört zum
-            Dienst und ist auch unter «Dienst und Einheit» sichtbar. Beides bleibt lokal; kein
-            Upload.
+            Dienst und ist auch unter «Dienst und Einheit» sichtbar. Auf Wunsch ersetzt das Wappen
+            des Dienstes das Logo rechts oben. Alles bleibt lokal; kein Upload.
           </p>
           {legacySignature && (
             <div className="callout callout-warning" data-testid="tb-legacy-signature">
@@ -229,6 +240,47 @@ export function AssetsStep({
                 </div>
               );
             })}
+          </div>
+          <div className={`tb-asset ${wappen ? 'is-loaded' : ''}`} data-testid="tb-wappen">
+            <span className="tb-asset-icon" aria-hidden="true">
+              <Icon name={wappen ? 'checkCircle' : 'info'} size={20} />
+            </span>
+            <div className="tb-asset-text">
+              <label className="check">
+                <input
+                  type="checkbox"
+                  checked={!!settings.wappenAlsLogo}
+                  disabled={archived || (!wappen && !settings.wappenAlsLogo)}
+                  onChange={(event) => saveWappenAlsLogo(event.target.checked)}
+                />
+                <span>Wappen statt Logo der Vorlage (rechts oben)</span>
+              </label>
+              <p className="tb-asset-status">
+                {wappen
+                  ? `Wappen des Dienstes: ${wappen.name || 'Ohne Dateiname'} · gilt für Druck, PDF und .xlsx`
+                  : settings.wappenAlsLogo
+                    ? 'Kein Wappen erfasst: Das Logo der Vorlage bleibt.'
+                    : 'Kein Wappen erfasst. Ohne Wappen bleibt das Logo der Vorlage.'}
+              </p>
+              {wappen && (
+                <img
+                  className="tb-signature-preview"
+                  src={`data:image/png;base64,${wappen.base64}`}
+                  alt="Wappen des Dienstes"
+                />
+              )}
+            </div>
+            {!archived && (
+              <div className="tb-asset-actions">
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  onClick={() => openOverlay({ service: true })}
+                >
+                  <Icon name="edit" size={15} /> {wappen ? 'Wappen ändern' : 'Wappen erfassen'}
+                </button>
+              </div>
+            )}
           </div>
           {assets.template && legacySignature && (
             <button
