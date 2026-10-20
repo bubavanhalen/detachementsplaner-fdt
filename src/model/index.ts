@@ -58,6 +58,7 @@ export {
   subDetsOf,
   updateEvent,
 } from './onsite';
+export * from './pendenzen';
 export { type MatchQuery, type MatchResult, matchPerson, NAME_ONLY_REVIEW } from './personMatch';
 export { type PersonRef, personRefs, replacePersonId } from './personRefs';
 export { derivePisa, entrySignature, generatedEntryId, projectSignature, validEc } from './pisa';

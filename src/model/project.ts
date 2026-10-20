@@ -1,4 +1,5 @@
 import { normalizeMilo } from './milo';
+import { normalizePendenzen, normalizePendenzImporte } from './pendenzen';
 import { createStamm, normalizeStamm } from './stamm';
 import { normalizeTbState } from './tagesbefehl/state';
 import type { Detachment, OnsiteEvent, Person, Project, SubDetachment } from './types';
@@ -338,6 +339,10 @@ export function normalizeProject(input: unknown): Project {
       : null,
     migrationNotes: [...new Set(migrationNotes)],
     ...(value.tb == null ? {} : { tb: normalizeTbState(value.tb) }),
+    ...(value.pendenzen == null ? {} : { pendenzen: normalizePendenzen(value.pendenzen) }),
+    ...(value.pendenzenImporte == null
+      ? {}
+      : { pendenzenImporte: normalizePendenzImporte(value.pendenzenImporte) }),
     ...(subDets ? { subDets } : {}),
     ...(events ? { onsiteEvents: events } : {}),
   };

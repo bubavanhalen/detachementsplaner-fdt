@@ -1,7 +1,7 @@
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { exportJson } from '../io/exports';
-import { createProject } from '../model';
+import { createProject, pendenzSummary } from '../model';
 import {
   feedbackStore,
   notify,
@@ -42,6 +42,10 @@ const tools = [
   { to: '/vor-ort', label: 'Vor Ort', icon: 'layout', hint: 'Events, Dets & Listen' },
 ] as const;
 const titles: Record<string, { title: string; description: string; step?: number }> = {
+  '/pendenzen': {
+    title: 'Pendenzen',
+    description: 'Mails, Chats, Anrufe und Planner an einem Ort',
+  },
   '/persons': { title: 'Personen', description: 'Suchen, prüfen und Angaben ergänzen' },
   '/contacts': { title: 'Kontakte', description: 'Kontakt-CSV lokal vorbereiten' },
   '/personal': {
@@ -113,6 +117,9 @@ export function Shell() {
       } else if (mod && key === 'y') {
         event.preventDefault();
         runSafely(redoProject);
+      } else if (event.altKey && event.key === '0') {
+        event.preventDefault();
+        void navigate({ to: '/pendenzen' });
       } else if (event.altKey && /^[1-8]$/.test(event.key)) {
         event.preventDefault();
         const targets = [
@@ -173,6 +180,9 @@ export function Shell() {
           </button>
         </div>
         <ProjectMenu />
+        <nav className="sb-nav" aria-label="Pendenzen">
+          <PendenzenLink />
+        </nav>
         <div className="sb-section">Ablauf</div>
         <nav className="sb-nav sb-steps" aria-label="Arbeitsschritte">
           {steps.map((step) => (
@@ -287,6 +297,32 @@ export function Shell() {
       {overlays.palette && <CommandPalette onClose={() => openOverlay({ palette: false })} />}
       {overlays.shortcuts && <ShortcutSheet onClose={() => openOverlay({ shortcuts: false })} />}
     </div>
+  );
+}
+
+function PendenzenLink() {
+  const project = useProject();
+  const summary = pendenzSummary(project);
+  return (
+    <Link
+      to="/pendenzen"
+      className="sb-link"
+      activeProps={{ className: 'sb-link active' }}
+      title={`Pendenzen · ${summary.active} aktiv`}
+    >
+      <Icon name="checkCircle" />
+      <span className="sb-link-text sb-hide">
+        <span>Pendenzen</span>
+        <small>
+          {summary.overdue
+            ? `${summary.overdue} überfällig`
+            : summary.neu
+              ? `${summary.neu} neu vom Agent`
+              : 'Mails, Chats, Anrufe, Planner'}
+        </small>
+      </span>
+      <span className={`count sb-hide ${summary.neu ? 'is-new' : ''}`}>{summary.active}</span>
+    </Link>
   );
 }
 
@@ -509,6 +545,7 @@ function ShortcutSheet({ onClose }: { onClose: () => void }) {
         ['Seitenleiste', [modKey, 'B']],
         ['Schritt 1–4 öffnen', ['Alt', '1–4']],
         ['Personen / Kontakte / Tagesbefehle / Vor Ort', ['Alt', '5–8']],
+        ['Pendenzen', ['Alt', '0']],
         ['Diese Übersicht', ['?']],
       ],
     ],

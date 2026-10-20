@@ -1,4 +1,5 @@
 import type { MiloState } from './milo';
+import type { Pendenz, PendenzImport } from './pendenzen';
 import type { Stamm } from './stamm';
 import type { TbState } from './tagesbefehl/types';
 
@@ -126,6 +127,10 @@ export interface Project {
   tb?: TbState;
   /** Optional MILO comparison data (leave, commands, list origins); old saves have none. */
   milo?: MiloState;
+  /** Optional Pendenzen of this service; old saves have none. Not part of the PISA handover. */
+  pendenzen?: Pendenz[];
+  /** Agent change files already applied (newest first). */
+  pendenzenImporte?: PendenzImport[];
 }
 export interface PisaEntry {
   id: string;
