@@ -4,7 +4,6 @@
 // the right-hand logo (coat of arms of the service) change.
 // Everything runs locally; nothing is logged or sent anywhere.
 import { unzipSync, zipSync } from 'fflate';
-import { weekFileLabel } from '../../model/tagesbefehl/state';
 import {
   isWeekend,
   TB_WEEKDAYS,
@@ -90,14 +89,8 @@ const WEEKEND_SHEET = /^Sa\s*\+\s*So$/;
 /** Rows 2–10 (header, logos, title, LK) are kept; the order starts in row 11. */
 const HEADER_LAST_ROW = 10;
 
-/** Tagesbefehle_<Woche>_<Dateikürzel>.xlsx, e.g. Tagesbefehle_KVK_FDT_2026.xlsx */
-export function xlsxFileName(sheet: string, dateikuerzel: string): string {
-  const suffix = dateikuerzel
-    .trim()
-    .replace(/[\\/:*?"<>|\s]+/g, '_')
-    .replace(/^_+|_+$/g, '');
-  return `Tagesbefehle_${weekFileLabel(sheet)}${suffix ? `_${suffix}` : ''}.xlsx`;
-}
+/** Tagesbefehle_<Woche>_<Dateikürzel>.xlsx; lives in ./fileName (no fflate), re-exported here. */
+export { xlsxFileName } from './fileName';
 
 interface SheetInfo {
   name: string;

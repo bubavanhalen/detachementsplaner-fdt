@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { exportJson } from '../io/exports';
 import { createProject, pendenzSummary } from '../model';
 import {
@@ -11,15 +11,7 @@ import {
   useFeedback,
   useProject,
 } from '../store';
-import {
-  isTyping,
-  modKey,
-  openOverlay,
-  preferencesStore,
-  setPreference,
-  useOverlays,
-  usePreferences,
-} from '../ui';
+import { isTyping, modKey, openOverlay, setPreference, useOverlays, usePreferences } from '../ui';
 import { type Step, useWorkflow } from '../workflow';
 import { CommandPalette } from './CommandPalette';
 import { HistoryButtons, runSafely } from './HistoryButtons';
@@ -40,12 +32,15 @@ const tools = [
     hint: 'Aus dem Kp-WAP erstellen',
   },
   { to: '/vor-ort', label: 'Vor Ort', icon: 'layout', hint: 'Events, Dets & Listen' },
+  // WAP-Planer (UI-Richtlinie 2.1, 18 S-1): Alt+9, wie die übrigen Werkzeuge in Tastenreihenfolge.
+  { to: '/wap', label: 'WAP-Planer', icon: 'calendar', hint: 'WAP erfassen, prüfen, PDF' },
 ] as const;
 const titles: Record<string, { title: string; description: string; step?: number }> = {
   '/pendenzen': {
     title: 'Pendenzen',
     description: 'Mails, Chats, Anrufe und Planner an einem Ort',
   },
+  '/wap': { title: 'WAP-Planer', description: 'Wochen lokal planen' },
   '/persons': { title: 'Personen', description: 'Suchen, prüfen und Angaben ergänzen' },
   '/contacts': { title: 'Kontakte', description: 'Kontakt-CSV lokal vorbereiten' },
   '/personal': {
@@ -62,6 +57,23 @@ const titles: Record<string, { title: string; description: string; step?: number
   },
 };
 
+/**
+ * Delegation der globalen Kürzel an eine Route (UI-Richtlinie 18 S-3; ADR-001 «Tastatur»; Vertrag E1-11 §3): Solange
+ * eine Route einen Delegaten gesetzt hat, fragt die Shell zuerst `handles(e)` und führt bei true nur `handle(e)` aus.
+ * Ctrl+K, Alt+0 und Alt+1–9 bleiben Suite-Kürzel. Beim Verlassen setzt die Route null.
+ */
+export interface RouteKeyDelegate {
+  handles(e: KeyboardEvent): boolean;
+  handle(e: KeyboardEvent): void;
+}
+let routeKeyDelegate: RouteKeyDelegate | null = null;
+export function setRouteKeyDelegate(d: RouteKeyDelegate | null): void {
+  routeKeyDelegate = d;
+}
+
+/** Routen mit eigener Kopfleiste und eingeklappter Seitenleiste als Vorgabe (UI-Richtlinie 2.1, 18 S-2). */
+const FULL_SCREEN_ROUTES: ReadonlySet<string> = new Set(['/wap']);
+
 export function Shell() {
   const project = useProject();
   const feedback = useFeedback();
@@ -76,6 +88,28 @@ export function Shell() {
     ? { title: currentStep.title, description: currentStep.description, step: currentStep.number }
     : (titles[path] ?? { title: 'WK Util Suite', description: '' });
   const next = currentStep ? steps[currentStep.number] : undefined;
+  const fullScreen = FULL_SCREEN_ROUTES.has(path);
+  // Vorgabe der Route (S-2): eingeklappt, ohne die gespeicherte Einstellung zu ändern; Ctrl+B schaltet nur hier.
+  const [routeSidebar, setRouteSidebar] = useState<{
+    readonly path: string;
+    readonly value: 'expanded' | 'collapsed';
+  } | null>(null);
+  const sidebar = fullScreen
+    ? routeSidebar !== null && routeSidebar.path === path
+      ? routeSidebar.value
+      : 'collapsed'
+    : preferences.sidebar;
+  const toggleSidebar = () => {
+    const value = sidebar === 'collapsed' ? 'expanded' : 'collapsed';
+    if (fullScreen) setRouteSidebar({ path, value });
+    else setPreference('sidebar', value);
+  };
+  const toggleSidebarNow = useRef(toggleSidebar);
+  toggleSidebarNow.current = toggleSidebar;
+  // Beim Verlassen der Route gilt beim nächsten Besuch wieder die Vorgabe.
+  useEffect(() => {
+    if (!FULL_SCREEN_ROUTES.has(path)) setRouteSidebar(null);
+  }, [path]);
 
   useLayoutEffect(() => {
     const root = document.documentElement;
@@ -91,6 +125,18 @@ export function Shell() {
     const onKey = (event: KeyboardEvent) => {
       const mod = event.ctrlKey || event.metaKey;
       const key = event.key.toLowerCase();
+      const suiteKey = (mod && key === 'k') || (event.altKey && !mod && /^[0-9]$/.test(event.key));
+      // Delegat der Route zuerst (S-3); Ctrl+K, Alt+0 (Pendenzen) und Alt+1–9 bleiben Suite-Kürzel.
+      const delegate = routeKeyDelegate;
+      if (delegate !== null && !suiteKey && delegate.handles(event)) {
+        delegate.handle(event);
+        return;
+      }
+      // Auf /wap gehören Ctrl+S/Z/Y/O/P/G und «?» dem WAP-Planer, auch bevor die Route ihren Delegaten gesetzt hat
+      // (UI-Richtlinie 18 S-3, S-4); Ctrl+B wirkt dort nicht in Textfeldern (WAP-Textbearbeitung).
+      if (path === '/wap' && mod && ['s', 'z', 'y', 'o', 'p', 'g'].includes(key)) return;
+      if (path === '/wap' && !mod && event.key === '?') return;
+      if (path === '/wap' && mod && key === 'b' && isTyping(event.target)) return;
       if (mod && key === 'k') {
         event.preventDefault();
         openOverlay({ palette: true });
@@ -104,10 +150,7 @@ export function Shell() {
       }
       if (mod && key === 'b') {
         event.preventDefault();
-        setPreference(
-          'sidebar',
-          preferencesStore.get().sidebar === 'collapsed' ? 'expanded' : 'collapsed',
-        );
+        toggleSidebarNow.current();
         return;
       }
       if (document.querySelector('dialog[open]') || isTyping(event.target)) return;
@@ -120,7 +163,7 @@ export function Shell() {
       } else if (event.altKey && event.key === '0') {
         event.preventDefault();
         void navigate({ to: '/pendenzen' });
-      } else if (event.altKey && /^[1-8]$/.test(event.key)) {
+      } else if (event.altKey && /^[1-9]$/.test(event.key)) {
         event.preventDefault();
         const targets = [
           '/sources',
@@ -131,6 +174,7 @@ export function Shell() {
           '/contacts',
           '/tagesbefehle',
           '/vor-ort',
+          '/wap',
         ] as const;
         void navigate({ to: targets[Number(event.key) - 1] });
       } else if (!mod && !event.altKey && event.key === '?') {
@@ -140,7 +184,7 @@ export function Shell() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [navigate]);
+  }, [navigate, path]);
 
   // Warn before closing only when the browser could not store the latest changes.
   useEffect(() => {
@@ -151,7 +195,7 @@ export function Shell() {
   }, [feedback.saveError]);
 
   return (
-    <div className="app" data-sidebar={preferences.sidebar}>
+    <div className="app" data-sidebar={sidebar}>
       <aside className="sidebar" aria-label="Seitenleiste">
         <div className="sb-top">
           <Link to="/" className="brand" title="WK Util Suite">
@@ -164,17 +208,10 @@ export function Shell() {
             type="button"
             className="btn btn-ghost btn-icon btn-sm"
             aria-label={
-              preferences.sidebar === 'collapsed'
-                ? 'Seitenleiste ausklappen'
-                : 'Seitenleiste einklappen'
+              sidebar === 'collapsed' ? 'Seitenleiste ausklappen' : 'Seitenleiste einklappen'
             }
             title={`Seitenleiste (${modKey}+B)`}
-            onClick={() =>
-              setPreference(
-                'sidebar',
-                preferences.sidebar === 'collapsed' ? 'expanded' : 'collapsed',
-              )
-            }
+            onClick={toggleSidebar}
           >
             <Icon name="sidebar" size={17} />
           </button>
@@ -231,38 +268,41 @@ export function Shell() {
       </aside>
 
       <div className="main">
-        <header className="topbar">
-          <div className="topbar-title">
-            <h1>{heading.title}</h1>
-            {heading.description && <p>{heading.description}</p>}
-          </div>
-          <div className="topbar-actions">
-            <SaveState />
-            <HistoryButtons />
-            <ThemeMenu />
-            <button
-              type="button"
-              className="btn btn-ghost btn-icon btn-sm"
-              aria-label="Tastenkürzel"
-              title="Tastenkürzel (?)"
-              onClick={() => openOverlay({ shortcuts: true })}
-            >
-              <Icon name="keyboard" size={17} />
-            </button>
-            {next && (
-              <>
-                <span className="topbar-sep" />
-                <Link
-                  to={next.to}
-                  className={`btn btn-sm ${currentStep?.state === 'done' ? 'btn-primary' : ''}`}
-                >
-                  Weiter: {next.label} <Icon name="arrowRight" size={15} />
-                </Link>
-              </>
-            )}
-          </div>
-        </header>
-        {feedback.saveError && (
+        {/* Auf /wap zeichnet die Route ihre eigene Kopfleiste (eigener Speicher und eigenes Undo, S-2). */}
+        {!fullScreen && (
+          <header className="topbar">
+            <div className="topbar-title">
+              <h1>{heading.title}</h1>
+              {heading.description && <p>{heading.description}</p>}
+            </div>
+            <div className="topbar-actions">
+              {path !== '/wap' && <SaveState />}
+              {path !== '/wap' && <HistoryButtons />}
+              <ThemeMenu />
+              <button
+                type="button"
+                className="btn btn-ghost btn-icon btn-sm"
+                aria-label="Tastenkürzel"
+                title="Tastenkürzel (?)"
+                onClick={() => openOverlay({ shortcuts: true })}
+              >
+                <Icon name="keyboard" size={17} />
+              </button>
+              {next && (
+                <>
+                  <span className="topbar-sep" />
+                  <Link
+                    to={next.to}
+                    className={`btn btn-sm ${currentStep?.state === 'done' ? 'btn-primary' : ''}`}
+                  >
+                    Weiter: {next.label} <Icon name="arrowRight" size={15} />
+                  </Link>
+                </>
+              )}
+            </div>
+          </header>
+        )}
+        {path !== '/wap' && feedback.saveError && (
           <div className="banner banner-danger" role="alert">
             <Icon name="alert" size={16} />
             <span>{feedback.saveError}</span>
@@ -275,7 +315,7 @@ export function Shell() {
             </button>
           </div>
         )}
-        {archived && project.archive && (
+        {path !== '/wap' && archived && project.archive && (
           <div className="banner banner-info">
             <Icon name="archive" size={16} />
             <span>
@@ -411,7 +451,8 @@ function initials(name: string): string {
   return letters.join('') || 'D';
 }
 
-function ThemeMenu() {
+/** Darstellung (hell, dunkel, wie System); auch in der Kopfleiste des WAP-Planers (UI-Richtlinie 2.1). */
+export function ThemeMenu() {
   const { theme } = usePreferences();
   const icon: IconName = theme === 'dark' ? 'moon' : theme === 'light' ? 'sun' : 'monitor';
   return (
@@ -544,7 +585,7 @@ function ShortcutSheet({ onClose }: { onClose: () => void }) {
         ['JSON sichern', [modKey, 'S']],
         ['Seitenleiste', [modKey, 'B']],
         ['Schritt 1–4 öffnen', ['Alt', '1–4']],
-        ['Personen / Kontakte / Tagesbefehle / Vor Ort', ['Alt', '5–8']],
+        ['Personen / Kontakte / Tagesbefehle / Vor Ort / WAP-Planer', ['Alt', '5–9']],
         ['Pendenzen', ['Alt', '0']],
         ['Diese Übersicht', ['?']],
       ],

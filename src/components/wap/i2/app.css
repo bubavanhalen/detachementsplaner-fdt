@@ -1,0 +1,584 @@
+.wap-i2 {
+  font-family: "WAP Arimo", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+  padding: 6px 10px 4px;
+  box-sizing: border-box;
+  max-width: none;
+  min-width: 0;
+  height: var(--wap-i2-height, 100dvh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--text, #17212b);
+}
+.wap-i2-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+  height: 44px;
+  flex: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.wap-i2-toolbar > * {
+  flex: none;
+}
+.wap-i2-toolbar h1 {
+  margin: 0 6px 0 0;
+  font-size: 17px;
+  white-space: nowrap;
+}
+.wap-i2-demo-note {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #e6f0fa;
+  color: #183e66;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.wap-i2 label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.wap-i2 select,
+.wap-i2 input {
+  font: inherit;
+  font-size: 13px;
+  padding: 3px 6px;
+  min-height: 30px;
+  box-sizing: border-box;
+  border: 1px solid #8695a5;
+  border-radius: 5px;
+  background: var(--surface, white);
+  color: inherit;
+}
+.wap-i2-form input,
+.wap-i2-form select {
+  font: inherit;
+  padding: 9px 10px;
+  min-height: 40px;
+  border: 1px solid #8695a5;
+  border-radius: 5px;
+  background: var(--surface, white);
+  color: inherit;
+}
+.wap-i2 select {
+  max-width: 240px;
+}
+.wap-i2 .btn,
+.wap-i2-dialog .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 3px 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  border: 1px solid #8695a5;
+  border-radius: 5px;
+  color: var(--text, #17212b);
+  background: var(--surface, white);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.wap-i2-dialog .btn {
+  min-height: 40px;
+  padding: 9px 14px;
+  font-size: 15px;
+}
+.wap-i2 .btn:hover:not(:disabled),
+.wap-i2-dialog .btn:hover:not(:disabled) {
+  background: #e6eef7;
+}
+.wap-i2 .btn-primary,
+.wap-i2-dialog .btn-primary {
+  background: #245ca4;
+  color: white;
+  border-color: #245ca4;
+}
+.wap-i2 .btn-primary:hover:not(:disabled),
+.wap-i2-dialog .btn-primary:hover:not(:disabled) {
+  background: #19447d;
+}
+.wap-i2 button:disabled,
+.wap-i2-dialog button:disabled {
+  background: #e8edf1;
+  color: #586574;
+  border-color: #c1cbd4;
+  cursor: default;
+}
+.wap-i2 :is(button, input, select, textarea):focus-visible,
+.wap-i2-dialog :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid #245ca4;
+  outline-offset: 2px;
+}
+.wap-i2-error,
+.wap-i2-warning {
+  padding: 6px 10px;
+  border-radius: 5px;
+  margin: 3px 0;
+  background: #fff0df;
+  color: #63370e;
+  font-size: 13px;
+  flex: none;
+}
+.wap-i2-warning p {
+  margin: 0 0 4px;
+}
+.wap-i2-error {
+  background: #fde8e8;
+  color: #712626;
+}
+.wap-i2-error p {
+  margin: 2px 0 0;
+}
+.wap-i2-save {
+  margin-left: auto;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.wap-i2-empty {
+  border: 1px dashed #8695a5;
+  padding: 36px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+.wap-i2-footnote {
+  padding: 18px 0 0;
+  font-size: 13px;
+}
+.wap-i2-form {
+  display: grid;
+  gap: 16px;
+}
+.wap-i2-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  white-space: normal;
+}
+
+.wap-i2-dialog {
+  font-family: "WAP Arimo", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  border: 1px solid #8695a5;
+  border-radius: 8px;
+  padding: 0;
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  background: var(--surface, white);
+  color: var(--text, #17212b);
+}
+.wap-i2-dialog::backdrop {
+  background: rgb(15 25 35 / 50%);
+}
+.wap-i2-dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid #c5cdd5;
+}
+.wap-i2-dialog-heading h2 {
+  margin: 0;
+  font-size: 21px;
+}
+.wap-i2-dialog-heading p {
+  margin: 10px 0 0;
+  line-height: 1.5;
+}
+.wap-i2-dialog-body {
+  padding: 20px;
+}
+/* Eigenständige Einzeldatei: nur das Raster scrollt (I2b-A A5); in der Suite steuert die Route die Höhe. */
+body:has(> #root > .wap-i2) {
+  margin: 0;
+  overflow: hidden;
+}
+/* I2b-B: nur für Screenreader sichtbar. */
+.wap-i2-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* Wochen als Tabs (B4). */
+.wap-i2-weeks {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid #8695a5;
+  border-radius: 6px;
+  background: #f1f4f7;
+}
+.wap-i2-weeks [role="tab"] {
+  min-height: 26px;
+  padding: 2px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #17212b;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.wap-i2-weeks [role="tab"][aria-selected="true"] {
+  background: #245ca4;
+  color: #fff;
+}
+.wap-i2-weeks [role="tab"]:hover:not([aria-selected="true"]) {
+  background: #e0e8f1;
+}
+.wap-i2-week-select select {
+  max-width: 120px;
+}
+/* Speicheranzeige (B5): «Gespeichert hh:mm · letzte Datei-Sicherung vor n Tagen». */
+.wap-i2-save-info {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.wap-i2-save-info .wap-i2-save {
+  margin-left: 0;
+}
+.wap-i2-file-age.is-stale {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fff0c2;
+  color: #5c3b00;
+  font-weight: 700;
+}
+/* Plan-Datei öffnen (B6). */
+.wap-i2-choices {
+  display: grid;
+  gap: 14px;
+}
+.wap-i2-choices > div {
+  display: grid;
+  gap: 4px;
+}
+.wap-i2-choices p {
+  margin: 0;
+  font-size: 14px;
+  color: #3d4955;
+}
+/* Tastenkürzel (B4). */
+.wap-i2-shortcuts {
+  display: grid;
+  gap: 14px;
+}
+.wap-i2-shortcuts h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+.wap-i2-shortcuts dl {
+  margin: 0;
+  display: grid;
+  gap: 3px;
+}
+.wap-i2-shortcuts dl > div {
+  display: grid;
+  grid-template-columns: minmax(170px, 40%) 1fr;
+  gap: 10px;
+  font-size: 14px;
+}
+.wap-i2-shortcuts dd {
+  margin: 0;
+}
+.wap-i2-shortcuts kbd {
+  font: inherit;
+  font-size: 13px;
+  padding: 1px 5px;
+  border: 1px solid #8695a5;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: #f4f6f8;
+}
+.wap-i2-callout {
+  padding: 10px 12px;
+  border-left: 4px solid #245ca4;
+  background: #eef4fb;
+  border-radius: 4px;
+}
+.wap-i2-callout p {
+  margin: 0;
+  font-size: 14px;
+}
+/* Eingaben (B7). */
+.wap-i2-hint {
+  margin: -8px 0 0;
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.wap-i2-field-error {
+  margin: 0;
+  padding: 6px 10px;
+  border-left: 4px solid #a32620;
+  background: #fff0ee;
+  color: #742019;
+  font-size: 14px;
+}
+.wap-i2 [aria-invalid="true"],
+.wap-i2-dialog [aria-invalid="true"] {
+  border-color: #a32620;
+  box-shadow: 0 0 0 1px #a32620;
+}
+/* Gehe zu, Auch an anderen Tagen. */
+.wap-i2-goto input {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  padding: 9px 10px;
+  border: 1px solid #8695a5;
+  border-radius: 5px;
+}
+.wap-i2-goto ul {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.wap-i2-goto li button {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 14px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.wap-i2-goto li button.is-active {
+  background: #dfe9f6;
+  outline: 1px solid #245ca4;
+}
+.wap-i2-otherdays {
+  display: grid;
+  gap: 12px;
+}
+.wap-i2-otherdays fieldset {
+  border: 1px solid #c5cdd5;
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: grid;
+  gap: 4px;
+}
+.wap-i2-otherdays label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 15px;
+}
+.wap-i2-otherdays-quick {
+  display: flex;
+  gap: 8px;
+}
+/* Kopf- und Werkzeugleiste mit Überlauf (H-UI2, UX-H-03; UI-Richtlinie 2.2, I2b-A A5): eine Zeile, nie breiter als
+   das Fenster; ausgewichene Elemente stehen im Planmenü bzw. im Menü «Mehr …». */
+.wap-i2-header {
+  flex: none;
+  min-width: 0;
+}
+.wap-i2-toolbar,
+.i2-grid-tools {
+  overflow: hidden;
+  min-width: 0;
+}
+.wap-bar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  min-width: 0;
+}
+.wap-bar-item[hidden],
+.wap-bar-more[hidden] {
+  display: none;
+}
+.wap-i2-toolbar > [data-bar-id="speicher"] {
+  margin-left: auto;
+}
+.wap-i2-toolbar .wap-i2-save-info {
+  margin-left: 0;
+}
+.wap-i2 select.wap-i2-plan-select {
+  max-width: 180px;
+}
+.wap-i2 .btn.wap-i2-icon,
+.i2-grid-tools .btn.wap-i2-icon {
+  min-width: 30px;
+  padding: 3px 6px;
+  font-size: 15px;
+  line-height: 1;
+}
+/* Speicheranzeige als Knopf (UI-Richtlinie 11.3): öffnet Wiederherstellungspunkte, Dauerhaftigkeit und Belegung. */
+.wap-i2-file-age {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 26px;
+  padding: 2px 6px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.wap-i2-file-age:hover {
+  border-color: #8695a5;
+  background: #f1f4f7;
+}
+.wap-i2-warnpoint {
+  color: #8a5300;
+  font-size: 11px;
+}
+.wap-i2-demo-note {
+  padding: 3px 6px;
+}
+/* Befehlspalette des WAP-Planers (Ctrl+K; H-UI2, UX-H-08). */
+.wap-palette {
+  font-family: "WAP Arimo", Arial, sans-serif;
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(520px, calc(100vh - 64px));
+  margin-top: 64px;
+  padding: 0;
+  border: 1px solid #8695a5;
+  border-radius: 8px;
+  background: var(--surface, white);
+  color: var(--text, #17212b);
+  overflow: hidden;
+}
+.wap-palette[open] {
+  display: flex;
+  flex-direction: column;
+}
+.wap-palette::backdrop {
+  background: rgb(15 25 35 / 40%);
+}
+.wap-palette-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #c5cdd5;
+}
+.wap-palette-input input {
+  flex: 1;
+  font: inherit;
+  font-size: 15px;
+  padding: 6px 8px;
+  border: 1px solid #8695a5;
+  border-radius: 5px;
+}
+.wap-palette-input input:focus-visible {
+  outline: 2px solid #245ca4;
+  outline-offset: 1px;
+}
+.wap-palette kbd {
+  font: inherit;
+  font-size: 12px;
+  color: #4a554e;
+}
+.wap-palette-list {
+  overflow: auto;
+  padding: 4px 0;
+}
+.wap-palette-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.wap-palette-item[aria-selected="true"] {
+  background: #dfe9f6;
+  box-shadow: inset 3px 0 0 #245ca4;
+}
+.wap-palette-empty,
+.wap-palette-foot {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: #4a554e;
+}
+.wap-palette-foot {
+  border-top: 1px solid #c5cdd5;
+}
+/* Speicheranzeige zweizeilig, damit die Kopfleiste bei 1366 px alle festen Elemente fasst (H-UI2, UX-H-03). */
+.wap-i2-toolbar .wap-i2-save-info {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  line-height: 1.15;
+}
+.wap-i2-toolbar .wap-i2-save-info .wap-i2-save {
+  padding-left: 7px;
+}
+.wap-i2-toolbar .wap-i2-file-age {
+  min-height: 0;
+  padding: 0 6px;
+}
+.wap-flow-chip .btn.wap-i2-icon {
+  min-width: 24px;
+  min-height: 24px;
+  padding: 1px 4px;
+  font-size: 12px;
+}
+/* Suite-Seitenleiste auf /wap (H-UI2, SA-H-21; UI-Richtlinie 14.1 Kontrast ≥ 4,5:1): Die schwache Schriftfarbe der
+   Seitenleiste erreicht 3,8:1 (hell) bzw. 4,45:1 (dunkel). Nur auf der Route und nur über Suite-Tokens: Sie nimmt die
+   Farbe der Zweitschrift. */
+.app:has(.wap-i2) > .sidebar {
+  --text-3: var(--text-2);
+}
+/* Erststart unter file://: Knopf «Hinweis zum gemeinsamen Speicher …» als Link (UI-Richtlinie 11.1, 11.6). */
+.wap-first-run-local {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+.wap-i2-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1c4f8f;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.wap-i2-link:focus-visible {
+  outline: 2px solid #245ca4;
+  outline-offset: 2px;
+}

@@ -1,0 +1,76 @@
+{
+  "faktor": 2,
+  "status": "festgelegt",
+  "quelle": "Umgebungsprobe umgebungsprobe-3, Auftraggeber; lokaler E1-01c-Lauf vom 07.10.2026 (.qa/e1-01c/bench-chromium-ae004.json)",
+  "messung": {
+    "dienstlaptopMedianMs": 132.7,
+    "lokalMedianMs": 84.40000003576279,
+    "datum": "07.10.2026"
+  },
+  "herleitung": {
+    "regel": "ADR-010 §8: F = t(Dienstlaptop, Edge) / t(lokal), gleicher fester Benchmark, beide als Median; aufgerundet auf die nächste halbe Stufe, mindestens 1,5 (Auftraggeber 08.10.2026)",
+    "rechnung": "132,7 ms / 84,40000003576279 ms = 1,572274880850368 -> 2",
+    "verhaeltnis": 1.572274880850368,
+    "kontrolle": "Historisch am 01.10.2026: Lauf A 132,7 / 90,6 = 1,46 -> 1,5; Lauf B 132,7 / 89,6 = 1,48 -> 1,5."
+  },
+  "pruefseite": {
+    "version": "umgebungsprobe-3",
+    "sha256": "62c9acec572357497b2c27373d8f36d4cb05cd34a07b931646fd551e01febc9d",
+    "benchmark": "bench-1",
+    "startwert": 20260930,
+    "eintraege": 1000,
+    "zoomstufen": 24,
+    "pruefsumme": "e00aad5a",
+    "laeufe": 7,
+    "aufwaermlaeufe": 1
+  },
+  "dienstlaptop": {
+    "browser": "Microsoft Edge",
+    "version": "155.0.4283.24",
+    "auslieferung": "file://",
+    "netzbetrieb": true,
+    "laeufeMs": [136.0, 122.0, 134.5, 132.7, 130.7, 136.5, 121.1],
+    "medianMs": 132.7,
+    "datum": "01.10.2026",
+    "hinweis": "Ausgabe gilt laut Auftraggeber (01.10.2026, PROGRESS.md Freigabeprotokoll) als Wert des Dienstlaptops."
+  },
+  "lokal": {
+    "browser": "Microsoft Edge headless über playwright-core",
+    "version": "155.0.4283.24",
+    "cpu": "Intel Core i7-12700F",
+    "laufA": {
+      "laeufeMs": [95.9, 107.2, 88.0, 93.2, 90.6, 90.1, 85.5],
+      "medianMs": 90.6
+    },
+    "laufB": {
+      "laeufeMs": [93.4, 90.3, 89.6, 88.9, 89.2, 89.2, 92.1],
+      "medianMs": 89.6
+    },
+    "laufE101c": {
+      "browser": "Chromium des Leistungsprojekts, sichtbares Fenster",
+      "version": "153.0.8010.12",
+      "netzbetrieb": true,
+      "netzwerkanfragen": 0,
+      "zeitpunktUtc": "2026-10-07T19:23:06.048Z",
+      "messbefehl": "node C:/Users/phili/source/repos/wap-wt/codex-int/spikes/ae004-benchmark/run.mjs",
+      "arbeitsverzeichnis": "C:/Users/phili/source/repos/detachementsplaner-fdt/.claude/worktrees/wap-planer-project-22a654",
+      "messbefehlBeleg": ".qa/e1-01c/messbefehl-20261007-beleg-20261008/historischer-toolaufruf-und-ergebnis.json",
+      "messbefehlCallId": "call_1093fa38d164464689564257ec3a5961",
+      "pruefseiteSha256": "62c9acec572357497b2c27373d8f36d4cb05cd34a07b931646fd551e01febc9d",
+      "aufwaermlaufMs": 108.80000001192093,
+      "laeufeMs": [87.30000001192093, 83.90000003576279, 92.5, 84.90000003576279, 80.19999998807907, 79.40000003576279],
+      "medianMs": 84.40000003576279,
+      "pruefsumme": "e00aad5a"
+    },
+    "massgebend": "laufE101c",
+    "datum": "07.10.2026",
+    "kontrolleSichtbar": {
+      "quelle": "Architektur-Review",
+      "browser": "Microsoft Edge über playwright-core, sichtbares Fenster",
+      "version": "155.0.4283.24",
+      "medianeMs": [97.1, 100.1],
+      "ergebnis": "132,7 / 97,1 = 1,37 und 132,7 / 100,1 = 1,33 -> 1,5 (gleiche Stufe)"
+    }
+  },
+  "vorbehalt": "Die lokalen Edge-Läufe A/B und ihre sichtbare Kontrolle stammen vom 01.10.2026 und bleiben als Historie erhalten. Maßgebend ist die vorhandene unabhängige E1-01c-Messung vom 07.10.2026 unter den Bedingungen des Leistungsprojekts (sichtbarer Chromium, Netzbetrieb); keine neue Messung am 08.10.2026. ADR-010 §8 ergibt daraus Stufe 2."
+}

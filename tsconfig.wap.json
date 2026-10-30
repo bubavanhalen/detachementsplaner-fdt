@@ -1,0 +1,30 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "include": [
+    "src/model/wap/**/*",
+    "src/io/wap-plan/**/*",
+    "src/io/wap-pdf/**/*",
+    "src/io/wap-import/**/*",
+    "src/io/wap-persons/**/*",
+    "src/io/xlsx-drawing/**/*",
+    "src/components/wap/**/*",
+    "src/pages/WapPage.tsx",
+    "src/assets/wap-fonts/**/*",
+    "tests/wap/**/*",
+    "tests/wap-e2e/**/*",
+    "tests/wap-perf/**/*",
+    "tests/wap-gate/**/*",
+    "tools/wap/**/*.mjs",
+    "scripts/wap/**/*.mjs",
+    "scripts/wap-gate/**/*.mjs"
+  ]
+}

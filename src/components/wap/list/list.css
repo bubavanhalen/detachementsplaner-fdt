@@ -1,0 +1,110 @@
+.wap-list {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 42%;
+  min-height: 180px;
+  border-top: 2px solid #8695a5;
+  margin-top: 4px;
+  padding-top: 4px;
+  overflow: hidden;
+}
+.wap-list-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+.wap-list-scope {
+  display: inline-flex;
+  gap: 8px;
+}
+.wap-list-menu {
+  position: relative;
+}
+.wap-list-menu-panel {
+  position: absolute;
+  z-index: 5;
+  top: 100%;
+  left: 0;
+  padding: 6px 10px;
+  border: 1px solid #8695a5;
+  border-radius: 5px;
+  background: var(--surface, white);
+}
+.wap-list-count {
+  color: #3b4652;
+  font-size: 13px;
+}
+.wap-list-error {
+  padding: 4px 8px;
+  border: 1px solid #b42318;
+  border-radius: 4px;
+  background: #fef3f2;
+  color: #7a271a;
+  margin-bottom: 4px;
+}
+.wap-list-empty {
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.wap-list-scroll {
+  overflow: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.wap-list-grid {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+.wap-list-grid th {
+  position: sticky;
+  top: 0;
+  background: #eef2f6;
+  z-index: 1;
+  text-align: left;
+  border: 1px solid #c1cbd4;
+  padding: 0;
+}
+.wap-list-sort {
+  all: unset;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 3px 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.wap-list-sort:focus-visible {
+  outline: 3px solid #245ca4;
+  outline-offset: -3px;
+}
+.wap-list-grid td {
+  border: 1px solid #dde3e9;
+  padding: 2px 6px;
+  vertical-align: top;
+  white-space: pre-wrap;
+}
+.wap-list-grid tr[aria-selected="true"] td {
+  background: #f1f6fc;
+}
+.wap-list-grid td.is-cursor {
+  outline: 1px dashed #5b6b7c;
+  outline-offset: -2px;
+}
+.wap-list-grid td:focus-visible,
+.wap-list-grid td.is-cursor:focus {
+  outline: 3px solid #245ca4;
+  outline-offset: -3px;
+  background: #dce8f6;
+}
+.wap-list-grid td input,
+.wap-list-grid td select {
+  width: 100%;
+  min-height: 24px;
+  box-sizing: border-box;
+}

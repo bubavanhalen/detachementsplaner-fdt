@@ -1,8 +1,8 @@
 import { type ChangeEvent, useId, useState } from 'react';
 import { createTbAsset } from '../io/tagesbefehl/assets';
 import { readFileBytes } from '../io/tagesbefehl/bytes';
+import { xlsxFileName } from '../io/tagesbefehl/fileName';
 import { prepareSignature } from '../io/tagesbefehl/signature';
-import { xlsxFileName } from '../io/tagesbefehl/xlsx';
 import { localError } from '../io/text';
 import {
   KADER_LABELS,

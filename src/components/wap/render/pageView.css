@@ -1,0 +1,84 @@
+/* Bildschirm-Zeichner einer Seite (Vertrag E1-02c §3.2; ADR-004 Punkt 4). Geometrie kommt je Element als
+   Inline-Stil aus dem Seitenmodell; hier stehen nur die festen Regeln. */
+
+.wap-seite {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Papier in fester Auflösung 4 px pro pt, skaliert auf die Zoomstufe (AR0-13 b). */
+.wap-seite__papier {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+
+/* SVG-Ebene: ganze Seite, ohne Zeigerereignisse, damit Text unter späteren Flächen markierbar bleibt. */
+.wap-seite__ebene {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Eine vorberechnete Zeile: kein Umbruch, keine Unterschneidung, keine Ligaturen, keine Ersatzschnitte;
+   Zeichen in gespeicherter Reihenfolge wie im PDF (V21). Die Oberkante liegt eine Schriftgrösse über der
+   Grundlinie; gedreht wird um den Grundlinienbeginn. */
+.wap-seite__zeile {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  white-space: pre;
+  /* biome-ignore lint/a11y/useGenericFontNames: Vertrag E1-02c §3.2 verlangt genau «WAP Arimo»; eine Ersatzfamilie widerspräche V-02c-4 (nie Text in Ersatzschrift), Zeilen erscheinen erst nach geladener Schrift */
+  font-family: "WAP Arimo";
+  font-style: normal;
+  font-weight: 400;
+  font-kerning: none;
+  font-variant-ligatures: none;
+  font-feature-settings: normal;
+  font-synthesis: none;
+  letter-spacing: 0;
+  word-spacing: 0;
+  text-transform: none;
+  text-indent: 0;
+  unicode-bidi: bidi-override;
+  direction: ltr;
+  line-height: 0;
+  color: #000;
+  transform-origin: 0 1em;
+}
+
+/* Legt die Grundlinie genau 1em unter die Oberkante: der Block reicht von der Grundlinie 1em nach oben und
+   bestimmt so die Oberkante der Zeile (die Schrift selbst trägt mit Zeilenhöhe 0 weniger bei). */
+.wap-seite__zeile::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: baseline;
+}
+
+/* Durchstreichung eines Laufs (V-02c-2): Lage und Dicke aus STRIKE_EM, Farbe des Laufs. */
+.wap-seite__strich {
+  position: absolute;
+  display: block;
+}
+
+/* Meldung, wenn die Bildschirmschrift nicht lädt (R-L-05). */
+.wap-seite-fehler {
+  padding: 8px 12px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+}
+
+.wap-seite-fehler p {
+  margin: 0;
+}
+
+.wap-seite-fehler p + p {
+  margin-top: 4px;
+}

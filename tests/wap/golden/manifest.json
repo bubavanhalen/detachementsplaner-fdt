@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "toleranz": {
+    "pixel": 0
+  },
+  "bilder": [
+    {
+      "datei": "baselines/kvk-fortsetzung-s1.png",
+      "sha256": "ca2fadafdfb48d6c2c8cea3cec13eb9938b20b6ccc069247a2e6e52291dc9298",
+      "status": "freigegeben",
+      "anforderungen": [
+        "R-H-20"
+      ],
+      "grund": "Gate B 28.10.2026 Entscheid 39: Kürzelbedeutung KR «Kompanierapport» in der Kp-Vorlage (nur Bedeutungsspalte der Kürzelliste)",
+      "commit": "113ce22"
+    },
+    {
+      "datei": "baselines/kvk-fortsetzung-s2.png",
+      "sha256": "4dd6f3788feee72d19546a49796f0e5a5120b40e38157a369322ecb2fbad1f89",
+      "status": "freigegeben",
+      "anforderungen": [
+        "R-H-20"
+      ],
+      "grund": "Golden-Erstaufnahme Schlussrunde nach F-UX2/F-LAYOUT2 (Koordinator 20.10.2026)",
+      "commit": "a415919"
+    },
+    {
+      "datei": "baselines/kvk-woche-s1.png",
+      "sha256": "68e35aa28fb6602c9a716876f47b5ed761d3c06dd02aaa50d9e31e54c6cc9fee",
+      "status": "freigegeben",
+      "anforderungen": [
+        "R-H-20"
+      ],
+      "grund": "Gate B 28.10.2026 Entscheid 39: Kürzelbedeutung KR «Kompanierapport» in der Kp-Vorlage (nur Bedeutungsspalte der Kürzelliste)",
+      "commit": "113ce22"
+    },
+    {
+      "datei": "baselines/synth-woche-1-s1.png",
+      "sha256": "29b38c31620d2830f3e06bba0fe73d0e8e3db8a259875f0190da9dc3eff40d65",
+      "status": "freigegeben",
+      "anforderungen": [
+        "R-H-20"
+      ],
+      "grund": "Gate B 28.10.2026 Entscheid 39: Kürzelbedeutung KR «Kompanierapport» in der Kp-Vorlage (nur Bedeutungsspalte der Kürzelliste)",
+      "commit": "113ce22"
+    }
+  ]
+}

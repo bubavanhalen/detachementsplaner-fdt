@@ -1,0 +1,1482 @@
+.i2-grid-editor {
+  color: #17201b;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.i2-grid-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+  height: 40px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: none;
+  scrollbar-width: thin;
+}
+.i2-grid-tools > * {
+  flex: none;
+}
+.i2-grid-tools button,
+.i2-grid-form button,
+.i2-grid-toast button {
+  min-height: 30px;
+  border: 1px solid #829189;
+  border-radius: 5px;
+  padding: 3px 10px;
+  background: #fff;
+  color: #17201b;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.i2-grid-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 4px;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+.i2-grid-zoom output {
+  min-width: 46px;
+  text-align: center;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.i2-grid-zoom button[aria-pressed="true"] {
+  background: #dfe9f6;
+  border-color: #2d63b5;
+}
+.i2-grid-editor :focus-visible {
+  outline: 2px solid #2d63b5;
+  outline-offset: 2px;
+}
+.i2-grid-editor button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.i2-grid-area {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+.i2-grid-form {
+  position: absolute;
+  z-index: 40;
+  top: 8px;
+  left: 56px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: end;
+  max-width: min(760px, calc(100% - 72px));
+  padding: 10px 12px;
+  border: 1px solid #6f8378;
+  border-radius: 8px;
+  background: #f4f8f5;
+  box-shadow: 0 6px 22px rgb(20 30 25 / 22%);
+}
+.i2-grid-editor .i2-grid-form label {
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.i2-grid-editor .i2-grid-form label:first-child {
+  flex: 1 1 200px;
+}
+.i2-grid-editor .i2-grid-form input,
+.i2-grid-editor .i2-grid-form select {
+  height: 30px;
+  min-height: 30px;
+  border: 1px solid #81958a;
+  background: #fff;
+  color: #17201b;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font: inherit;
+  font-size: 13px;
+}
+.i2-grid-editor .i2-grid-form input[aria-label="Beginn"],
+.i2-grid-editor .i2-grid-form input[aria-label="Ende"] {
+  width: 70px;
+}
+.i2-grid-error {
+  border-left: 4px solid #a32620;
+  background: #fff0ee;
+  color: #742019;
+  padding: 6px 10px;
+  margin: 4px 0;
+  font-size: 13px;
+  flex: none;
+}
+.i2-grid-scroll {
+  position: relative;
+  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 160px;
+  border: 1px solid #87948b;
+  border-radius: 6px;
+  background: #fff;
+  overscroll-behavior: contain;
+}
+.i2-grid-content {
+  position: relative;
+  width: max-content;
+  /* Eigene Stapelung (Runde 3): Marken des Ziehens liegen über allen Einträgen, aber unter Zeitschild und Karten. */
+  isolation: isolate;
+}
+.i2-grid {
+  display: block;
+  width: max-content;
+  /* Touch (UX-H-02): Wischen rollt; Ändern erst nach Langdruck (GridEditor deferTouch). */
+  touch-action: pan-x pan-y;
+  user-select: none;
+  border-spacing: 0;
+}
+.i2-grid-rows {
+  display: flex;
+}
+.i2-grid tr {
+  display: block;
+}
+.i2-grid th,
+.i2-grid td {
+  display: block;
+  padding: 0;
+  box-sizing: border-box;
+}
+.i2-grid-day {
+  flex: none;
+  box-sizing: border-box;
+  /* Tageskante: im Raster als Linie der Vorlage (F-UX2 P3), im Kopf als Schatten innen am rechten Rand. */
+  --i2-ink-line: #17201b;
+}
+.i2-grid-day-head {
+  box-shadow: inset -1px 0 0 #839088;
+}
+.i2-grid-day-head {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #f4f7f5;
+  height: 58px;
+  border-bottom: 1px solid #89998f;
+  overflow: hidden;
+}
+.i2-grid-day-head > strong {
+  display: block;
+  height: 20px;
+  line-height: 20px;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+.i2-grid-column-heads {
+  display: flex;
+  height: 37px;
+  align-items: stretch;
+  position: relative;
+}
+.i2-grid-colhead-cell {
+  flex: none;
+  position: relative;
+  display: flex;
+  border-left: 0 solid #afbab3;
+  box-sizing: border-box;
+  min-width: 0;
+}
+.i2-grid-colhead {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #17201b;
+  padding: 1px 3px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.15;
+  white-space: normal;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-align: center;
+  cursor: default;
+}
+.i2-grid-colhead:hover {
+  background: #e7eee9;
+}
+.i2-grid-editor .i2-grid-colhead-input {
+  width: 100%;
+  min-width: 70px;
+  box-sizing: border-box;
+  border: 2px solid #2d63b5;
+  font: inherit;
+  font-size: 12px;
+  padding: 2px 4px;
+  position: relative;
+  z-index: 2;
+  user-select: text;
+}
+.i2-grid-col-resize {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  width: 8px;
+  height: 100%;
+  z-index: 3;
+  cursor: col-resize;
+}
+.i2-grid-col-resize:hover,
+.i2-grid-col-resize:focus-visible {
+  background: rgb(45 99 181 / 35%);
+}
+.i2-grid-day-body {
+  position: relative;
+}
+/* Linien des Rasters wie im PDF (F-UX2 P3): auf Gerätepixel gerundet, über dem Band, unter den Einträgen. */
+.i2-grid-gridlines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.i2-grid-line-v,
+.i2-grid-line-h {
+  position: absolute;
+  background-color: #8a958e;
+}
+.i2-grid-line-v {
+  top: 0;
+}
+.i2-grid-line-h {
+  left: 0;
+}
+.i2-grid-line-h[data-linie="halb"] {
+  background-color: #c9d2cc;
+}
+.i2-grid-line-v[data-linie="tag"] {
+  background-color: #17201b;
+}
+.i2-grid-line-v.is-dashed,
+.i2-grid-line-h.is-dashed {
+  background-color: transparent;
+  --i2-ink-line: #8a958e;
+}
+.i2-grid-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: #f1f3f2;
+  border-bottom: 1px solid #c4cec8;
+  pointer-events: none;
+}
+.i2-grid-axis {
+  flex: none;
+  position: sticky;
+  left: 0;
+  z-index: 25;
+  background: #fff;
+  border-right: 1px solid #89998f;
+  box-sizing: border-box;
+}
+.i2-grid-axis-head {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  height: 58px;
+  padding: 20px 4px 0;
+  box-sizing: border-box;
+  background: #f4f7f5;
+  border-bottom: 1px solid #89998f;
+  font-size: 12px;
+}
+.i2-grid-axis-body {
+  position: relative;
+}
+.i2-grid-axis span {
+  position: absolute;
+  left: 4px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.i2-grid-empty {
+  position: absolute;
+  top: 0;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: crosshair;
+}
+.i2-grid-entry {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 2px;
+}
+.i2-grid-entry.is-selected {
+  outline: 2px solid #2d63b5;
+  outline-offset: 1px;
+}
+.i2-grid-entry.is-dragged {
+  /* Original als Umriss mit 45 % Deckkraft (Runde 3, Variante B; UI-Richtlinie 5.5). */
+  opacity: 0.45;
+  outline: 1px dashed rgb(0 0 0 / 55%);
+  outline-offset: -1px;
+}
+.i2-grid-entry.is-adjusting {
+  /* Keine Übergänge auf Layout-Eigenschaften (F-UX3); das Gleiten der Nachbarn folgt dem Prototyp (transform). */
+  outline: 2px dashed #2d63b5;
+  outline-offset: -2px;
+}
+.i2-grid-entry.is-cancelled .i2-grid-entry-hit strong {
+  text-decoration: line-through;
+}
+.i2-grid-piece {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid #536157;
+  box-sizing: border-box;
+}
+.i2-grid-entry-hit {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: start;
+  border: 1px solid #536157;
+  box-sizing: border-box;
+  padding: 2px 4px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.15;
+  cursor: grab;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.i2-grid-entry-hit strong {
+  white-space: normal;
+}
+.i2-grid-entry-hit span {
+  font-size: 10px;
+}
+.i2-grid-entry.is-short .i2-grid-entry-hit {
+  padding: 0 3px;
+  line-height: 1.05;
+  justify-content: center;
+}
+.i2-grid-rapport .i2-grid-entry-hit,
+.i2-grid-beso .i2-grid-entry-hit {
+  align-items: center;
+  text-align: center;
+  padding: 1px;
+}
+.i2-grid-marker .i2-grid-entry-hit {
+  border: 0;
+  padding: 0;
+  overflow: visible;
+}
+.i2-grid-marker .i2-grid-entry-hit::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 5px;
+  border-top: 2px solid #17201b;
+}
+.i2-grid-marker .i2-grid-entry-hit strong {
+  position: relative;
+  background: #fff;
+  border: 1px solid #17201b;
+  padding: 0 3px;
+  font-size: 10px;
+  line-height: 10px;
+}
+.i2-grid-querbalken {
+  border-radius: 0;
+}
+.i2-grid-querbalken .i2-grid-entry-hit {
+  justify-content: center;
+  padding: 0 3px;
+  white-space: nowrap;
+  overflow: visible;
+  border-left-width: 0;
+  border-right-width: 0;
+}
+.i2-grid-querbalken.is-first .i2-grid-entry-hit {
+  border-left-width: 1px;
+}
+.i2-grid-querbalken.is-last .i2-grid-entry-hit {
+  border-right-width: 1px;
+}
+.i2-grid-querbalken .i2-grid-entry-hit strong {
+  white-space: nowrap;
+}
+/* Ziehgriffe (B8): Trefferfläche 8 px über die ganze Kante, innerhalb des Eintrags (die leere Fläche daneben
+   bleibt zum Erfassen frei) und durchsichtig, damit sie keinen Text verdecken; sichtbar ist nur ein kleiner Griff. */
+.i2-grid-handle {
+  position: absolute;
+  z-index: 4;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.i2-grid-handle::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid #173f78;
+  background: #fff;
+  box-sizing: border-box;
+}
+.i2-grid-handle-start,
+.i2-grid-handle-end {
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+}
+.i2-grid-handle-start {
+  top: 0;
+}
+.i2-grid-handle-end {
+  bottom: 0;
+}
+.i2-grid-handle-start::after,
+.i2-grid-handle-end::after {
+  left: calc(50% - 8px);
+  width: 16px;
+  height: 5px;
+}
+.i2-grid-handle-start::after {
+  top: -3px;
+}
+.i2-grid-handle-end::after {
+  bottom: -3px;
+}
+.i2-grid-handle-left,
+.i2-grid-handle-right {
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+}
+.i2-grid-handle-left {
+  left: 0;
+}
+.i2-grid-handle-right {
+  right: 0;
+}
+.i2-grid-handle-left::after,
+.i2-grid-handle-right::after {
+  top: calc(50% - 8px);
+  height: 16px;
+  width: 5px;
+}
+.i2-grid-handle-left::after {
+  left: -3px;
+}
+.i2-grid-handle-right::after {
+  right: -3px;
+}
+.i2-grid-handle:hover::after {
+  background: #2d63b5;
+}
+/* Die Pillen-Griffe (Runde 3) zeigen die Kanten; die Griffknöpfe am gewählten Block bleiben nur als Trefferfläche. */
+.i2-grid-handle::after {
+  display: none;
+}
+.i2-grid-editing {
+  position: absolute;
+  z-index: 45;
+  pointer-events: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  /* Direktbearbeitung im Block (F-UX2 P2): der Block zeigt den Text der Layout-Schicht; nur die Marke liegt darüber. */
+  outline: 2px solid #2d63b5;
+  outline-offset: 1px;
+  background: transparent;
+  box-sizing: border-box;
+  min-inline-size: 0;
+}
+.i2-grid-editing.is-draft {
+  background: rgb(223 233 246 / 35%);
+}
+/* Unsichtbare Eingabefelder: nehmen Tasten, IME, Kopieren und Einfügen auf; sichtbar ist nur der Block selbst. */
+.i2-grid-editor .i2-grid-inline-hidden {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: min(100%, 14px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  opacity: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 12px;
+  pointer-events: none;
+  user-select: text;
+}
+.i2-grid-editor .i2-grid-inline-hidden:focus-visible {
+  outline: 0;
+}
+/* Blockfläche ausser den Kanten oben/unten: Klick setzt die Marke (UX-2-05). */
+.i2-grid-inline-pad {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: auto;
+  cursor: text;
+}
+.i2-grid-inline-surface {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.i2-grid-inline-text {
+  position: absolute;
+  pointer-events: auto;
+  cursor: text;
+}
+.i2-grid-inline-mark {
+  position: absolute;
+  background: rgb(45 99 181 / 32%);
+  pointer-events: none;
+}
+.i2-grid-inline-caret {
+  position: absolute;
+  background: #17201b;
+  pointer-events: none;
+  animation: i2-caret 1.06s steps(1, end) infinite;
+}
+@keyframes i2-caret {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .i2-grid-inline-caret {
+    animation: none;
+  }
+}
+.i2-grid-inline-card {
+  pointer-events: auto;
+  position: absolute;
+  left: -2px;
+  top: calc(100% + 4px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 340px;
+  width: max-content;
+  padding: 3px 6px;
+  background: #fff;
+  border: 1px solid #6f8378;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgb(20 30 25 / 18%);
+  font-size: 11px;
+}
+.i2-grid-inline-card.is-above {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+.i2-grid-inline-field {
+  font-weight: 700;
+  color: #17201b;
+}
+.i2-grid-inline-value {
+  font-weight: 400;
+  white-space: pre-wrap;
+}
+.i2-grid-inline-valuecaret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin: 0 -0.5px;
+  vertical-align: text-bottom;
+  background: #17201b;
+}
+.i2-grid-inline-hint,
+.i2-grid-inline-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+  color: #47564c;
+}
+.i2-grid-inline-error {
+  color: #8a1f17;
+  font-weight: 600;
+}
+.i2-grid-ghost {
+  /* Ziellage bei Kanten (Runde 3, Variante B): 2-px-Rahmen in der Modusfarbe um die Ziellage. Beim Verschieben ist
+     der angehobene Block selbst die Ziellage (Rahmen unsichtbar). Nur transform gleitet (110 ms). */
+  --i2-mc: #2d63b5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* Über allen Einträgen (deren Stapelung reicht bis etwa 40 inkl. Auswahl). */
+  z-index: 4999;
+  pointer-events: none;
+  box-sizing: border-box;
+  border: 2px solid var(--i2-mc);
+  border-radius: 2px;
+  background: transparent;
+  will-change: transform;
+  contain: strict;
+  transition: transform 110ms cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.i2-grid-ghost[data-kind="move"] {
+  opacity: 0;
+}
+.i2-grid-ghost[data-mode="shift"] {
+  --i2-mc: #a35a00;
+}
+.i2-grid-ghost[data-mode="none"] {
+  --i2-mc: #9b2fae;
+}
+/* Angehobener Block (Runde 3, Entscheid 1a «Variante B»): rastet ein und gleitet 110 ms von Raster zu Raster; beim
+   Greifen 1,015 und weicher Schatten, Leuchtrahmen in der Modusfarbe. Nur transform und opacity; Grundgrösse einmal
+   je Geste, Fläche per scale, Kanten eigene Linien (Strichstärke bleibt). Eigene Ebene nur für diesen Block. */
+.i2-grid-lift {
+  --i2-mc: #2d63b5;
+  --i2-mg: rgb(45 99 181 / 32%);
+  --i2-follow: 110ms cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5000;
+  pointer-events: none;
+  box-sizing: border-box;
+  transform-origin: 0 0;
+  will-change: transform;
+  contain: layout style;
+  transition:
+    transform var(--i2-follow),
+    opacity 180ms linear;
+}
+.i2-grid-lift[data-mode="shift"] {
+  --i2-mc: #a35a00;
+  --i2-mg: rgb(245 158 11 / 55%);
+}
+.i2-grid-lift[data-mode="none"] {
+  --i2-mc: #9b2fae;
+  --i2-mg: rgb(196 84 214 / 48%);
+}
+.i2-lift-z {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.i2-lift-z > * {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+  transition: transform var(--i2-follow);
+}
+.i2-lift-sh {
+  box-shadow:
+    0 8px 20px -6px rgb(16 24 20 / 30%),
+    0 2px 6px -2px rgb(16 24 20 / 16%);
+  animation: i2-lift-in 140ms linear;
+}
+.i2-lift-gl {
+  box-shadow:
+    0 0 0 2px var(--i2-mc),
+    0 0 12px 1px var(--i2-mg);
+  animation: i2-lift-in 140ms linear;
+}
+.i2-lift-f {
+  background: #fff;
+}
+.i2-lift-e {
+  background: rgb(0 0 0 / 85%);
+}
+.i2-lift-z > .i2-lift-et,
+.i2-lift-z > .i2-lift-eb {
+  height: 1px;
+}
+.i2-lift-z > .i2-lift-el,
+.i2-lift-z > .i2-lift-er {
+  width: 1px;
+}
+.i2-lift-z > .i2-lift-tx {
+  overflow: hidden;
+  padding: 2px 3px 0;
+  box-sizing: border-box;
+  font:
+    700 10px / 1.15 Arimo,
+    Arial,
+    "Liberation Sans",
+    sans-serif;
+  color: #000;
+  text-align: center;
+  transition: none;
+}
+/* Textebene beim Kantenzug (UX-FUX3-01): Abbild der gezeichneten Zeilen, nicht gestreckt; der innere Teil gleitet
+   gegenläufig zum Block (gleiche Dauer und Kurve) und steht so still. Flächen, Teilstücke und Plaketten des Abbilds
+   entfallen (die Fläche zeichnet die skalierte Füllung). */
+.i2-grid-lift.is-text .i2-lift-z > .i2-lift-tx {
+  padding: 0;
+}
+.i2-lift-txin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: transform var(--i2-follow);
+}
+.i2-lift-txin > .i2-lift-copy {
+  position: absolute;
+  box-sizing: border-box;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0;
+  text-align: left;
+  font-weight: 400;
+  pointer-events: none;
+}
+.i2-lift-txin .i2-grid-shape-layer,
+.i2-lift-txin .i2-grid-piece,
+.i2-lift-txin .i2-grid-tag,
+.i2-lift-txin .i2-grid-changed,
+.i2-lift-txin .i2-grid-finding {
+  display: none;
+}
+.i2-lift-txin .i2-grid-entry-hit {
+  border-color: transparent;
+  background: transparent;
+}
+.i2-grid-lift.is-copy .i2-lift-e,
+.i2-grid-lift.is-copy .i2-lift-tx {
+  display: none;
+}
+.i2-grid-lift.is-copy .i2-lift-f > .i2-lift-copy {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 2px;
+  outline: 0;
+  pointer-events: none;
+}
+.i2-grid-lift.is-create .i2-lift-f {
+  background: rgb(45 99 181 / 22%);
+}
+.i2-grid-lift.is-create .i2-lift-sh,
+.i2-grid-lift.is-create .i2-lift-e {
+  display: none;
+}
+.i2-grid-lift.is-marker .i2-lift-f,
+.i2-grid-lift.is-marker .i2-lift-e,
+.i2-grid-lift.is-marker .i2-lift-sh,
+.i2-grid-lift.is-marker .i2-lift-tx {
+  display: none;
+}
+.i2-grid-lift.is-marker .i2-lift-z > .i2-lift-gl {
+  top: calc(50% - 1px);
+  height: 2px;
+  background: var(--i2-mc);
+  box-shadow: 0 0 8px 1px var(--i2-mg);
+}
+.i2-grid-lift.is-jump,
+.i2-grid-lift.is-jump * {
+  transition: none !important;
+}
+.i2-grid-lift.is-settle {
+  opacity: 0;
+}
+.i2-grid-lift.is-esc {
+  --i2-follow: 200ms cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+@keyframes i2-lift-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.i2-grid-statusbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 24px;
+  font-size: 12px;
+  color: #34433a;
+  overflow: hidden;
+}
+.i2-grid-time-status.is-floating.is-jump {
+  transition: none;
+}
+.i2-grid-time-status {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.i2-grid-time-status.is-floating {
+  position: fixed;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  /* Folgt dem Zeiger als Animation des Compositors (F-PERF, FL2-04): ohne Übergang teilte jede Bewegung die Ebenen
+     neu auf (Layerize, bei 1000 Einträgen rund 3 ms je Bild). Erstes Bild einer Geste ohne Übergang (is-jump). */
+  transition: transform 32ms linear;
+  z-index: 60;
+  pointer-events: none;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #17201b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  overflow: visible;
+}
+.i2-grid-shortcuts {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.i2-grid-detail {
+  position: fixed;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #6f8378;
+  box-shadow: 0 6px 20px rgb(20 30 25 / 22%);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.35;
+  user-select: text;
+}
+.i2-grid-detail-type {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #47564c;
+}
+.i2-grid-toast {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: 36px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #17201b;
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 30%);
+}
+.i2-grid-toast button {
+  background: #fff;
+}
+.i2-grid-scope {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .i2-grid-ghost,
+  .i2-grid-entry.is-adjusting,
+  .i2-grid-lift {
+    transition: none;
+  }
+}
+.i2-grid-colhead.is-vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  overflow-wrap: normal;
+  padding: 2px 0;
+}
+
+/* Zellzeiger (B1): 15-Min-Zelle bzw. Bereich mit 2 px Rahmen und 12 % Füllung (UI-Richtlinie 4.2). */
+.i2-grid-editor .i2-grid-cursor {
+  position: absolute;
+  z-index: 15;
+  pointer-events: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 2px solid #2d63b5;
+  background: rgb(45 99 181 / 12%);
+  border-radius: 0;
+  scroll-margin: 64px 12px 12px 56px;
+}
+.i2-grid-editor .i2-grid-cursor:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px #2d63b5;
+}
+.i2-grid-cursor.is-range {
+  background: rgb(45 99 181 / 18%);
+}
+.i2-grid-entry.is-cut {
+  outline: 2px dashed #7a3db8;
+  outline-offset: 1px;
+  opacity: 0.7;
+}
+.i2-grid-entry-hit:focus-visible {
+  outline: 2px dashed #2d63b5;
+  outline-offset: 2px;
+}
+.i2-grid-lift.is-marquee > * {
+  display: none;
+}
+.i2-grid-lift.is-marquee {
+  border: 1px dashed #173f78;
+  background: rgb(45 99 181 / 10%);
+  box-shadow: none;
+}
+.i2-grid-empty.is-special {
+  cursor: cell;
+}
+.i2-grid-count {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.i2-grid-where {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.i2-grid-tools select {
+  font: inherit;
+  font-size: 13px;
+  min-height: 30px;
+  max-width: 180px;
+}
+
+.i2-grid-form-error {
+  flex: 1 1 100%;
+  margin: 0;
+}
+/* E1-02l: Flächen und Zeilen aus der Layout-Schicht (ADR-004 Punkt 4). Nur vorberechnete Zeilen, kein Umbruch
+   durch den Browser, Grundlinie 1em unter der Oberkante, Skalierung und Drehung am Grundlinienbeginn. */
+.i2-grid-shape-layer,
+.i2-grid-lines {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+.i2-grid-lines {
+  width: 0;
+  height: 0;
+  overflow: visible;
+}
+.i2-grid-line {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  /* biome-ignore lint/a11y/useGenericFontNames: wie der Seitenzeichner (Vertrag E1-02c §3.2): nur «WAP Arimo», nie eine Ersatzschrift */
+  font-family: "WAP Arimo";
+  font-style: normal;
+  font-weight: 400;
+  font-kerning: none;
+  font-variant-ligatures: none;
+  font-synthesis: none;
+  letter-spacing: 0;
+  word-spacing: 0;
+  unicode-bidi: bidi-override;
+  direction: ltr;
+  line-height: 0;
+  transform-origin: 0 1em;
+}
+.i2-grid-line::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: baseline;
+}
+.i2-grid-line.is-sideways {
+  writing-mode: sideways-lr;
+}
+.i2-grid-line.is-sideways::before {
+  width: 1em;
+  height: 0;
+}
+.i2-grid-strike {
+  position: absolute;
+  display: block;
+}
+.i2-grid-entry.is-rendered {
+  border-radius: 0;
+}
+.i2-grid-entry.is-rendered .i2-grid-entry-hit {
+  border-color: transparent;
+  background: transparent;
+}
+.i2-grid-entry.is-rendered .i2-grid-entry-hit::before {
+  content: none;
+}
+.i2-grid-column-heads .i2-grid-lines {
+  z-index: 2;
+}
+.i2-grid-day-warning {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 8px;
+  background: #b42318;
+  color: #fff;
+  font-size: 11px;
+  line-height: 16px;
+}
+/* Leistung beim Ziehen (I2b-A A3): Änderungen in einem Eintrag lösen keine Neuberechnung des ganzen Rasters aus. */
+.i2-grid-entry.is-rendered {
+  contain: layout style;
+}
+/* Vorschau beim Ziehen (PERF): die Zeichnung vor dem Ziehen, auf die neue Fläche zugeschnitten. */
+.i2-grid-entry.is-adjusting.is-rendered {
+  overflow: hidden;
+}
+.i2-grid-shape-layer.is-clipped {
+  overflow: hidden;
+}
+.i2-grid-shape,
+.i2-grid-shape-layer .i2-grid-shapes {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  overflow: visible;
+}
+/* Nächster Schritt in einer leeren Woche (I5; Beschrieb 5.7, UI-Richtlinie 11.1): klein unten links, ohne das
+   Raster zu verschieben. */
+.i2-grid-next-step {
+  position: absolute;
+  z-index: 30;
+  left: 60px;
+  bottom: 8px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid #829189;
+  border-radius: 6px;
+  background: #fffdf3;
+  color: #17201b;
+  font-size: 13px;
+  box-shadow: 0 2px 6px rgb(15 25 35 / 18%);
+}
+.i2-grid-next-step p {
+  margin: 0;
+}
+/* Befehle der Auswahl in der Statuszeile (H-UI2, UX-H-03): feste Höhe, damit das Raster beim Wählen nicht springt. */
+.i2-grid-statusbar {
+  height: 30px;
+}
+.i2-grid-selection-tools {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+.i2-grid-statusbar.has-selection .i2-grid-where,
+.i2-grid-statusbar.has-selection .i2-grid-shortcuts {
+  display: none;
+}
+.i2-grid-statusbar.has-selection .i2-grid-time-status:not(.is-floating) {
+  flex: 0 1 auto;
+  max-width: 35%;
+}
+.i2-grid-selection-tools button {
+  min-height: 26px;
+  border: 1px solid #829189;
+  border-radius: 5px;
+  padding: 2px 9px;
+  background: #fff;
+  color: #17201b;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.i2-grid-selection-tools button:disabled {
+  background: #e8edf1;
+  color: #586574;
+  border-color: #c1cbd4;
+  cursor: default;
+}
+.i2-grid-statusbar .i2-grid-selection-tools select {
+  font: inherit;
+  font-size: 12px;
+  min-height: 26px;
+  max-width: 180px;
+}
+.i2-grid-selection-tools :is(button, select):focus-visible {
+  outline: 2px solid #245ca4;
+  outline-offset: 2px;
+}
+.i2-grid-zoom button {
+  min-width: 28px;
+  padding: 3px 6px;
+}
+
+/* Treffen (F-UX2 P4): Mauszeiger je Zone setzt der Tag; Eintrag unter dem Zeiger dünn blau gerahmt, Kantenzone als
+   3-px-Balken. Nur Bildschirm (Marke, UI-Richtlinie 4.2). */
+.i2-grid-day-body {
+  cursor: crosshair;
+}
+.i2-grid-day-body .i2-grid-entry-hit,
+.i2-grid-day-body .i2-grid-empty,
+.i2-grid-day-body .i2-grid-handle {
+  cursor: inherit;
+}
+.i2-grid-hover {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 19;
+  pointer-events: none;
+  box-sizing: border-box;
+  outline: 1px solid rgb(45 99 181 / 60%);
+  outline-offset: 1px;
+}
+.i2-grid-hover::after {
+  content: "";
+  position: absolute;
+  background: #2d63b5;
+  display: none;
+}
+.i2-grid-hover[data-zone="start"]::after,
+.i2-grid-hover[data-zone="end"]::after {
+  display: block;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.i2-grid-hover[data-zone="start"]::after {
+  top: 0;
+}
+.i2-grid-hover[data-zone="end"]::after {
+  bottom: 0;
+}
+.i2-grid-hover[data-zone="left"]::after,
+.i2-grid-hover[data-zone="right"]::after {
+  display: block;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+.i2-grid-hover[data-zone="left"]::after {
+  left: 0;
+}
+.i2-grid-hover[data-zone="right"]::after {
+  right: 0;
+}
+.i2-grid-unsnap {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.i2-grid-rows .i2-grid-agenda {
+  border-top: 0;
+}
+.i2-grid-agenda-list {
+  position: relative;
+}
+.i2-grid-agenda-chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Tag ohne Spaltensatz: Hinweis im Spaltenkopf (UX-2-13), eine Zeile, Rest im Tooltip. */
+.i2-grid-colhead-hint {
+  position: absolute;
+  inset: 0 2px;
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1.2;
+  color: #5b6472;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* Seitenbereich (UX-AB-11): ein Teil wie bisher neben dem Raster; mehrere (Seitenfeld, Befundliste, Importbericht)
+   untereinander in einer Spalte, damit keiner den anderen überdeckt oder aus dem Bild schiebt. */
+.i2-grid-side {
+  display: contents;
+}
+.i2-grid-side:has(> :nth-child(2)) {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 6px;
+  width: 380px;
+  max-width: 45%;
+  min-height: 0;
+  margin-left: 6px;
+}
+.i2-grid-side:has(> :nth-child(2)) > * {
+  flex: 1 1 0;
+  width: auto;
+  max-width: none;
+  min-height: 0;
+  margin-left: 0;
+}
+/* Geist einer nicht übernommenen (verdeckten) Form an der Originallage (Importbericht «Zur Stelle»; UX-AB-07). */
+.i2-grid-import-ghost {
+  position: absolute;
+  z-index: 40;
+  box-sizing: border-box;
+  border: 2px dashed #b42318;
+  background: rgb(255 255 255 / 55%);
+  pointer-events: none;
+  overflow: hidden;
+}
+.i2-grid-import-ghost > span {
+  display: block;
+  padding: 1px 3px;
+  font-size: 11px;
+  line-height: 1.2;
+  color: #7a1a12;
+}
+
+/* ---------- Runde 3 (Entscheid Auftraggeber 21.10.2026, 1a–5a): Griffe, Hover, Shift/Alt-Aufleuchten ---------- */
+/* Hover des ganzen Blocks (Variante B): 1-px-Rahmen und weicher Schatten unter dem Block. */
+.i2-grid-content > .i2-grid-hover {
+  outline-width: 1px;
+  box-shadow: 0 6px 14px -6px rgb(16 24 20 / 32%);
+}
+.i2-grid-content > .i2-grid-hover::after {
+  border-radius: 2px;
+  background: rgb(45 99 181 / 80%);
+}
+/* Marker beim Überfahren: 8 px hellblaues Band (30 %) auf der Linie, kein Rahmen. */
+.i2-grid-content > .i2-grid-hover[data-kind="marker"] {
+  outline: 0;
+  box-shadow: none;
+}
+.i2-grid-content > .i2-grid-hover[data-kind="marker"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 4px);
+  height: 8px;
+  border-radius: 4px;
+  background: rgb(45 99 181 / 30%);
+}
+/* Griff (5a): Pille 34 × 16 px mit Doppelpfeil; Einblenden aus 80 % und Deckkraft 0 in 140 ms, Kante überfahren =
+   gefüllt (Modusfarbe, Symbol weiss) 114 %, Greifen 120 %. Lage nur über transform, gesetzt ohne Gleiten. */
+.i2-grid-grip {
+  --i2-mc: #2d63b5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5001;
+  pointer-events: none;
+}
+.i2-grid-grip[data-mode="shift"] {
+  --i2-mc: #a35a00;
+}
+.i2-grid-grip[data-mode="none"] {
+  --i2-mc: #9b2fae;
+}
+.i2-grid-grip.is-follow {
+  transition: transform 110ms cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.i2-grip-in {
+  position: relative;
+  transform: scale(0.8);
+  opacity: 0;
+  filter: drop-shadow(0 2px 3px rgb(16 24 20 / 25%));
+  transition:
+    transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 140ms linear;
+}
+.i2-grid-grip.is-on .i2-grip-in {
+  transform: scale(1);
+  opacity: 1;
+}
+.i2-grid-grip.is-on.is-hot .i2-grip-in {
+  transform: scale(1.14);
+}
+.i2-grid-grip.is-on.is-grab .i2-grip-in {
+  transform: scale(1.2);
+}
+.i2-grip-in svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  overflow: visible;
+}
+.i2-grip-in svg.is-h {
+  opacity: 0;
+  transition: opacity 140ms linear;
+}
+.i2-grid-grip.is-hot svg.is-h,
+.i2-grid-grip.is-grab svg.is-h {
+  opacity: 1;
+}
+.i2-grip-bg {
+  fill: #fff;
+  stroke: var(--i2-mc);
+  stroke-width: 1.5;
+}
+.i2-grip-ic {
+  fill: none;
+  stroke: var(--i2-mc);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.i2-grip-dot {
+  fill: var(--i2-mc);
+  opacity: 0.7;
+}
+.i2-grip-in svg.is-h .i2-grip-bg {
+  fill: var(--i2-mc);
+}
+.i2-grip-in svg.is-h .i2-grip-ic {
+  stroke: #fff;
+}
+.i2-grip-in svg.is-h .i2-grip-dot {
+  fill: #fff;
+  opacity: 0.9;
+}
+/* Shift/Alt leuchten auf (Aufleuchten aus C): Rahmen mit Glanz um das Raster, nur an der Rollfläche. */
+.i2-grid-scroll[data-mode] {
+  transition:
+    box-shadow 50ms linear,
+    border-color 50ms linear;
+}
+.i2-grid-scroll[data-mode="shift"] {
+  border-color: #a35a00;
+  box-shadow:
+    0 0 0 2px #a35a00,
+    0 0 22px rgb(245 158 11 / 55%);
+}
+.i2-grid-scroll[data-mode="none"] {
+  border-color: #9b2fae;
+  box-shadow:
+    0 0 0 2px #9b2fae,
+    0 0 22px rgb(196 84 214 / 48%);
+}
+/* Plakette am Zeitschild: Blau (Standard), Bernstein (Shift), Violett (Alt); leuchtet bei jedem Wechsel kurz auf. */
+.i2-grid-mode {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 7px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  background: #2d63b5;
+  /* Runde 4: Moduswechsel sofort, nur ein kurzer Farbübergang (≤ 50 ms), kein Einblenden. */
+  transition: background-color 50ms linear;
+}
+.i2-grid-mode.is-shift {
+  background: #a35a00;
+  box-shadow: 0 0 0 2px rgb(245 158 11 / 45%);
+}
+.i2-grid-mode.is-none {
+  background: #9b2fae;
+  box-shadow: 0 0 0 2px rgb(196 84 214 / 40%);
+}
+/* Betroffene Nachbarn: 2-px-Rahmen in der Modusfarbe und Plakette («+45 Min», «dockt an»); blendet in 160 ms ein. */
+.i2-grid-entry.is-follow {
+  outline: 2px solid #2d63b5;
+  outline-offset: -2px;
+}
+.i2-grid-entry.is-follow.is-shift-follow {
+  outline-color: #a35a00;
+}
+.i2-grid-entry.is-parallel {
+  outline: 2px dashed #9b2fae;
+  outline-offset: -2px;
+}
+.i2-grid-tag {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  z-index: 3;
+  max-width: calc(100% - 4px);
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: clip;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #2d63b5;
+  color: #fff;
+  /* Mindestens 11 px (UX-FUX3-05, Dienstlaptop). */
+  font:
+    600 11px / 16px system-ui,
+    sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+  font-variant-numeric: tabular-nums;
+}
+/* Kurzer Block (z.B. auf 15 Min geschrumpft): Plakette mittig, ragt kaum hinaus (UX-FUX3-05; die gegriffene Pille
+   liegt innen am gezogenen Block). */
+.i2-grid-entry.is-short > .i2-grid-tag {
+  top: 50%;
+  bottom: auto;
+  line-height: 14px;
+  transform: translateY(-50%);
+}
+.i2-grid-entry.is-shift-follow > .i2-grid-tag {
+  background: #a35a00;
+}
+/* Bewegung reduzieren: alle Dauern 0, keine Animation; Farbe statt Bewegung bleibt. */
+@media (prefers-reduced-motion: reduce) {
+  .i2-grid-lift,
+  .i2-grid-lift *,
+  .i2-grid-grip,
+  .i2-grip-in,
+  .i2-grip-in svg,
+  .i2-grid-mode,
+  .i2-grid-time-status,
+  .i2-grid-entry.is-follow {
+    transition: none !important;
+    animation: none !important;
+  }
+}

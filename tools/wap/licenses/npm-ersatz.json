@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "ersatz": [
+    {
+      "paket": "brotli",
+      "version": "1.3.3",
+      "lizenz": "MIT",
+      "datei": "tools/wap/licenses/brotli.txt",
+      "herkunft": "aus package.json rekonstruiert",
+      "entscheid": "Vorgabe Orchestrator bis Entscheid Q-031, 05.10.2026"
+    },
+    {
+      "paket": "dfa",
+      "version": "1.2.0",
+      "lizenz": "MIT",
+      "datei": "tools/wap/licenses/dfa.txt",
+      "herkunft": "aus package.json rekonstruiert",
+      "entscheid": "Vorgabe Orchestrator bis Entscheid Q-031, 05.10.2026"
+    },
+    {
+      "paket": "fontkit",
+      "version": "2.0.4",
+      "lizenz": "MIT",
+      "datei": "tools/wap/licenses/fontkit.txt",
+      "herkunft": "aus package.json rekonstruiert",
+      "entscheid": "Vorgabe Orchestrator bis Entscheid Q-031, 05.10.2026"
+    }
+  ]
+}
