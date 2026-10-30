@@ -1,0 +1,2341 @@
+{
+  "format": "wap-planer-plan",
+  "version": 1,
+  "planId": "p-migration-etappe-1",
+  "revision": 7,
+  "modifiedAt": "2026-10-01T10:00:00.000Z",
+  "savedAt": "2026-10-01T10:05:00.000Z",
+  "containsInternalNotes": true,
+  "plan": {
+    "schemaVersion": 1,
+    "id": "p-migration-etappe-1",
+    "level": "kp",
+    "templateId": "kp",
+    "unit": "Inf Kp 99/1 (fiktiv)",
+    "parentUnit": "Inf Bat 99 (fiktiv)",
+    "service": "FDT 2026",
+    "exerciseName": "BEISPIEL",
+    "beilage": "Beilage 01-02 zum Allgemeinen Befehl (fiktiv)",
+    "classification": "INTERN",
+    "sunLocation": "Musterhausen (fiktiv)",
+    "commander": {
+      "grad": "Hptm",
+      "name": "Muster A",
+      "vorname": "Max",
+      "funktion": "Kp Kdt",
+      "nameOrder": "gradVornameName"
+    },
+    "signatureImage": {
+      "mime": "image/png",
+      "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    },
+    "signatureEnabled": true,
+    "coatOfArms": {
+      "mime": "image/png",
+      "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    },
+    "motto": "MUSTER UND BEISPIEL (fiktiv)",
+    "persons": [
+      {
+        "id": "r401",
+        "grad": "Oblt",
+        "name": "Muster B",
+        "vorname": "Anna",
+        "funktion": "Zfhr"
+      },
+      {
+        "id": "r402",
+        "grad": "Wm",
+        "name": "Muster C",
+        "vorname": "Ben",
+        "funktion": "Gfhr"
+      }
+    ],
+    "functionList": [
+      {
+        "code": "Zfhr",
+        "categoryId": "k3",
+        "singleFunction": false
+      },
+      {
+        "code": "S2",
+        "categoryId": "k5",
+        "singleFunction": false
+      },
+      {
+        "code": "Bat Kdt",
+        "categoryId": "k1",
+        "singleFunction": false
+      },
+      {
+        "code": "S3",
+        "categoryId": "k1",
+        "singleFunction": false
+      },
+      {
+        "code": "S4",
+        "categoryId": "k1",
+        "singleFunction": false
+      },
+      {
+        "code": "Kp Kdt",
+        "categoryId": "k2",
+        "singleFunction": true
+      },
+      {
+        "code": "Kdt Stv",
+        "categoryId": "k2",
+        "singleFunction": true
+      },
+      {
+        "code": "Einh Fw",
+        "categoryId": "k2",
+        "singleFunction": true
+      },
+      {
+        "code": "Four",
+        "categoryId": "k2",
+        "singleFunction": true
+      }
+    ],
+    "legend": [
+      {
+        "id": "k1",
+        "name": "Ltg Bat",
+        "legendLabel": "Leitung Bat",
+        "color": {
+          "r": 204,
+          "g": 236,
+          "b": 255
+        },
+        "neutral": false,
+        "inLegend": true
+      },
+      {
+        "id": "k2",
+        "name": "Ltg Kp",
+        "legendLabel": "Leitung Kp",
+        "color": {
+          "r": 255,
+          "g": 255,
+          "b": 153
+        },
+        "neutral": false,
+        "inLegend": true
+      },
+      {
+        "id": "k3",
+        "name": "Ltg Zfhr",
+        "legendLabel": "Leitung Zfhr",
+        "color": {
+          "r": 253,
+          "g": 234,
+          "b": 218
+        },
+        "neutral": false,
+        "inLegend": true
+      },
+      {
+        "id": "k4",
+        "name": "Extern",
+        "legendLabel": "Extern",
+        "color": {
+          "r": 191,
+          "g": 191,
+          "b": 191
+        },
+        "neutral": false,
+        "inLegend": true
+      },
+      {
+        "id": "k5",
+        "name": "Ltg S2",
+        "legendLabel": "Ltg S2",
+        "color": {
+          "r": 255,
+          "g": 204,
+          "b": 153
+        },
+        "neutral": false,
+        "inLegend": true
+      },
+      {
+        "id": "k6",
+        "name": "neutral",
+        "legendLabel": "neutral",
+        "color": {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        "neutral": true,
+        "inLegend": false
+      }
+    ],
+    "rapportCodes": [
+      {
+        "code": "KR",
+        "categoryId": "k2"
+      },
+      {
+        "code": "DR",
+        "categoryId": "k2"
+      },
+      {
+        "code": "AR1",
+        "categoryId": "k2"
+      },
+      {
+        "code": "AR2",
+        "categoryId": "k2"
+      },
+      {
+        "code": "ARK",
+        "categoryId": "k2"
+      },
+      {
+        "code": "BR 0",
+        "categoryId": "k1"
+      },
+      {
+        "code": "BR 1",
+        "categoryId": "k1"
+      },
+      {
+        "code": "BR 2",
+        "categoryId": "k1"
+      },
+      {
+        "code": "BR 3",
+        "categoryId": "k1"
+      }
+    ],
+    "abbreviationsSelected": [
+      "Ukft"
+    ],
+    "abbreviationMeanings": {
+      "DR": "Dienstrapport (fiktiv)",
+      "Ukft": "Unterkunft (fiktiv)"
+    },
+    "markerLabels": [
+      {
+        "kind": "AV",
+        "withTime": false
+      },
+      {
+        "kind": "ABV",
+        "withTime": true
+      },
+      {
+        "kind": "HV",
+        "withTime": false
+      },
+      {
+        "kind": "custom",
+        "withTime": false
+      }
+    ],
+    "columnSets": [
+      {
+        "id": "s7",
+        "name": "KVK Stufen",
+        "columns": [
+          {
+            "id": "c8",
+            "name": "Kp Kdt",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c9",
+            "name": "Stv",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c10",
+            "name": "Zfhr",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c11",
+            "name": "Uof",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c12",
+            "name": "höh Uof",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c13",
+            "name": "Trp",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c14",
+            "name": "Rap",
+            "kind": "rap",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c15",
+            "name": "Beso",
+            "kind": "beso",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          }
+        ]
+      },
+      {
+        "id": "s16",
+        "name": "KVK Mi–Fr",
+        "columns": [
+          {
+            "id": "c17",
+            "name": "Kdo",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c18",
+            "name": "Mö",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c19",
+            "name": "Sph",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c20",
+            "name": "Rap",
+            "kind": "rap",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c21",
+            "name": "Beso",
+            "kind": "beso",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          }
+        ]
+      },
+      {
+        "id": "s22",
+        "name": "Wochenende kompakt",
+        "columns": [
+          {
+            "id": "c23",
+            "name": "Kp",
+            "kind": "planning",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c24",
+            "name": "Rap",
+            "kind": "rap",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          },
+          {
+            "id": "c25",
+            "name": "Beso",
+            "kind": "beso",
+            "weight": "normal",
+            "labelOrientation": "horizontal",
+            "defaultCategoryId": null,
+            "origin": "manual"
+          }
+        ]
+      }
+    ],
+    "weeks": [
+      {
+        "id": "w26",
+        "label": "KVK",
+        "shortName": "KVK",
+        "startDate": "2026-09-14",
+        "days": [
+          {
+            "weekday": "Mo",
+            "columnSetId": "s7",
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Di",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Mi",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": "Tagesnotiz (fiktiv)"
+          },
+          {
+            "weekday": "Do",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Fr",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Sa",
+            "columnSetId": null,
+            "display": "compact",
+            "internalNote": ""
+          },
+          {
+            "weekday": "So",
+            "columnSetId": null,
+            "display": "hidden",
+            "internalNote": ""
+          }
+        ],
+        "weekGoals": [
+          {
+            "id": "g301",
+            "text": "Ziel Muster (fiktiv)",
+            "group": "Gruppe A"
+          },
+          {
+            "id": "g302",
+            "text": "Ziel ohne Gruppe (fiktiv)",
+            "group": null
+          }
+        ],
+        "heightenedReadiness": "Bereitschaft (fiktiv)",
+        "sunOverride": {
+          "sunrise": 420,
+          "sunset": null
+        },
+        "agendaWeekend": "separate",
+        "hiddenRemarkIds": [
+          "e119"
+        ]
+      },
+      {
+        "id": "w27",
+        "label": "Woche 1",
+        "shortName": "Wo1",
+        "startDate": "2026-09-21",
+        "days": [
+          {
+            "weekday": "Mo",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Di",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Mi",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Do",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Fr",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "Sa",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          },
+          {
+            "weekday": "So",
+            "columnSetId": null,
+            "display": "full",
+            "internalNote": ""
+          }
+        ],
+        "weekGoals": [],
+        "heightenedReadiness": "",
+        "sunOverride": {
+          "sunrise": null,
+          "sunset": 1150
+        },
+        "agendaWeekend": "combined",
+        "hiddenRemarkIds": []
+      }
+    ],
+    "deletedWeeks": [
+      {
+        "week": {
+          "id": "w28",
+          "label": "Woche 2 (gelöscht)",
+          "shortName": "Wo2",
+          "startDate": "2026-09-28",
+          "days": [
+            {
+              "weekday": "Mo",
+              "columnSetId": null,
+              "display": "full",
+              "internalNote": ""
+            },
+            {
+              "weekday": "Di",
+              "columnSetId": null,
+              "display": "full",
+              "internalNote": ""
+            },
+            {
+              "weekday": "Mi",
+              "columnSetId": null,
+              "display": "full",
+              "internalNote": ""
+            },
+            {
+              "weekday": "Do",
+              "columnSetId": null,
+              "display": "full",
+              "internalNote": ""
+            },
+            {
+              "weekday": "Fr",
+              "columnSetId": null,
+              "display": "full",
+              "internalNote": ""
+            },
+            {
+              "weekday": "Sa",
+              "columnSetId": null,
+              "display": "full",
+              "internalNote": ""
+            },
+            {
+              "weekday": "So",
+              "columnSetId": null,
+              "display": "full",
+              "internalNote": ""
+            }
+          ],
+          "weekGoals": [],
+          "heightenedReadiness": "",
+          "sunOverride": {
+            "sunrise": null,
+            "sunset": null
+          },
+          "agendaWeekend": "auto",
+          "hiddenRemarkIds": []
+        },
+        "entries": [
+          {
+            "id": "e120",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 20,
+            "internalNote": "",
+            "removedText": [],
+            "type": "dayRemark",
+            "date": "2026-09-29",
+            "text": "Gelöschte Bemerkung (fiktiv)"
+          }
+        ]
+      }
+    ],
+    "entries": {
+      "e101": {
+        "id": "e101",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 1,
+        "internalNote": "Interne Notiz (fiktiv)",
+        "removedText": [],
+        "type": "block",
+        "date": "2026-09-15",
+        "time": {
+          "form": "range",
+          "from": 480,
+          "to": 720
+        },
+        "columns": {
+          "kind": "all"
+        },
+        "title": [
+          {
+            "text": "Ausbildung ",
+            "bold": true
+          },
+          {
+            "text": "Muster (fiktiv)",
+            "bold": false
+          }
+        ],
+        "supplement": "Zusatz (fiktiv)",
+        "ltg": "Zfhr",
+        "tn": "Kp",
+        "tpt": "Fuss",
+        "ort": "Platz A (fiktiv)",
+        "tenue": "TAZ",
+        "printTn": false,
+        "printTenue": true,
+        "categoryId": "k2",
+        "secondCategoryId": null,
+        "textDirection": "auto",
+        "openEnd": false,
+        "subtasks": [
+          {
+            "title": [
+              {
+                "text": "Teil ",
+                "bold": true
+              },
+              {
+                "text": "Eins (fiktiv)",
+                "bold": false
+              }
+            ],
+            "ltg": "Oblt Muster B",
+            "ort": "Halle (fiktiv)"
+          },
+          {
+            "title": [
+              {
+                "text": "Teil Zwei (fiktiv)",
+                "bold": false
+              }
+            ],
+            "ltg": "",
+            "ort": ""
+          }
+        ]
+      },
+      "e102": {
+        "id": "e102",
+        "status": "open",
+        "changed": true,
+        "createdSeq": 2,
+        "internalNote": "",
+        "removedText": [
+          "entfernt (fiktiv)"
+        ],
+        "type": "block",
+        "date": "2026-09-16",
+        "time": {
+          "form": "point",
+          "at": 780
+        },
+        "columns": {
+          "kind": "ids",
+          "ids": [
+            "c8",
+            "c9"
+          ]
+        },
+        "title": [
+          {
+            "text": "Punkt (fiktiv)",
+            "bold": false
+          }
+        ],
+        "supplement": "",
+        "ltg": "",
+        "tn": "",
+        "tpt": "",
+        "ort": "",
+        "tenue": "",
+        "printTn": true,
+        "printTenue": false,
+        "categoryId": "k2",
+        "secondCategoryId": "k3",
+        "textDirection": "vertical",
+        "openEnd": true
+      },
+      "e103": {
+        "id": "e103",
+        "status": "cancelled",
+        "changed": false,
+        "createdSeq": 3,
+        "internalNote": "",
+        "removedText": [],
+        "type": "block",
+        "date": "2026-09-17",
+        "time": {
+          "form": "from",
+          "from": 840
+        },
+        "columns": {
+          "kind": "all"
+        },
+        "title": [
+          {
+            "text": "Ab (fiktiv)",
+            "bold": false
+          }
+        ],
+        "supplement": "",
+        "ltg": "",
+        "tn": "",
+        "tpt": "",
+        "ort": "",
+        "tenue": "",
+        "printTn": false,
+        "printTenue": false,
+        "categoryId": "k3",
+        "secondCategoryId": null,
+        "textDirection": "horizontal",
+        "openEnd": false
+      },
+      "e104": {
+        "id": "e104",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 4,
+        "internalNote": "",
+        "removedText": [],
+        "type": "block",
+        "date": "2026-09-18",
+        "time": {
+          "form": "until",
+          "to": 1020
+        },
+        "columns": {
+          "kind": "all"
+        },
+        "title": [
+          {
+            "text": "Bis (fiktiv)",
+            "bold": false
+          }
+        ],
+        "supplement": "",
+        "ltg": "",
+        "tn": "",
+        "tpt": "",
+        "ort": "",
+        "tenue": "",
+        "printTn": false,
+        "printTenue": false,
+        "categoryId": "k2",
+        "secondCategoryId": null,
+        "textDirection": "auto",
+        "openEnd": false
+      },
+      "e105": {
+        "id": "e105",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 5,
+        "internalNote": "",
+        "removedText": [],
+        "type": "querbalken",
+        "title": [
+          {
+            "text": "Verlegung (fiktiv) ",
+            "bold": false
+          },
+          {
+            "text": "",
+            "bold": false,
+            "besoRef": "e110"
+          }
+        ],
+        "fromDate": "2026-09-18",
+        "toDate": "2026-09-22",
+        "columns": {
+          "kind": "all"
+        },
+        "categoryId": null
+      },
+      "e106": {
+        "id": "e106",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 6,
+        "internalNote": "",
+        "removedText": [],
+        "type": "querbalken",
+        "title": [
+          {
+            "text": "Wache (fiktiv)",
+            "bold": true
+          }
+        ],
+        "fromDate": "2026-09-23",
+        "toDate": "2026-09-24",
+        "columns": {
+          "kind": "ids",
+          "ids": [
+            "c8"
+          ]
+        },
+        "categoryId": "k2"
+      },
+      "e107": {
+        "id": "e107",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 7,
+        "internalNote": "",
+        "removedText": [],
+        "type": "marker",
+        "date": "2026-09-15",
+        "at": 360,
+        "kind": "AV",
+        "customKind": "",
+        "columns": {
+          "kind": "all"
+        },
+        "asFlatBlock": false
+      },
+      "e108": {
+        "id": "e108",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 8,
+        "internalNote": "",
+        "removedText": [],
+        "type": "marker",
+        "date": "2026-09-15",
+        "at": 1320,
+        "kind": "ABV",
+        "customKind": "",
+        "columns": {
+          "kind": "all"
+        },
+        "asFlatBlock": false
+      },
+      "e109": {
+        "id": "e109",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 9,
+        "internalNote": "",
+        "removedText": [],
+        "type": "marker",
+        "date": "2026-09-21",
+        "at": 1200,
+        "kind": "HV",
+        "customKind": "",
+        "columns": {
+          "kind": "ids",
+          "ids": [
+            "c9"
+          ]
+        },
+        "asFlatBlock": true
+      },
+      "e110": {
+        "id": "e110",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 10,
+        "internalNote": "",
+        "removedText": [],
+        "type": "beso",
+        "date": "2026-09-16",
+        "title": [
+          {
+            "text": "Besprechung Muster (fiktiv)",
+            "bold": false
+          }
+        ],
+        "windows": [
+          {
+            "id": "t201",
+            "time": {
+              "form": "point",
+              "at": 540
+            },
+            "columnId": null,
+            "supplement": ""
+          },
+          {
+            "id": "t202",
+            "time": {
+              "form": "range",
+              "from": 600,
+              "to": 660
+            },
+            "columnId": "c8",
+            "supplement": "Zusatz"
+          },
+          {
+            "id": "t203",
+            "time": {
+              "form": "from",
+              "from": 840
+            },
+            "columnId": null,
+            "supplement": ""
+          }
+        ],
+        "ltg": "Hptm Muster A",
+        "tn": "Kader",
+        "tpt": "",
+        "ort": "KP (fiktiv)",
+        "categoryId": "k2",
+        "besoNumber": 21,
+        "numberFixed": false,
+        "agendaOverride": "Besprechung (fiktiv)"
+      },
+      "e111": {
+        "id": "e111",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 11,
+        "internalNote": "",
+        "removedText": [],
+        "type": "marker",
+        "date": "2026-09-22",
+        "at": 900,
+        "kind": "custom",
+        "customKind": "Übung (fiktiv)",
+        "columns": {
+          "kind": "all"
+        },
+        "asFlatBlock": false
+      },
+      "e112": {
+        "id": "e112",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 12,
+        "internalNote": "",
+        "removedText": [],
+        "type": "beso",
+        "date": "2026-09-23",
+        "title": [
+          {
+            "text": "Frist (fiktiv)",
+            "bold": false
+          }
+        ],
+        "windows": [
+          {
+            "id": "t204",
+            "time": {
+              "form": "until",
+              "to": 960
+            },
+            "columnId": null,
+            "supplement": ""
+          },
+          {
+            "id": "t205",
+            "time": {
+              "form": "deadline",
+              "to": 1080
+            },
+            "columnId": null,
+            "supplement": ""
+          },
+          {
+            "id": "t206",
+            "time": {
+              "form": "deadline"
+            },
+            "columnId": null,
+            "supplement": ""
+          }
+        ],
+        "ltg": "",
+        "tn": "",
+        "tpt": "",
+        "ort": "",
+        "categoryId": "k3",
+        "besoNumber": null,
+        "numberFixed": true,
+        "agendaOverride": null
+      },
+      "e113": {
+        "id": "e113",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 13,
+        "internalNote": "",
+        "removedText": [],
+        "type": "rapport",
+        "date": "2026-09-15",
+        "code": "DR",
+        "time": {
+          "form": "point",
+          "at": 420
+        },
+        "ort": "KP (fiktiv)",
+        "tn": "Kader",
+        "categoryId": "k2",
+        "display": "rapColumn",
+        "displayColumns": {
+          "kind": "all"
+        }
+      },
+      "e114": {
+        "id": "e114",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 14,
+        "internalNote": "",
+        "removedText": [],
+        "type": "rapport",
+        "date": "2026-09-16",
+        "code": "KR",
+        "time": {
+          "form": "range",
+          "from": 1080,
+          "to": 1140
+        },
+        "ort": "",
+        "tn": "",
+        "categoryId": "k2",
+        "display": "alsoInColumns",
+        "displayColumns": {
+          "kind": "all"
+        }
+      },
+      "e115": {
+        "id": "e115",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 15,
+        "internalNote": "",
+        "removedText": [],
+        "type": "rapport",
+        "date": "2026-09-22",
+        "code": "Ukft",
+        "time": {
+          "form": "point",
+          "at": 1200
+        },
+        "ort": "",
+        "tn": "",
+        "categoryId": "k3",
+        "display": "onlyInColumns",
+        "displayColumns": {
+          "kind": "ids",
+          "ids": [
+            "c8"
+          ]
+        }
+      },
+      "e116": {
+        "id": "e116",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 16,
+        "internalNote": "",
+        "removedText": [],
+        "type": "dayRemark",
+        "date": "2026-09-17",
+        "text": "Tagesbemerkung (fiktiv)"
+      },
+      "e117": {
+        "id": "e117",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 17,
+        "internalNote": "",
+        "removedText": [],
+        "type": "multiDayRemark",
+        "text": "Planbemerkung (fiktiv)",
+        "scope": {
+          "kind": "plan"
+        },
+        "number": 1,
+        "refBoxColumnId": null
+      },
+      "e118": {
+        "id": "e118",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 18,
+        "internalNote": "",
+        "removedText": [],
+        "type": "multiDayRemark",
+        "text": "Wochenbemerkung (fiktiv)",
+        "scope": {
+          "kind": "week",
+          "weekId": "w27"
+        },
+        "number": null,
+        "refBoxColumnId": null
+      },
+      "e119": {
+        "id": "e119",
+        "status": "confirmed",
+        "changed": false,
+        "createdSeq": 19,
+        "internalNote": "",
+        "removedText": [],
+        "type": "multiDayRemark",
+        "text": "Zeitraum (fiktiv)",
+        "scope": {
+          "kind": "range",
+          "fromDate": "2026-09-16",
+          "toDate": "2026-09-18"
+        },
+        "number": 2,
+        "refBoxColumnId": null
+      }
+    },
+    "displayRange": {
+      "from": 300,
+      "to": 1380
+    },
+    "stand": {
+      "date": "2026-09-17",
+      "version": 2
+    },
+    "nextSeq": 21,
+    "nextId": 500,
+    "lastUsedCategoryId": "k2",
+    "printDefaults": {
+      "printTn": true,
+      "printTenue": false
+    },
+    "acknowledgedFindings": [
+      {
+        "key": "befund-1",
+        "reason": "Bewusst so geplant (fiktiv)",
+        "at": "2026-09-15"
+      }
+    ]
+  },
+  "stands": [
+    {
+      "standId": "stand-fixture-1",
+      "date": "2026-09-17",
+      "version": 2,
+      "standsSameDay": 1,
+      "plan": {
+        "schemaVersion": 1,
+        "id": "p-migration-etappe-1",
+        "level": "kp",
+        "templateId": "kp",
+        "unit": "Inf Kp 99/1 (fiktiv)",
+        "parentUnit": "Inf Bat 99 (fiktiv)",
+        "service": "FDT 2026",
+        "exerciseName": "BEISPIEL",
+        "beilage": "Beilage 01-02 zum Allgemeinen Befehl (fiktiv)",
+        "classification": "INTERN",
+        "sunLocation": "Musterhausen (fiktiv)",
+        "commander": {
+          "grad": "Hptm",
+          "name": "Muster A",
+          "vorname": "Max",
+          "funktion": "Kp Kdt",
+          "nameOrder": "gradVornameName"
+        },
+        "signatureImage": {
+          "mime": "image/png",
+          "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        },
+        "signatureEnabled": true,
+        "coatOfArms": {
+          "mime": "image/png",
+          "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        },
+        "motto": "MUSTER UND BEISPIEL (fiktiv)",
+        "persons": [
+          {
+            "id": "r401",
+            "grad": "Oblt",
+            "name": "Muster B",
+            "vorname": "Anna",
+            "funktion": "Zfhr"
+          },
+          {
+            "id": "r402",
+            "grad": "Wm",
+            "name": "Muster C",
+            "vorname": "Ben",
+            "funktion": "Gfhr"
+          }
+        ],
+        "functionList": [
+          {
+            "code": "Zfhr",
+            "categoryId": "k3",
+            "singleFunction": false
+          },
+          {
+            "code": "S2",
+            "categoryId": "k5",
+            "singleFunction": false
+          },
+          {
+            "code": "Bat Kdt",
+            "categoryId": "k1",
+            "singleFunction": false
+          },
+          {
+            "code": "S3",
+            "categoryId": "k1",
+            "singleFunction": false
+          },
+          {
+            "code": "S4",
+            "categoryId": "k1",
+            "singleFunction": false
+          },
+          {
+            "code": "Kp Kdt",
+            "categoryId": "k2",
+            "singleFunction": true
+          },
+          {
+            "code": "Kdt Stv",
+            "categoryId": "k2",
+            "singleFunction": true
+          },
+          {
+            "code": "Einh Fw",
+            "categoryId": "k2",
+            "singleFunction": true
+          },
+          {
+            "code": "Four",
+            "categoryId": "k2",
+            "singleFunction": true
+          }
+        ],
+        "legend": [
+          {
+            "id": "k1",
+            "name": "Ltg Bat",
+            "legendLabel": "Leitung Bat",
+            "color": {
+              "r": 204,
+              "g": 236,
+              "b": 255
+            },
+            "neutral": false,
+            "inLegend": true
+          },
+          {
+            "id": "k2",
+            "name": "Ltg Kp",
+            "legendLabel": "Leitung Kp",
+            "color": {
+              "r": 255,
+              "g": 255,
+              "b": 153
+            },
+            "neutral": false,
+            "inLegend": true
+          },
+          {
+            "id": "k3",
+            "name": "Ltg Zfhr",
+            "legendLabel": "Leitung Zfhr",
+            "color": {
+              "r": 253,
+              "g": 234,
+              "b": 218
+            },
+            "neutral": false,
+            "inLegend": true
+          },
+          {
+            "id": "k4",
+            "name": "Extern",
+            "legendLabel": "Extern",
+            "color": {
+              "r": 191,
+              "g": 191,
+              "b": 191
+            },
+            "neutral": false,
+            "inLegend": true
+          },
+          {
+            "id": "k5",
+            "name": "Ltg S2",
+            "legendLabel": "Ltg S2",
+            "color": {
+              "r": 255,
+              "g": 204,
+              "b": 153
+            },
+            "neutral": false,
+            "inLegend": true
+          },
+          {
+            "id": "k6",
+            "name": "neutral",
+            "legendLabel": "neutral",
+            "color": {
+              "r": 255,
+              "g": 255,
+              "b": 255
+            },
+            "neutral": true,
+            "inLegend": false
+          }
+        ],
+        "rapportCodes": [
+          {
+            "code": "KR",
+            "categoryId": "k2"
+          },
+          {
+            "code": "DR",
+            "categoryId": "k2"
+          },
+          {
+            "code": "AR1",
+            "categoryId": "k2"
+          },
+          {
+            "code": "AR2",
+            "categoryId": "k2"
+          },
+          {
+            "code": "ARK",
+            "categoryId": "k2"
+          },
+          {
+            "code": "BR 0",
+            "categoryId": "k1"
+          },
+          {
+            "code": "BR 1",
+            "categoryId": "k1"
+          },
+          {
+            "code": "BR 2",
+            "categoryId": "k1"
+          },
+          {
+            "code": "BR 3",
+            "categoryId": "k1"
+          }
+        ],
+        "abbreviationsSelected": [
+          "Ukft"
+        ],
+        "abbreviationMeanings": {
+          "DR": "Dienstrapport (fiktiv)",
+          "Ukft": "Unterkunft (fiktiv)"
+        },
+        "markerLabels": [
+          {
+            "kind": "AV",
+            "withTime": false
+          },
+          {
+            "kind": "ABV",
+            "withTime": true
+          },
+          {
+            "kind": "HV",
+            "withTime": false
+          },
+          {
+            "kind": "custom",
+            "withTime": false
+          }
+        ],
+        "columnSets": [
+          {
+            "id": "s7",
+            "name": "KVK Stufen",
+            "columns": [
+              {
+                "id": "c8",
+                "name": "Kp Kdt",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c9",
+                "name": "Stv",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c10",
+                "name": "Zfhr",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c11",
+                "name": "Uof",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c12",
+                "name": "höh Uof",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c13",
+                "name": "Trp",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c14",
+                "name": "Rap",
+                "kind": "rap",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c15",
+                "name": "Beso",
+                "kind": "beso",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              }
+            ]
+          },
+          {
+            "id": "s16",
+            "name": "KVK Mi–Fr",
+            "columns": [
+              {
+                "id": "c17",
+                "name": "Kdo",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c18",
+                "name": "Mö",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c19",
+                "name": "Sph",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c20",
+                "name": "Rap",
+                "kind": "rap",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c21",
+                "name": "Beso",
+                "kind": "beso",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              }
+            ]
+          },
+          {
+            "id": "s22",
+            "name": "Wochenende kompakt",
+            "columns": [
+              {
+                "id": "c23",
+                "name": "Kp",
+                "kind": "planning",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c24",
+                "name": "Rap",
+                "kind": "rap",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              },
+              {
+                "id": "c25",
+                "name": "Beso",
+                "kind": "beso",
+                "weight": "normal",
+                "labelOrientation": "horizontal",
+                "defaultCategoryId": null,
+                "origin": "manual"
+              }
+            ]
+          }
+        ],
+        "weeks": [
+          {
+            "id": "w26",
+            "label": "KVK",
+            "shortName": "KVK",
+            "startDate": "2026-09-14",
+            "days": [
+              {
+                "weekday": "Mo",
+                "columnSetId": "s7",
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Di",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Mi",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": "Tagesnotiz (fiktiv)"
+              },
+              {
+                "weekday": "Do",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Fr",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Sa",
+                "columnSetId": null,
+                "display": "compact",
+                "internalNote": ""
+              },
+              {
+                "weekday": "So",
+                "columnSetId": null,
+                "display": "hidden",
+                "internalNote": ""
+              }
+            ],
+            "weekGoals": [
+              {
+                "id": "g301",
+                "text": "Ziel Muster (fiktiv)",
+                "group": "Gruppe A"
+              },
+              {
+                "id": "g302",
+                "text": "Ziel ohne Gruppe (fiktiv)",
+                "group": null
+              }
+            ],
+            "heightenedReadiness": "Bereitschaft (fiktiv)",
+            "sunOverride": {
+              "sunrise": 420,
+              "sunset": null
+            },
+            "agendaWeekend": "separate",
+            "hiddenRemarkIds": [
+              "e119"
+            ]
+          },
+          {
+            "id": "w27",
+            "label": "Woche 1",
+            "shortName": "Wo1",
+            "startDate": "2026-09-21",
+            "days": [
+              {
+                "weekday": "Mo",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Di",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Mi",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Do",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Fr",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "Sa",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              },
+              {
+                "weekday": "So",
+                "columnSetId": null,
+                "display": "full",
+                "internalNote": ""
+              }
+            ],
+            "weekGoals": [],
+            "heightenedReadiness": "",
+            "sunOverride": {
+              "sunrise": null,
+              "sunset": 1150
+            },
+            "agendaWeekend": "combined",
+            "hiddenRemarkIds": []
+          }
+        ],
+        "deletedWeeks": [
+          {
+            "week": {
+              "id": "w28",
+              "label": "Woche 2 (gelöscht)",
+              "shortName": "Wo2",
+              "startDate": "2026-09-28",
+              "days": [
+                {
+                  "weekday": "Mo",
+                  "columnSetId": null,
+                  "display": "full",
+                  "internalNote": ""
+                },
+                {
+                  "weekday": "Di",
+                  "columnSetId": null,
+                  "display": "full",
+                  "internalNote": ""
+                },
+                {
+                  "weekday": "Mi",
+                  "columnSetId": null,
+                  "display": "full",
+                  "internalNote": ""
+                },
+                {
+                  "weekday": "Do",
+                  "columnSetId": null,
+                  "display": "full",
+                  "internalNote": ""
+                },
+                {
+                  "weekday": "Fr",
+                  "columnSetId": null,
+                  "display": "full",
+                  "internalNote": ""
+                },
+                {
+                  "weekday": "Sa",
+                  "columnSetId": null,
+                  "display": "full",
+                  "internalNote": ""
+                },
+                {
+                  "weekday": "So",
+                  "columnSetId": null,
+                  "display": "full",
+                  "internalNote": ""
+                }
+              ],
+              "weekGoals": [],
+              "heightenedReadiness": "",
+              "sunOverride": {
+                "sunrise": null,
+                "sunset": null
+              },
+              "agendaWeekend": "auto",
+              "hiddenRemarkIds": []
+            },
+            "entries": [
+              {
+                "id": "e120",
+                "status": "confirmed",
+                "changed": false,
+                "createdSeq": 20,
+                "internalNote": "",
+                "removedText": [],
+                "type": "dayRemark",
+                "date": "2026-09-29",
+                "text": "Gelöschte Bemerkung (fiktiv)"
+              }
+            ]
+          }
+        ],
+        "entries": {
+          "e101": {
+            "id": "e101",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 1,
+            "internalNote": "Interne Notiz (fiktiv)",
+            "removedText": [],
+            "type": "block",
+            "date": "2026-09-15",
+            "time": {
+              "form": "range",
+              "from": 480,
+              "to": 720
+            },
+            "columns": {
+              "kind": "all"
+            },
+            "title": [
+              {
+                "text": "Ausbildung ",
+                "bold": true
+              },
+              {
+                "text": "Muster (fiktiv)",
+                "bold": false
+              }
+            ],
+            "supplement": "Zusatz (fiktiv)",
+            "ltg": "Zfhr",
+            "tn": "Kp",
+            "tpt": "Fuss",
+            "ort": "Platz A (fiktiv)",
+            "tenue": "TAZ",
+            "printTn": false,
+            "printTenue": true,
+            "categoryId": "k2",
+            "secondCategoryId": null,
+            "textDirection": "auto",
+            "openEnd": false,
+            "subtasks": [
+              {
+                "title": [
+                  {
+                    "text": "Teil ",
+                    "bold": true
+                  },
+                  {
+                    "text": "Eins (fiktiv)",
+                    "bold": false
+                  }
+                ],
+                "ltg": "Oblt Muster B",
+                "ort": "Halle (fiktiv)"
+              },
+              {
+                "title": [
+                  {
+                    "text": "Teil Zwei (fiktiv)",
+                    "bold": false
+                  }
+                ],
+                "ltg": "",
+                "ort": ""
+              }
+            ]
+          },
+          "e102": {
+            "id": "e102",
+            "status": "open",
+            "changed": true,
+            "createdSeq": 2,
+            "internalNote": "",
+            "removedText": [
+              "entfernt (fiktiv)"
+            ],
+            "type": "block",
+            "date": "2026-09-16",
+            "time": {
+              "form": "point",
+              "at": 780
+            },
+            "columns": {
+              "kind": "ids",
+              "ids": [
+                "c8",
+                "c9"
+              ]
+            },
+            "title": [
+              {
+                "text": "Punkt (fiktiv)",
+                "bold": false
+              }
+            ],
+            "supplement": "",
+            "ltg": "",
+            "tn": "",
+            "tpt": "",
+            "ort": "",
+            "tenue": "",
+            "printTn": true,
+            "printTenue": false,
+            "categoryId": "k2",
+            "secondCategoryId": "k3",
+            "textDirection": "vertical",
+            "openEnd": true
+          },
+          "e103": {
+            "id": "e103",
+            "status": "cancelled",
+            "changed": false,
+            "createdSeq": 3,
+            "internalNote": "",
+            "removedText": [],
+            "type": "block",
+            "date": "2026-09-17",
+            "time": {
+              "form": "from",
+              "from": 840
+            },
+            "columns": {
+              "kind": "all"
+            },
+            "title": [
+              {
+                "text": "Ab (fiktiv)",
+                "bold": false
+              }
+            ],
+            "supplement": "",
+            "ltg": "",
+            "tn": "",
+            "tpt": "",
+            "ort": "",
+            "tenue": "",
+            "printTn": false,
+            "printTenue": false,
+            "categoryId": "k3",
+            "secondCategoryId": null,
+            "textDirection": "horizontal",
+            "openEnd": false
+          },
+          "e104": {
+            "id": "e104",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 4,
+            "internalNote": "",
+            "removedText": [],
+            "type": "block",
+            "date": "2026-09-18",
+            "time": {
+              "form": "until",
+              "to": 1020
+            },
+            "columns": {
+              "kind": "all"
+            },
+            "title": [
+              {
+                "text": "Bis (fiktiv)",
+                "bold": false
+              }
+            ],
+            "supplement": "",
+            "ltg": "",
+            "tn": "",
+            "tpt": "",
+            "ort": "",
+            "tenue": "",
+            "printTn": false,
+            "printTenue": false,
+            "categoryId": "k2",
+            "secondCategoryId": null,
+            "textDirection": "auto",
+            "openEnd": false
+          },
+          "e105": {
+            "id": "e105",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 5,
+            "internalNote": "",
+            "removedText": [],
+            "type": "querbalken",
+            "title": [
+              {
+                "text": "Verlegung (fiktiv) ",
+                "bold": false
+              },
+              {
+                "text": "",
+                "bold": false,
+                "besoRef": "e110"
+              }
+            ],
+            "fromDate": "2026-09-18",
+            "toDate": "2026-09-22",
+            "columns": {
+              "kind": "all"
+            },
+            "categoryId": null
+          },
+          "e106": {
+            "id": "e106",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 6,
+            "internalNote": "",
+            "removedText": [],
+            "type": "querbalken",
+            "title": [
+              {
+                "text": "Wache (fiktiv)",
+                "bold": true
+              }
+            ],
+            "fromDate": "2026-09-23",
+            "toDate": "2026-09-24",
+            "columns": {
+              "kind": "ids",
+              "ids": [
+                "c8"
+              ]
+            },
+            "categoryId": "k2"
+          },
+          "e107": {
+            "id": "e107",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 7,
+            "internalNote": "",
+            "removedText": [],
+            "type": "marker",
+            "date": "2026-09-15",
+            "at": 360,
+            "kind": "AV",
+            "customKind": "",
+            "columns": {
+              "kind": "all"
+            },
+            "asFlatBlock": false
+          },
+          "e108": {
+            "id": "e108",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 8,
+            "internalNote": "",
+            "removedText": [],
+            "type": "marker",
+            "date": "2026-09-15",
+            "at": 1320,
+            "kind": "ABV",
+            "customKind": "",
+            "columns": {
+              "kind": "all"
+            },
+            "asFlatBlock": false
+          },
+          "e109": {
+            "id": "e109",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 9,
+            "internalNote": "",
+            "removedText": [],
+            "type": "marker",
+            "date": "2026-09-21",
+            "at": 1200,
+            "kind": "HV",
+            "customKind": "",
+            "columns": {
+              "kind": "ids",
+              "ids": [
+                "c9"
+              ]
+            },
+            "asFlatBlock": true
+          },
+          "e110": {
+            "id": "e110",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 10,
+            "internalNote": "",
+            "removedText": [],
+            "type": "beso",
+            "date": "2026-09-16",
+            "title": [
+              {
+                "text": "Besprechung Muster (fiktiv)",
+                "bold": false
+              }
+            ],
+            "windows": [
+              {
+                "id": "t201",
+                "time": {
+                  "form": "point",
+                  "at": 540
+                },
+                "columnId": null,
+                "supplement": ""
+              },
+              {
+                "id": "t202",
+                "time": {
+                  "form": "range",
+                  "from": 600,
+                  "to": 660
+                },
+                "columnId": "c8",
+                "supplement": "Zusatz"
+              },
+              {
+                "id": "t203",
+                "time": {
+                  "form": "from",
+                  "from": 840
+                },
+                "columnId": null,
+                "supplement": ""
+              }
+            ],
+            "ltg": "Hptm Muster A",
+            "tn": "Kader",
+            "tpt": "",
+            "ort": "KP (fiktiv)",
+            "categoryId": "k2",
+            "besoNumber": 21,
+            "numberFixed": false,
+            "agendaOverride": "Besprechung (fiktiv)"
+          },
+          "e111": {
+            "id": "e111",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 11,
+            "internalNote": "",
+            "removedText": [],
+            "type": "marker",
+            "date": "2026-09-22",
+            "at": 900,
+            "kind": "custom",
+            "customKind": "Übung (fiktiv)",
+            "columns": {
+              "kind": "all"
+            },
+            "asFlatBlock": false
+          },
+          "e112": {
+            "id": "e112",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 12,
+            "internalNote": "",
+            "removedText": [],
+            "type": "beso",
+            "date": "2026-09-23",
+            "title": [
+              {
+                "text": "Frist (fiktiv)",
+                "bold": false
+              }
+            ],
+            "windows": [
+              {
+                "id": "t204",
+                "time": {
+                  "form": "until",
+                  "to": 960
+                },
+                "columnId": null,
+                "supplement": ""
+              },
+              {
+                "id": "t205",
+                "time": {
+                  "form": "deadline",
+                  "to": 1080
+                },
+                "columnId": null,
+                "supplement": ""
+              },
+              {
+                "id": "t206",
+                "time": {
+                  "form": "deadline"
+                },
+                "columnId": null,
+                "supplement": ""
+              }
+            ],
+            "ltg": "",
+            "tn": "",
+            "tpt": "",
+            "ort": "",
+            "categoryId": "k3",
+            "besoNumber": null,
+            "numberFixed": true,
+            "agendaOverride": null
+          },
+          "e113": {
+            "id": "e113",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 13,
+            "internalNote": "",
+            "removedText": [],
+            "type": "rapport",
+            "date": "2026-09-15",
+            "code": "DR",
+            "time": {
+              "form": "point",
+              "at": 420
+            },
+            "ort": "KP (fiktiv)",
+            "tn": "Kader",
+            "categoryId": "k2",
+            "display": "rapColumn",
+            "displayColumns": {
+              "kind": "all"
+            }
+          },
+          "e114": {
+            "id": "e114",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 14,
+            "internalNote": "",
+            "removedText": [],
+            "type": "rapport",
+            "date": "2026-09-16",
+            "code": "KR",
+            "time": {
+              "form": "range",
+              "from": 1080,
+              "to": 1140
+            },
+            "ort": "",
+            "tn": "",
+            "categoryId": "k2",
+            "display": "alsoInColumns",
+            "displayColumns": {
+              "kind": "all"
+            }
+          },
+          "e115": {
+            "id": "e115",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 15,
+            "internalNote": "",
+            "removedText": [],
+            "type": "rapport",
+            "date": "2026-09-22",
+            "code": "Ukft",
+            "time": {
+              "form": "point",
+              "at": 1200
+            },
+            "ort": "",
+            "tn": "",
+            "categoryId": "k3",
+            "display": "onlyInColumns",
+            "displayColumns": {
+              "kind": "ids",
+              "ids": [
+                "c8"
+              ]
+            }
+          },
+          "e116": {
+            "id": "e116",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 16,
+            "internalNote": "",
+            "removedText": [],
+            "type": "dayRemark",
+            "date": "2026-09-17",
+            "text": "Tagesbemerkung (fiktiv)"
+          },
+          "e117": {
+            "id": "e117",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 17,
+            "internalNote": "",
+            "removedText": [],
+            "type": "multiDayRemark",
+            "text": "Planbemerkung (fiktiv)",
+            "scope": {
+              "kind": "plan"
+            },
+            "number": 1,
+            "refBoxColumnId": null
+          },
+          "e118": {
+            "id": "e118",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 18,
+            "internalNote": "",
+            "removedText": [],
+            "type": "multiDayRemark",
+            "text": "Wochenbemerkung (fiktiv)",
+            "scope": {
+              "kind": "week",
+              "weekId": "w27"
+            },
+            "number": null,
+            "refBoxColumnId": null
+          },
+          "e119": {
+            "id": "e119",
+            "status": "confirmed",
+            "changed": false,
+            "createdSeq": 19,
+            "internalNote": "",
+            "removedText": [],
+            "type": "multiDayRemark",
+            "text": "Zeitraum (fiktiv)",
+            "scope": {
+              "kind": "range",
+              "fromDate": "2026-09-16",
+              "toDate": "2026-09-18"
+            },
+            "number": 2,
+            "refBoxColumnId": null
+          }
+        },
+        "displayRange": {
+          "from": 300,
+          "to": 1380
+        },
+        "stand": {
+          "date": "2026-09-17",
+          "version": 2
+        },
+        "nextSeq": 21,
+        "nextId": 500,
+        "lastUsedCategoryId": "k2",
+        "printDefaults": {
+          "printTn": true,
+          "printTenue": false
+        },
+        "acknowledgedFindings": [
+          {
+            "key": "befund-1",
+            "reason": "Bewusst so geplant (fiktiv)",
+            "at": "2026-09-15"
+          }
+        ]
+      },
+      "pdfs": [
+        {
+          "key": "w26",
+          "base64": "JVBERi0xLjcKJSBXb2NoZSBLVksgKGZpa3RpdikKJSVFT0Y="
+        },
+        {
+          "key": "plan",
+          "base64": "JVBERi0xLjcKJSBHZXNhbXRwbGFuIChmaWt0aXYpCiUlRU9G"
+        }
+      ]
+    }
+  ]
+}

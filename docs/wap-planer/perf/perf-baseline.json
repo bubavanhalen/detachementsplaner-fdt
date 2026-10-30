@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "protokoll": {
+    "drosselung": 2,
+    "laeufe": 5,
+    "aufwaermlaeufe": 1,
+    "startwert": 20260928,
+    "plan": { "wochen": 4, "eintraege": 1000 }
+  },
+  "umgebung": {
+    "browser": "chromium 153.0.8010.12 (Playwright 1.63.0)",
+    "node": "24.15.0",
+    "cpu": "12th Gen Intel(R) Core(TM) i7-12700F",
+    "strom": "Netz"
+  },
+  "messwerte": {}
+}

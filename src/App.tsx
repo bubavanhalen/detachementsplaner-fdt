@@ -8,7 +8,8 @@ import {
   redirect,
 } from '@tanstack/react-router';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Shell } from './components/Shell';
+import { setRouteCommands } from './components/CommandPalette';
+import { Shell, setRouteKeyDelegate, ThemeMenu } from './components/Shell';
 import ContactsPage from './pages/ContactsPage';
 import FinishPage from './pages/FinishPage';
 import OnsitePage from './pages/OnsitePage';
@@ -17,6 +18,7 @@ import PisaPage from './pages/PisaPage';
 import PlanningPage from './pages/PlanningPage';
 import SourcesPage from './pages/SourcesPage';
 import TagesbefehlePage from './pages/TagesbefehlePage';
+import WapPage from './pages/WapPage';
 
 const rootRoute = createRootRoute({
   component: Shell,
@@ -41,7 +43,18 @@ const rootRoute = createRootRoute({
     </div>
   ),
 });
+/** WAP-Planer mit Delegation der Suite-Kürzel und Darstellung in der eigenen Kopfleiste (UI-Richtlinie 18 S-2, S-3). */
+function WapRoute() {
+  return (
+    <WapPage
+      routeKeys={setRouteKeyDelegate}
+      routeCommands={setRouteCommands}
+      headerTools={<ThemeMenu />}
+    />
+  );
+}
 const routes = [
+  createRoute({ getParentRoute: () => rootRoute, path: '/wap', component: WapRoute }),
   createRoute({ getParentRoute: () => rootRoute, path: '/', component: PlanningPage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/sources', component: SourcesPage }),
   createRoute({ getParentRoute: () => rootRoute, path: '/pisa', component: PisaPage }),

@@ -1,0 +1,4263 @@
+{
+  "schemaVersion": 1,
+  "id": "kvk-fixture-pseudonymisiert",
+  "level": "kp",
+  "templateId": "kp",
+  "unit": "Inf Ustü Kp 61/4",
+  "parentUnit": "Inf Bat 61",
+  "service": "FDT 2026",
+  "exerciseName": "",
+  "beilage": "01-02 zum Allgemeinen Befehl für den FDT 2026",
+  "classification": "",
+  "sunLocation": "",
+  "commander": {
+    "grad": "Hptm",
+    "name": "Muster C",
+    "vorname": "Max",
+    "funktion": "Kommandant",
+    "nameOrder": "gradVornameName"
+  },
+  "signatureImage": null,
+  "signatureEnabled": false,
+  "coatOfArms": null,
+  "motto": "TRAGEN & SCHLAGEN",
+  "persons": [],
+  "functionList": [
+    {
+      "code": "Zfhr",
+      "categoryId": "k3",
+      "singleFunction": false
+    },
+    {
+      "code": "S2",
+      "categoryId": "k5",
+      "singleFunction": false
+    },
+    {
+      "code": "Bat Kdt",
+      "categoryId": "k1",
+      "singleFunction": false
+    },
+    {
+      "code": "S3",
+      "categoryId": "k1",
+      "singleFunction": false
+    },
+    {
+      "code": "S4",
+      "categoryId": "k1",
+      "singleFunction": false
+    },
+    {
+      "code": "Kp Kdt",
+      "categoryId": "k2",
+      "singleFunction": true
+    },
+    {
+      "code": "Kdt Stv",
+      "categoryId": "k2",
+      "singleFunction": true
+    },
+    {
+      "code": "Einh Fw",
+      "categoryId": "k2",
+      "singleFunction": true
+    },
+    {
+      "code": "Four",
+      "categoryId": "k2",
+      "singleFunction": true
+    }
+  ],
+  "legend": [
+    {
+      "id": "k1",
+      "name": "Ltg Bat",
+      "legendLabel": "Leitung Bat",
+      "color": {
+        "r": 204,
+        "g": 236,
+        "b": 255
+      },
+      "neutral": false,
+      "inLegend": true
+    },
+    {
+      "id": "k2",
+      "name": "Ltg Kp",
+      "legendLabel": "Leitung Kp",
+      "color": {
+        "r": 255,
+        "g": 255,
+        "b": 153
+      },
+      "neutral": false,
+      "inLegend": true
+    },
+    {
+      "id": "k3",
+      "name": "Ltg Zfhr",
+      "legendLabel": "Leitung Zfhr",
+      "color": {
+        "r": 253,
+        "g": 234,
+        "b": 218
+      },
+      "neutral": false,
+      "inLegend": true
+    },
+    {
+      "id": "k4",
+      "name": "Extern",
+      "legendLabel": "Extern",
+      "color": {
+        "r": 191,
+        "g": 191,
+        "b": 191
+      },
+      "neutral": false,
+      "inLegend": true
+    },
+    {
+      "id": "k5",
+      "name": "Ltg S2",
+      "legendLabel": "Ltg S2",
+      "color": {
+        "r": 255,
+        "g": 204,
+        "b": 153
+      },
+      "neutral": false,
+      "inLegend": true
+    },
+    {
+      "id": "k6",
+      "name": "neutral",
+      "legendLabel": "neutral",
+      "color": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+      },
+      "neutral": true,
+      "inLegend": false
+    }
+  ],
+  "rapportCodes": [
+    {
+      "code": "KR",
+      "categoryId": "k2"
+    },
+    {
+      "code": "DR",
+      "categoryId": "k2"
+    },
+    {
+      "code": "AR1",
+      "categoryId": "k2"
+    },
+    {
+      "code": "AR2",
+      "categoryId": "k2"
+    },
+    {
+      "code": "ARK",
+      "categoryId": "k2"
+    },
+    {
+      "code": "BR 0",
+      "categoryId": "k1"
+    },
+    {
+      "code": "BR 1",
+      "categoryId": "k1"
+    },
+    {
+      "code": "BR 2",
+      "categoryId": "k1"
+    },
+    {
+      "code": "BR 3",
+      "categoryId": "k1"
+    }
+  ],
+  "abbreviationsSelected": [],
+  "markerLabels": [
+    {
+      "kind": "AV",
+      "withTime": false
+    },
+    {
+      "kind": "ABV",
+      "withTime": true
+    },
+    {
+      "kind": "HV",
+      "withTime": false
+    },
+    {
+      "kind": "custom",
+      "withTime": false
+    }
+  ],
+  "columnSets": [
+    {
+      "id": "s7",
+      "name": "KVK Stufen",
+      "columns": [
+        {
+          "id": "c8",
+          "name": "Kp Kdt",
+          "kind": "planning",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c9",
+          "name": "Stv",
+          "kind": "planning",
+          "weight": "narrow",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c10",
+          "name": "Zfhr",
+          "kind": "planning",
+          "weight": "narrow",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c11",
+          "name": "Uof",
+          "kind": "planning",
+          "weight": "narrow",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c12",
+          "name": "höh Uof",
+          "kind": "planning",
+          "weight": "narrow",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c13",
+          "name": "Trp",
+          "kind": "planning",
+          "weight": "narrow",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c27",
+          "name": "Det",
+          "kind": "secondary",
+          "weight": "narrow",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c14",
+          "name": "Rap",
+          "kind": "rap",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c15",
+          "name": "Beso",
+          "kind": "beso",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        }
+      ]
+    },
+    {
+      "id": "s16",
+      "name": "KVK Mi–Fr",
+      "columns": [
+        {
+          "id": "c17",
+          "name": "Kdo",
+          "kind": "planning",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c18",
+          "name": "Mö",
+          "kind": "planning",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c19",
+          "name": "Sph",
+          "kind": "planning",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c20",
+          "name": "Rap",
+          "kind": "rap",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c21",
+          "name": "Beso",
+          "kind": "beso",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        }
+      ]
+    },
+    {
+      "id": "s22",
+      "name": "Wochenende kompakt",
+      "columns": [
+        {
+          "id": "c23",
+          "name": "Kp",
+          "kind": "planning",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c24",
+          "name": "Rap",
+          "kind": "rap",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        },
+        {
+          "id": "c25",
+          "name": "Beso",
+          "kind": "beso",
+          "weight": "normal",
+          "labelOrientation": "horizontal",
+          "defaultCategoryId": null,
+          "origin": "manual"
+        }
+      ]
+    }
+  ],
+  "weeks": [
+    {
+      "id": "w26",
+      "label": "KVK",
+      "shortName": "KVK",
+      "startDate": "2026-09-28",
+      "days": [
+        {
+          "weekday": "Mo",
+          "columnSetId": "s7",
+          "display": "full",
+          "internalNote": ""
+        },
+        {
+          "weekday": "Di",
+          "columnSetId": "s7",
+          "display": "full",
+          "internalNote": ""
+        },
+        {
+          "weekday": "Mi",
+          "columnSetId": "s16",
+          "display": "full",
+          "internalNote": ""
+        },
+        {
+          "weekday": "Do",
+          "columnSetId": "s16",
+          "display": "full",
+          "internalNote": ""
+        },
+        {
+          "weekday": "Fr",
+          "columnSetId": "s16",
+          "display": "full",
+          "internalNote": ""
+        },
+        {
+          "weekday": "Sa",
+          "columnSetId": "s22",
+          "display": "compact",
+          "internalNote": ""
+        },
+        {
+          "weekday": "So",
+          "columnSetId": "s22",
+          "display": "compact",
+          "internalNote": ""
+        }
+      ],
+      "weekGoals": [
+        {
+          "id": "g28",
+          "text": "Ukft ist bezogen und der Eigenschutz etabliert.",
+          "group": null
+        },
+        {
+          "id": "g29",
+          "text": "Mat, Mun und sind Fz gefasst und kontrolliert.",
+          "group": null
+        },
+        {
+          "id": "g30",
+          "text": "Arbeits- und Lektionenpläne für die FDT Wo 1 sind erstellt und die Ausb ist vorbereitet.",
+          "group": null
+        },
+        {
+          "id": "g31",
+          "text": "Der Zusammenhalt im Kader wird gestärkt.",
+          "group": null
+        }
+      ],
+      "heightenedReadiness": "",
+      "sunOverride": {
+        "sunrise": 455,
+        "sunset": 1005
+      },
+      "agendaWeekend": "auto",
+      "hiddenRemarkIds": []
+    }
+  ],
+  "deletedWeeks": [],
+  "entries": {
+    "e32": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 1,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e32",
+      "type": "marker",
+      "date": "2026-09-28",
+      "at": 1350,
+      "kind": "ABV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e33": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 2,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e33",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 510,
+        "to": 540
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c12",
+          "c13"
+        ]
+      },
+      "title": [
+        {
+          "text": "Einrücken",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e34": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 3,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e34",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 540,
+        "to": 565
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8",
+          "c9"
+        ]
+      },
+      "title": [
+        {
+          "text": "Einrücken",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Stv: Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e35": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 4,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e35",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 540,
+        "to": 1045
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c12",
+          "c13"
+        ]
+      },
+      "title": [
+        {
+          "text": "Fsg Mat Fsg Fz, Fahrer Rep anschl Vs Ukft",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e36": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 5,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e36",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 565,
+        "to": 705
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8",
+          "c9"
+        ]
+      },
+      "title": [
+        {
+          "text": "Kontrl Fsg",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Muster A",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e37": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 6,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e37",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 705,
+        "to": 760
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8",
+          "c9"
+        ]
+      },
+      "title": [
+        {
+          "text": "MiE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e38": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 7,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e38",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 760,
+        "to": 1040
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8",
+          "c9"
+        ]
+      },
+      "title": [
+        {
+          "text": "AVOR",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e39": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 8,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e39",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 960
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c27"
+        ]
+      },
+      "title": [
+        {
+          "text": "Ausb. Mun Det",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Lt Muster B",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e41": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 10,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e41",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 1040,
+        "to": 1100
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "NaE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e42": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 11,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e42",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 1100,
+        "to": 1200
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8"
+        ]
+      },
+      "title": [
+        {
+          "text": "VS",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e43": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 12,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e43",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 1100,
+        "to": 1295
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c9"
+        ]
+      },
+      "title": [
+        {
+          "text": "AVOR",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e44": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 13,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e44",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 1100,
+        "to": 1295
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c12",
+          "c13"
+        ]
+      },
+      "title": [
+        {
+          "text": "Einrichten Ukft/Mag",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Einh Fw",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e45": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 14,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e45",
+      "type": "block",
+      "date": "2026-09-28",
+      "time": {
+        "form": "range",
+        "from": 1295,
+        "to": 1350
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "PD / ID",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e46": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 15,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e46",
+      "type": "rapport",
+      "date": "2026-09-28",
+      "code": "BR 0",
+      "time": {
+        "form": "range",
+        "from": 1200,
+        "to": 1320
+      },
+      "ort": "Bat KP",
+      "tn": "",
+      "categoryId": "k1",
+      "display": "alsoInColumns",
+      "displayColumns": {
+        "kind": "ids",
+        "ids": [
+          "c8"
+        ]
+      }
+    },
+    "e47": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 16,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e47",
+      "type": "marker",
+      "date": "2026-09-29",
+      "at": 420,
+      "kind": "AV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e48": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 17,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e48",
+      "type": "marker",
+      "date": "2026-09-29",
+      "at": 1380,
+      "kind": "ABV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e49": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 18,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e49",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 360,
+        "to": 405
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Tagwach / MoE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e50": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 19,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e50",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 960
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c27"
+        ]
+      },
+      "title": [
+        {
+          "text": "Mun Fsg Det",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Mun C",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e51": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 20,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e51",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c12",
+          "c13"
+        ]
+      },
+      "title": [
+        {
+          "text": "Einrichten Ukft/Mag",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Einh Fw",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e52": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 21,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e52",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 460,
+        "to": 585
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8",
+          "c9"
+        ]
+      },
+      "title": [
+        {
+          "text": "Einrücken Sub Of",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e53": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 22,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e53",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 585,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8",
+          "c9"
+        ]
+      },
+      "title": [
+        {
+          "text": "AVOR",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e54": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 23,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e54",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 585,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c10"
+        ]
+      },
+      "title": [
+        {
+          "text": "Einrücken Zfhr Bezug Ukft",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e55": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 24,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e55",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 720,
+        "to": 780
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "MiE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e57": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 26,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e57",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 1050
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8",
+          "c9",
+          "c10"
+        ]
+      },
+      "title": [
+        {
+          "text": "ERK Spl inkl Vs Breitfeld / Säntisalpen",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k4",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e58": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 27,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e58",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 1050
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c12",
+          "c13"
+        ]
+      },
+      "title": [
+        {
+          "text": "Einrichten Ukft/Mag",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Einh Fw",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e59": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 28,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e59",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 1050,
+        "to": 1105
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c8",
+          "c9",
+          "c10"
+        ]
+      },
+      "title": [
+        {
+          "text": "Vs",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "AVOR EIr",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e60": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 29,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e60",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 1050,
+        "to": 1105
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c11",
+          "c12",
+          "c13"
+        ]
+      },
+      "title": [
+        {
+          "text": "NaE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e61": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 30,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e61",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 1105,
+        "to": 1160
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Einrücken Uof",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Kdt Stv",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e62": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 31,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e62",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 1160,
+        "to": 1215
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Th FDT / Dienstbetrieb",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Kdt, Einh Fw",
+      "tn": "",
+      "tpt": "",
+      "ort": "ThS",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e63": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 32,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e63",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 1220,
+        "to": 1275
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Bezug Ukft",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Einh Fw",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e64": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 33,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e64",
+      "type": "block",
+      "date": "2026-09-29",
+      "time": {
+        "form": "range",
+        "from": 1275,
+        "to": 1330
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "PD / ID",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e65": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 34,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e65",
+      "type": "rapport",
+      "date": "2026-09-29",
+      "code": "KR",
+      "time": {
+        "form": "range",
+        "from": 600,
+        "to": 630
+      },
+      "ort": "",
+      "tn": "",
+      "categoryId": "k2",
+      "display": "rapColumn",
+      "displayColumns": {
+        "kind": "ids",
+        "ids": []
+      }
+    },
+    "e66": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 35,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e66",
+      "type": "rapport",
+      "date": "2026-09-29",
+      "code": "DR",
+      "time": {
+        "form": "range",
+        "from": 660,
+        "to": 720
+      },
+      "ort": "",
+      "tn": "",
+      "categoryId": "k2",
+      "display": "rapColumn",
+      "displayColumns": {
+        "kind": "ids",
+        "ids": []
+      }
+    },
+    "e67": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 36,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e67",
+      "type": "marker",
+      "date": "2026-09-30",
+      "at": 420,
+      "kind": "AV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e68": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 37,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e68",
+      "type": "marker",
+      "date": "2026-09-30",
+      "at": 1380,
+      "kind": "ABV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e69": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 38,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e69",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 360,
+        "to": 405
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Tagwach / MoE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e70": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 39,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e70",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c17"
+        ]
+      },
+      "title": [
+        {
+          "text": "AVOR",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e71": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 40,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e71",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 510
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18"
+        ]
+      },
+      "title": [
+        {
+          "text": "EV",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e72": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 41,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e72",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "KU FFG7",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Spl/Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k4",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e73": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 42,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e73",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 510,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18"
+        ]
+      },
+      "title": [
+        {
+          "text": "KU VBA18 40",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Spl/Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k4",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e74": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 43,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e74",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 720,
+        "to": 780
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "MiE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft/Spl",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e75": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 44,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e75",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 1020
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c17"
+        ]
+      },
+      "title": [
+        {
+          "text": "AVOR",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e76": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 45,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e76",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 1020
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18"
+        ]
+      },
+      "title": [
+        {
+          "text": "KU VBA18 40",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Spl/Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k4",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e77": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 46,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e77",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 1020
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "KU FFG7",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Spl/Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k4",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e78": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 47,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e78",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 1020,
+        "to": 1080
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "WEB / PD",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e79": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 48,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e79",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 1080,
+        "to": 1140
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "NaE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "QM",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k1",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e80": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 49,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e80",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 1140,
+        "to": 1200
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Korpsvisite",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k1",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e81": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 50,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e81",
+      "type": "block",
+      "date": "2026-09-30",
+      "time": {
+        "form": "range",
+        "from": 1200,
+        "to": 1350
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Kaderabend 61",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k1",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e83": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 52,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e83",
+      "type": "rapport",
+      "date": "2026-09-30",
+      "code": "KR",
+      "time": {
+        "form": "range",
+        "from": 360,
+        "to": 390
+      },
+      "ort": "",
+      "tn": "",
+      "categoryId": "k2",
+      "display": "rapColumn",
+      "displayColumns": {
+        "kind": "ids",
+        "ids": []
+      }
+    },
+    "e84": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 53,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e84",
+      "type": "marker",
+      "date": "2026-10-01",
+      "at": 420,
+      "kind": "AV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e85": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 54,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e85",
+      "type": "marker",
+      "date": "2026-10-01",
+      "at": 1440,
+      "kind": "ABV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e86": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 55,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e86",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 360,
+        "to": 405
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Tagwach / MoE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e87": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 56,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e87",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c17"
+        ]
+      },
+      "title": [
+        {
+          "text": "Insp DB",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Wache, Mat Mag, Mun Mag, KP, Kassen, Küche Fz Park",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e88": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 57,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e88",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18"
+        ]
+      },
+      "title": [
+        {
+          "text": "z Vf Zf",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "EV Fhz",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e89": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 58,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e89",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 480
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "EV",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e90": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 59,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e90",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 480,
+        "to": 720
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "KU VBA18 Fe Ltg",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k4",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e91": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 60,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e91",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 720,
+        "to": 780
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "MiE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft/Spl",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e92": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 61,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e92",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 1140
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c17"
+        ]
+      },
+      "title": [
+        {
+          "text": "AVOR",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e93": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 62,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e93",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 1140
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18"
+        ]
+      },
+      "title": [
+        {
+          "text": "z Vf Zfhr",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Refresher",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e94": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 63,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e94",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 1020
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "KU VBA18 Fe Ltg",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k4",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e95": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 64,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e95",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 1020,
+        "to": 1140
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "z Vf Zfhr",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e96": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 65,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e96",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 1140,
+        "to": 1170
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "PD",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e97": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 66,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e97",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 1170,
+        "to": 1380
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Kaderabend Ustü",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e98": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 67,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e98",
+      "type": "block",
+      "date": "2026-10-01",
+      "time": {
+        "form": "range",
+        "from": 1380,
+        "to": 1410
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "ID",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e99": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 68,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e99",
+      "type": "rapport",
+      "date": "2026-10-01",
+      "code": "KR",
+      "time": {
+        "form": "range",
+        "from": 360,
+        "to": 390
+      },
+      "ort": "",
+      "tn": "",
+      "categoryId": "k2",
+      "display": "rapColumn",
+      "displayColumns": {
+        "kind": "ids",
+        "ids": []
+      }
+    },
+    "e100": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 69,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e100",
+      "type": "rapport",
+      "date": "2026-10-01",
+      "code": "DR",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 480
+      },
+      "ort": "",
+      "tn": "",
+      "categoryId": "k2",
+      "display": "rapColumn",
+      "displayColumns": {
+        "kind": "ids",
+        "ids": []
+      }
+    },
+    "e101": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 70,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e101",
+      "type": "marker",
+      "date": "2026-10-02",
+      "at": 420,
+      "kind": "AV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e102": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 71,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e102",
+      "type": "marker",
+      "date": "2026-10-02",
+      "at": 1140,
+      "kind": "HV",
+      "customKind": "",
+      "columns": {
+        "kind": "all"
+      },
+      "asFlatBlock": false
+    },
+    "e103": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 72,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e103",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 360,
+        "to": 405
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Tagwach / MoE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e104": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 73,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e104",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 780
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c17"
+        ]
+      },
+      "title": [
+        {
+          "text": "AVOR",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e105": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 74,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e105",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 450,
+        "to": 480
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18",
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "EV",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e106": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 75,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e106",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 480,
+        "to": 780
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18",
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "z Vf Zfhr",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e107": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 76,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e107",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 780,
+        "to": 840
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "MiE",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e108": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 77,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e108",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 840,
+        "to": 1020
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c17"
+        ]
+      },
+      "title": [
+        {
+          "text": "AVOR Einr",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "Ukft",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e109": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 78,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e109",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 840,
+        "to": 900
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18",
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "z Vf Zf",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "EV Fhz",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e110": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 79,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e110",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 900,
+        "to": 1020
+      },
+      "columns": {
+        "kind": "ids",
+        "ids": [
+          "c18",
+          "c19"
+        ]
+      },
+      "title": [
+        {
+          "text": "WPD",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "Einh Fw",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e111": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 80,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e111",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 1020,
+        "to": 1080
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "Kdt Stunde / Bf Ausgb Einrücken",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "ThS",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k2",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e112": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 81,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e112",
+      "type": "block",
+      "date": "2026-10-02",
+      "time": {
+        "form": "range",
+        "from": 1080,
+        "to": 1125
+      },
+      "columns": {
+        "kind": "all"
+      },
+      "title": [
+        {
+          "text": "ID / Zi Ord",
+          "bold": true
+        }
+      ],
+      "supplement": "",
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "tenue": "",
+      "printTn": false,
+      "printTenue": false,
+      "categoryId": "k3",
+      "secondCategoryId": null,
+      "textDirection": "auto",
+      "openEnd": false
+    },
+    "e113": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 82,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e113",
+      "type": "rapport",
+      "date": "2026-10-02",
+      "code": "KR",
+      "time": {
+        "form": "range",
+        "from": 750,
+        "to": 780
+      },
+      "ort": "",
+      "tn": "",
+      "categoryId": "k2",
+      "display": "rapColumn",
+      "displayColumns": {
+        "kind": "ids",
+        "ids": []
+      }
+    },
+    "e114": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 83,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e114",
+      "type": "beso",
+      "date": "2026-09-28",
+      "title": [
+        {
+          "text": "Kick-off Rap",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t115",
+          "time": {
+            "form": "range",
+            "from": 510,
+            "to": 540
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "LBA",
+      "tn": "Einh Kdt Stv u/o Einh Fw, Mat C, VT C",
+      "tpt": "",
+      "ort": "ALC-O Truppengebäude Nr 5",
+      "categoryId": "k2",
+      "besoNumber": 10,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e116": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 84,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e116",
+      "type": "beso",
+      "date": "2026-09-28",
+      "title": [
+        {
+          "text": "Aufbau Fahrschulgarten",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t117",
+          "time": {
+            "form": "point",
+            "at": 510
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "VT Of Bat und VT C Kp",
+      "tn": "",
+      "tpt": "",
+      "ort": "ALC-O",
+      "categoryId": "k2",
+      "besoNumber": 11,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e118": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 85,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e118",
+      "type": "beso",
+      "date": "2026-09-28",
+      "title": [
+        {
+          "text": "Fassung Erst Ausb Mun für das COMPLETTO Det",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t119",
+          "time": {
+            "form": "point",
+            "at": 600
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "Kdt Stv 61/4",
+      "tn": "",
+      "tpt": "",
+      "ort": "ALC-O",
+      "categoryId": "k2",
+      "besoNumber": 12,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e120": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 86,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e120",
+      "type": "beso",
+      "date": "2026-09-28",
+      "title": [
+        {
+          "text": "SEM; AdA mit erforderlicher ärztlicher Vorstellung telefonisch an den Bat Az melden",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t121",
+          "time": {
+            "form": "until",
+            "to": 720
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 13,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e122": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 87,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e122",
+      "type": "beso",
+      "date": "2026-09-28",
+      "title": [
+        {
+          "text": "Lage Rap",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t123",
+          "time": {
+            "form": "point",
+            "at": 690
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "S4",
+      "tn": "Einh Kdt Stv u/o Einh Fw, Mat C, VT C",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 14,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e124": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 88,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e124",
+      "type": "beso",
+      "date": "2026-09-28",
+      "title": [
+        {
+          "text": "Log Absprache via Teams",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t125",
+          "time": {
+            "form": "point",
+            "at": 1020
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "S4",
+      "tn": "alle Einh Fw",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 15,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e126": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 89,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e126",
+      "type": "beso",
+      "date": "2026-09-28",
+      "title": [
+        {
+          "text": "Bf Ausgabe Mun Fsg",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t127",
+          "time": {
+            "form": "point",
+            "at": 1140
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "FGG 4",
+      "tn": "Trsp Det C aus 61/4",
+      "tpt": "",
+      "ort": "Kas Herisau",
+      "categoryId": "k2",
+      "besoNumber": 16,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e128": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 90,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e128",
+      "type": "beso",
+      "date": "2026-09-29",
+      "title": [
+        {
+          "text": "Fsg Mun inkl COMPLETTO",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t129",
+          "time": {
+            "form": "point",
+            "at": 600
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "Kdt 61/4",
+      "tn": "",
+      "tpt": "",
+      "ort": "ALC UTTIGEN; Trsp bis Mun Mag der Einh, Ziel GAISERWALD",
+      "categoryId": "k2",
+      "besoNumber": 20,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e130": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 91,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e130",
+      "type": "beso",
+      "date": "2026-09-29",
+      "title": [
+        {
+          "text": "Spl Begehung SÄNTISALP und OBERTOGGENBURG",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t131",
+          "time": {
+            "form": "range",
+            "from": 810,
+            "to": 1080
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "Koord St 4",
+      "tn": "UL Kp 61/0/1/2/4",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 21,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e132": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 92,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e132",
+      "type": "beso",
+      "date": "2026-09-29",
+      "title": [
+        {
+          "text": "Fsg FIS HE Fz und Mat, AS EMMEN in ROTHENBURG",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t133",
+          "time": {
+            "form": "from",
+            "from": 600
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "Kdt Inf Stabskp 61; Personal durch die Einh",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 22,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e134": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 93,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e134",
+      "type": "beso",
+      "date": "2026-09-29",
+      "title": [
+        {
+          "text": "Log Absprache via Teams",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t135",
+          "time": {
+            "form": "point",
+            "at": 1020
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "S4",
+      "tn": "alle Einh Fw",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 23,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e136": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 94,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e136",
+      "type": "beso",
+      "date": "2026-09-29",
+      "title": [
+        {
+          "text": "Ausb Mun D",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t137",
+          "time": {
+            "form": "range",
+            "from": 1020,
+            "to": 1110
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "FGG 4",
+      "tn": "alle Mun C",
+      "tpt": "",
+      "ort": "Mun Mag GAISERWALD",
+      "categoryId": "k2",
+      "besoNumber": 24,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e138": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 95,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e138",
+      "type": "beso",
+      "date": "2026-09-29",
+      "title": [
+        {
+          "text": "KP TBZ - Kp KP betriebsbereit und jederzeit erreichbar, sonst Umleitung auf die Wache",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t139",
+          "time": {
+            "form": "point",
+            "at": 960
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 25,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e140": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 96,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e140",
+      "type": "beso",
+      "date": "2026-09-30",
+      "title": [
+        {
+          "text": "Log Absprache via Teams",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t141",
+          "time": {
+            "form": "point",
+            "at": 1020
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "S4",
+      "tn": "alle Einh Fw",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 30,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e142": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 97,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e142",
+      "type": "beso",
+      "date": "2026-09-30",
+      "title": [
+        {
+          "text": "Höh Uof und Uof z Vf Stabsuof",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t143",
+          "time": {
+            "form": "range",
+            "from": 1110,
+            "to": 1125
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "offen",
+      "categoryId": "k2",
+      "besoNumber": 31,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e144": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 98,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e144",
+      "type": "beso",
+      "date": "2026-09-30",
+      "title": [
+        {
+          "text": "Fhr Fähigkeit erstellt (Ber Auflage)",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t145",
+          "time": {
+            "form": "point",
+            "at": 1320
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 32,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e146": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 99,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e146",
+      "type": "beso",
+      "date": "2026-10-01",
+      "title": [
+        {
+          "text": "Begehung Einrückstao / Mob Pl, Bhf ST.GALLEN WINKELN, Schalonieren; Tn u.a. Einh Kdt Stv",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t147",
+          "time": {
+            "form": "range",
+            "from": 540,
+            "to": 660
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 40,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e148": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 100,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e148",
+      "type": "beso",
+      "date": "2026-10-01",
+      "title": [
+        {
+          "text": "Log Absprache via Teams",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t149",
+          "time": {
+            "form": "point",
+            "at": 1020
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "S4",
+      "tn": "alle Einh Fw",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 41,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e150": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 101,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e150",
+      "type": "beso",
+      "date": "2026-10-01",
+      "title": [
+        {
+          "text": "Wechsel Plantondienst auf Scharfe Wache; gilt bis Fr 23.10.2026, 0600",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t151",
+          "time": {
+            "form": "point",
+            "at": 1080
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 42,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e152": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 102,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e152",
+      "type": "beso",
+      "date": "2026-10-01",
+      "title": [
+        {
+          "text": "Abspracherapport Mobilmachung via Teams",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t153",
+          "time": {
+            "form": "point",
+            "at": 1260
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "Ber Of, Einh Kdt Stv, S4, C Triage Det, C Si Det",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 43,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e154": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 103,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e154",
+      "type": "beso",
+      "date": "2026-10-02",
+      "title": [
+        {
+          "text": "Laufbahngespräche Inf Ustü Kp 61/4",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t155",
+          "time": {
+            "form": "range",
+            "from": 480,
+            "to": 720
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "Bat Kdt",
+      "tn": "Of und Höh Uof 61/4",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 50,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e156": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 104,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e156",
+      "type": "beso",
+      "date": "2026-10-02",
+      "title": [],
+      "windows": [
+        {
+          "id": "t157",
+          "time": {
+            "form": "range",
+            "from": 810,
+            "to": 840
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 51,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e158": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 105,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e158",
+      "type": "beso",
+      "date": "2026-10-02",
+      "title": [
+        {
+          "text": "Planungsfähigkeit erstellt (Ber Auflage)",
+          "bold": false
+        }
+      ],
+      "windows": [
+        {
+          "id": "t159",
+          "time": {
+            "form": "point",
+            "at": 1320
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 52,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e160": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 106,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e160",
+      "type": "beso",
+      "date": "2026-10-04",
+      "title": [],
+      "windows": [
+        {
+          "id": "t161",
+          "time": {
+            "form": "range",
+            "from": 570,
+            "to": 600
+          },
+          "columnId": null,
+          "supplement": ""
+        }
+      ],
+      "ltg": "",
+      "tn": "",
+      "tpt": "",
+      "ort": "",
+      "categoryId": "k2",
+      "besoNumber": 70,
+      "numberFixed": false,
+      "agendaOverride": null
+    },
+    "e162": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 107,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e162",
+      "type": "dayRemark",
+      "date": "2026-10-02",
+      "text": "LKW inkl Anh mit Mat für Mob Ausrüstung und Erstausbildung an Stao AMP BRONSCHHOFEN; Fz für die Mob U vorbereiten."
+    },
+    "e163": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 108,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e163",
+      "type": "dayRemark",
+      "date": "2026-10-04",
+      "text": "Übernahme FDT-Wache; Ltg: Wacht Of."
+    },
+    "e164": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 109,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e164",
+      "type": "multiDayRemark",
+      "text": "Sport: 4h pro Woche (2x90', 2x30'); FTAS einmal im FDT.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e165": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 110,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e165",
+      "type": "multiDayRemark",
+      "text": "Tagesablauf: vor 0700 Mat Fsg und Zi Ord, 0700 AV. Kader inkl Uof haben kein ABV.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e166": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 111,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e166",
+      "type": "multiDayRemark",
+      "text": "Kp KP jederzeit erreichbar; bei unbesetztem KP Umleitung auf die Wache.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e167": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 112,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e167",
+      "type": "multiDayRemark",
+      "text": "Einh Four: BuHa taeglich nachfuehren, taegliche Kassenkontrolle aller Kassen.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e168": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 113,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e168",
+      "type": "multiDayRemark",
+      "text": "DIM-Onboarding und Funktionskontrolle DIM Wallet bei saemtlichen AdA.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e169": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 114,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e169",
+      "type": "multiDayRemark",
+      "text": "Geheimhaltungsverpflichtung aller im KP dienstleistenden AdA.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e170": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 115,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e170",
+      "type": "multiDayRemark",
+      "text": "Aufsichts Of pro Einh bei Ausgang und allg Urlaub.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e171": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 116,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e171",
+      "type": "multiDayRemark",
+      "text": "Meldungen nur ueber M365 Planner / Sharepoint, nicht per Mail oder Telefon.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e172": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 117,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e172",
+      "type": "multiDayRemark",
+      "text": "Einrücken zwingend mit öV, keine Trp Parkplätze; MiE in Seso mitführen, NaE durch die Einh.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e173": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 118,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e173",
+      "type": "multiDayRemark",
+      "text": "Kupplungsplan (Anh 04-01a-1) vor Abfahrt durch C Transportbegleitschutz ausfüllen; Fk Vrb Kontr am WK Stao und in UTTIGEN.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e174": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 119,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e174",
+      "type": "multiDayRemark",
+      "text": "Der KU des Bat gilt nicht für die Ustü Kp; pflichtig sind Zfhr und Grfhr der Kp 0-3 (Bf 03-01c).",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e175": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 120,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e175",
+      "type": "multiDayRemark",
+      "text": "Entlassung aus dem KVK Einh-weise auf Antrag der Einh Kdt an den Bat Kdt (via Threema).",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    },
+    "e176": {
+      "status": "confirmed",
+      "changed": false,
+      "createdSeq": 121,
+      "internalNote": "",
+      "removedText": [],
+      "id": "e176",
+      "type": "multiDayRemark",
+      "text": "Höh Kader z Vf Kdt.",
+      "scope": {
+        "kind": "plan"
+      },
+      "number": null,
+      "refBoxColumnId": null
+    }
+  },
+  "displayRange": {
+    "from": 240,
+    "to": 1440
+  },
+  "stand": {
+    "date": "2026-09-17",
+    "version": 1
+  },
+  "nextSeq": 122,
+  "nextId": 177,
+  "lastUsedCategoryId": null,
+  "printDefaults": {
+    "printTn": false,
+    "printTenue": false
+  },
+  "acknowledgedFindings": []
+}

@@ -6,6 +6,8 @@
       "tests/**/*.ts",
       "tests/**/*.tsx",
       "tools/**/*.mjs",
+      "tools/wap/**",
+      "scripts/wap*/**/*.mjs",
       "*.json",
       "*.ts",
       "!!src/vendor",
@@ -31,5 +33,35 @@
       "suspicious": { "noConsole": "error" }
     }
   },
+  "overrides": [
+    {
+      "includes": [
+        "src/model/wap/**",
+        "src/io/wap-plan/**",
+        "src/io/wap-pdf/**",
+        "src/io/wap-import/**",
+        "src/io/wap-persons/**",
+        "src/io/xlsx-drawing/**",
+        "src/components/wap/**",
+        "src/pages/WapPage.tsx",
+        "src/assets/wap-fonts/**",
+        "tests/wap/**",
+        "tests/wap-e2e/**",
+        "tests/wap-perf/**",
+        "tests/wap-gate/**",
+        "tools/wap/**",
+        "scripts/wap*/**"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noFocusedTests": "error",
+            "noSkippedTests": "error",
+            "noExplicitAny": "error"
+          }
+        }
+      }
+    }
+  ],
   "assist": { "actions": { "source": { "organizeImports": "on" } } }
 }

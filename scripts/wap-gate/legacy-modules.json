@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "dateien": [
+    {
+      "pfad": "src/io/xlsx-drawing/zip.ts",
+      "sha256": "f8906e84721c1f793416341b8749da66e5970dc2f6f5b71ab4c270c9f0c58a39"
+    },
+    {
+      "pfad": "src/io/xlsx-drawing/xml.ts",
+      "sha256": "06cf025c611580e36ea6a5a9a92db87a97250ba1a9d5f4c5e7707dd054c5e9de"
+    },
+    {
+      "pfad": "src/io/xlsx-drawing/sheet.ts",
+      "sha256": "8becea68bc561ed297c3e38bb1cd88269fb6f2726962bb3af5bf020c08de3e84"
+    },
+    {
+      "pfad": "src/io/xlsx-drawing/colors.ts",
+      "sha256": "b99e23b3811f5dde35f99923dac80217981fdf8d3aee3bb158228d159dbb459e"
+    },
+    {
+      "pfad": "src/io/xlsx-drawing/drawing.ts",
+      "sha256": "4090d1c6cd38bc7f60cd9af73152e19e67fd26e4e2c2b4118fae06ceee97bd48"
+    }
+  ]
+}
