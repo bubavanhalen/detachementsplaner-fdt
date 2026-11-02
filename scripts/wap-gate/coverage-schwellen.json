@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "grundlage": "Prompt §7 Abdeckung, ADR-010 §6.2 (je Pfadmenge und je Modulordner); Änderung nur per lock-update mit Zustimmung des Auftraggebers",
+  "mengen": [
+    {
+      "name": "fachlogik",
+      "muster": ["src/model/wap/**", "src/io/wap-import/**", "src/io/xlsx-drawing/**"],
+      "zweige": 90
+    },
+    {
+      "name": "uebrig",
+      "muster": [
+        "src/io/wap-plan/**",
+        "src/io/wap-pdf/**",
+        "src/io/wap-persons/**",
+        "src/components/wap/**",
+        "src/pages/WapPage.tsx",
+        "src/assets/wap-fonts/**"
+      ],
+      "zweige": 75,
+      "entscheid": "Gate B 28.10.2026, Entscheid 34c (Zustimmung des Auftraggebers, «All as recommended»): tools/wap/** ist nicht mehr Teil dieser Pfadmenge. Begründung: Bauwerkzeug, kein ausgelieferter Code; belegt durch den Build (npm run build, V10-build), check:release (V10-release), die Lizenztexte der Einzeldatei (V10-lizenztexte) und die Gate-Tests der Werkzeuge. src/pages/WapPage.tsx bleibt gemessen. Schwellen unverändert."
+    }
+  ],
+  "jeModul": true,
+  "ausnahmen": ["**/types.ts", "**/*.d.ts", "src/model/wap/layout/text/metrics.generated.ts"]
+}

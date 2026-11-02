@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "grundlage": "ADR-010 §7.3 (gesperrt; Änderung nur mit neuen Baselines per lock-update, eigener Commit, Vorher/Nachher/Differenz an Gate B)",
+  "pdf": {
+    "pdfjsDist": "6.3.289",
+    "napiRsCanvas": "1.0.10",
+    "dpi": 300,
+    "schriften": {
+      "src/assets/wap-fonts/Arimo-Bold.ttf": "ec96ac9fdd94766f66f6140c1375bf011577558f88d43f76b3b59307d2a6bca3",
+      "src/assets/wap-fonts/Arimo-Regular.ttf": "88cc899855d30f9c779b73c3319d0e077b098f927187aafce11ca029add707a6"
+    }
+  },
+  "bildschirm": {
+    "playwright": "1.63.0",
+    "browser": "chromium",
+    "revision": "1243",
+    "browserVersion": "153.0.8010.12",
+    "viewport": "1600x1000",
+    "deviceScaleFactor": 1,
+    "betriebssystem": "Windows 11 Pro 10.0.26340",
+    "anzeigeSkalierung": 1
+  }
+}

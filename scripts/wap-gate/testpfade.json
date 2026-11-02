@@ -1,0 +1,322 @@
+{
+  "E1-01": [
+    "tests/wap-gate/**/*.gate.ts",
+    "tests/wap-gate/**/*.selbsttest.ts",
+    "tests/wap-gate/support/**",
+    "tests/wap-gate/fixtures/**",
+    "tests/wap-harness/pre-commit-gate.harness.ts"
+  ],
+  "E1-01b": [
+    "tests/wap-gate/config-b.gate.ts",
+    "tests/wap-gate/e2e-grundlauf.selbsttest.ts",
+    "tests/wap-gate/e2e-support.gate.ts",
+    "tests/wap-gate/einzeldatei.gate.ts",
+    "tests/wap-gate/einzeldatei.selbsttest.ts",
+    "tests/wap-gate/gate-full-b.gate.ts",
+    "tests/wap-gate/gate-full-b.selbsttest.ts",
+    "tests/wap-gate/node-check-b.gate.ts",
+    "tests/wap-gate/pdf-artefakte.gate.ts",
+    "tests/wap-gate/pdf-bild.gate.ts",
+    "tests/wap-gate/pdf-support.gate.ts",
+    "tests/wap-gate/selftest-s6.selbsttest.ts",
+    "tests/wap-gate/temp.gate.ts",
+    "tests/wap-gate/temp.selbsttest.ts",
+    "tests/wap-gate/trace-b.gate.ts",
+    "tests/wap-gate/support/vertrag-b.ts",
+    "tests/wap-gate/einzeldatei-verweise.gate.ts",
+    "tests/wap-gate/einzeldatei-leseschutz.gate.ts",
+    "tests/wap-gate/e2e-cr1.gate.ts",
+    "tests/wap-gate/vite-e2e-config.gate.ts",
+    "tests/wap-gate/pdf-rotate.gate.ts",
+    "tests/wap-gate/e2e-route.selbsttest.ts",
+    "tests/wap-gate/support/vertrag-b-cr1.ts",
+    "tests/wap-gate/e2e-server.gate.ts",
+    "tests/wap-gate/pdf-reihenfolge.gate.ts"
+  ],
+  "E1-02a": [
+    "tests/wap/unit/model/**",
+    "tests/wap/integration/model/**",
+    "tests/wap/property/model/**",
+    "tests/wap/fixtures/durchstich/**",
+    "tests/wap/support/model/**",
+    "tests/wap/support/arbitraries/model.ts",
+    "tests/wap/support/synthetic-plan.ts"
+  ],
+  "E1-02b": [
+    "tests/wap/unit/text/**",
+    "tests/wap/property/text/**"
+  ],
+  "E1-03": [
+    "tests/wap/unit/commands/**",
+    "tests/wap/property/commands/**",
+    "tests/wap/support/commands/**"
+  ],
+  "E1-02c": [
+    "tests/wap/unit/pdf-writer/**",
+    "tests/wap/pdf/writer/**",
+    "tests/wap/integration/pdf-writer/**",
+    "tests/wap-e2e/render/**",
+    "tests/wap-e2e/harness/page-view.*"
+  ],
+  "E1-07": [
+    "tests/wap/unit/xlsx-drawing/**",
+    "tests/wap/integration/xlsx-drawing/**"
+  ],
+  "E1-02d": [
+    "tests/wap/unit/grid/**",
+    "tests/wap/property/grid/**",
+    "tests/wap/support/grid/**",
+    "tests/wap/support/arbitraries/grid.ts"
+  ],
+  "E1-05": [
+    "tests/wap/unit/stand/**",
+    "tests/wap/integration/stand/**",
+    "tests/wap/pdf/stand/**",
+    "tests/wap/support/stand/**"
+  ],
+  "E1-02e": [
+    "tests/wap/unit/page/**",
+    "tests/wap/pdf/page/**",
+    "tests/wap/property/page/**",
+    "tests/wap/support/page/**",
+    "tests/wap/support/arbitraries/page.ts",
+    "tests/wap/fixtures/page/**",
+    "tests/wap/reference/b-kp/**"
+  ],
+  "E1-02f": [
+    "tests/wap/pdf/plan/**",
+    "tests/wap-e2e/parity/**",
+    "tests/wap-e2e/harness/week.*",
+    "tests/wap-e2e/harness/zwischenstand-i1.*"
+  ],
+  "E1-01c": [
+    "tests/wap-gate/*-c.gate.ts",
+    "tests/wap-gate/*-c.selbsttest.ts",
+    "tests/wap-gate/red-phase-playwright.gate.ts",
+    "tests/wap-gate/red-phase-playwright.selbsttest.ts",
+    "tests/wap-gate/support/vertrag-c.ts",
+    "tests/wap-gate/fixtures/e1-01c/**",
+    "tests/wap-e2e/kernzustaende.visual.spec.ts",
+    "docs/wap-planer/perf/budgets.json",
+    "tests/wap-gate/nachtrag-c-r2.gate.ts",
+    "tests/wap-gate/support/vertrag-c-r2.ts"
+  ],
+  "E1-02h": [
+    "tests/wap/unit/model/nachtrag-gate-s*.test.ts",
+    "tests/wap/property/model/nachtrag-gate-s.test.ts",
+    "tests/wap/unit/commands/nachtrag-teilaufgaben.test.ts",
+    "tests/wap/support/model/teilaufgaben.ts",
+    "tests/wap/unit/model/derive-abbreviations.test.ts",
+    "tests/wap/unit/model/template.test.ts"
+  ],
+  "E1-04": [
+    "tests/wap/unit/storage/**",
+    "tests/wap/integration/storage/**",
+    "tests/wap/property/storage/**",
+    "tests/wap/support/storage/**",
+    "tests/wap/fixtures/migration/**"
+  ],
+  "E1-02j": [
+    "tests/wap/fixtures/durchstich/kvk.plan.json",
+    "tests/wap/integration/model/kvk-fixture.test.ts",
+    "tests/wap/unit/page/nachtrag-s318.test.ts"
+  ],
+  "E1-02k": [
+    "tests/wap/pdf/page/nachtrag-rahmen.test.ts",
+    "tests/wap/unit/page/nachtrag-rahmen.test.ts",
+    "tests/wap/support/page/nachtrag-rahmen.ts",
+    "tests/wap/pdf/page/eintraege.test.ts",
+    "tests/wap/pdf/page/seite.test.ts",
+    "tests/wap/pdf/page/raster.test.ts",
+    "tests/wap/pdf/page/b-kp/pruefer.ts",
+    "tests/wap/pdf/page/b-kp/b-kp.test.ts",
+    "tests/wap/unit/page/geometrie.test.ts",
+    "tests/wap/support/page/bkp.ts",
+    "tests/wap/support/page/pdf-seite.ts",
+    "docs/wap-planer/anhaenge/anhang-b-kp.csv"
+  ],
+  "E1-04b": [
+    "tests/wap/integration/storage/nachtrag-base64.test.ts",
+    "tests/wap/unit/storage/nachtrag-kuerzen.test.ts",
+    "tests/wap/integration/storage/nachtrag-undefined.test.ts",
+    "tests/wap/integration/storage/nachtrag-umstellung.test.ts"
+  ],
+  "AE004": [
+    "tests/wap-harness/codex-integration.harness.ts"
+  ],
+  "E1-01h": [
+    "tests/wap-harness/rueckmerge-protokoll.harness.ts"
+  ],
+  "I2": [
+    "tests/wap/unit/i2/interaction.test.ts",
+    "tests/wap/unit/i2/session.test.ts",
+    "tests/wap-e2e/i2/ablauf.spec.ts",
+    "tests/wap-e2e/i2/ablauf.dist.spec.ts",
+    "tests/wap-e2e/i2/support/ablauf.ts",
+    "tests/wap-e2e/i2/support/demo.ts",
+    "tests/wap-e2e/harness/i2.tsx",
+    "tests/wap-e2e/harness/i2.html"
+  ],
+  "I2b": [
+    "tests/wap/unit/i2b/**",
+    "tests/wap-e2e/i2b/**",
+    "tests/wap-e2e/harness/i2b.tsx",
+    "tests/wap-e2e/harness/i2b.html"
+  ],
+  "E1-02l": [
+    "tests/wap/unit/e1-02l/**",
+    "tests/wap/property/e1-02l/**",
+    "tests/wap/pdf/e1-02l/**",
+    "tests/wap/support/e1-02l/**",
+    "tests/wap-e2e/e1-02l/**",
+    "tests/wap-e2e/harness/e1-02l.tsx",
+    "tests/wap-e2e/harness/e1-02l.html"
+  ],
+  "I2c": [
+    "tests/wap/unit/i2c/**",
+    "tests/wap-e2e/i2c/**",
+    "tests/wap-e2e/harness/i2c.tsx",
+    "tests/wap-e2e/harness/i2c.html"
+  ],
+  "I3": [
+    "tests/wap/unit/i3/**",
+    "tests/wap/integration/i3/**",
+    "tests/wap/pdf/i3/**",
+    "tests/wap/support/i3/**",
+    "tests/wap-e2e/i3/**",
+    "tests/wap-e2e/harness/i3.tsx",
+    "tests/wap-e2e/harness/i3.html"
+  ],
+  "I4": [
+    "tests/wap/unit/import/**",
+    "tests/wap/integration/import/**",
+    "tests/wap/reference/import/**",
+    "tests/wap/fixtures/import/**",
+    "tests/wap/support/anhang-compare/**",
+    "tests/wap-e2e/list/**",
+    "tests/wap-e2e/i4/**",
+    "tests/wap-e2e/harness/i4.tsx",
+    "tests/wap-e2e/harness/i4.html"
+  ],
+  "I5": [
+    "tests/wap/unit/i5/**",
+    "tests/wap/pdf/i5/**",
+    "tests/wap/support/i5/**",
+    "tests/wap-e2e/i5/**",
+    "tests/wap-e2e/harness/i5.tsx",
+    "tests/wap-e2e/harness/i5.html",
+    "tests/wap-perf/i5.perf.ts",
+    "tests/wap-perf/harness/entries/i5.ts"
+  ],
+  "PERF": [
+    "tests/wap/unit/perf/**"
+  ],
+  "H-LAYOUT": [
+    "tests/wap/unit/h-layout/**",
+    "tests/wap/pdf/h-layout/**",
+    "tests/wap-e2e/h-layout/**"
+  ],
+  "H-UI": [
+    "tests/wap/unit/h-ui/**",
+    "tests/wap-e2e/h-ui/**",
+    "tests/wap-e2e/harness/h-ui.tsx",
+    "tests/wap-e2e/harness/h-ui.html"
+  ],
+  "H-DATEN": [
+    "tests/wap/unit/h-daten/**"
+  ],
+  "H-UI2": [
+    "tests/wap/unit/h-ui2/**",
+    "tests/wap-e2e/h-ui2/**",
+    "tests/wap-e2e/harness/h-ui2.tsx",
+    "tests/wap-e2e/harness/h-ui2.html",
+    "tests/wap-e2e/harness/h-ui2-sperre.tsx",
+    "tests/wap-e2e/harness/h-ui2-sperre.html"
+  ],
+  "H-TESTS": [
+    "tests/wap/unit/h-tests/**",
+    "tests/wap/integration/h-tests/**",
+    "tests/wap/pdf/h-tests/**",
+    "tests/wap-e2e/h-tests/**",
+    "tests/wap-perf/h-tests/**",
+    "tests/wap-perf/harness/entries/h-tests.ts"
+  ],
+  "F-TOOLS": [
+    "tests/wap-gate/config-f-tools.gate.ts",
+    "tests/wap-gate/coverage.gate.ts",
+    "tests/wap-gate/gate-f-tools.gate.ts",
+    "tests/wap-gate/gate-fast-f10.selbsttest.ts",
+    "tests/wap-gate/golden.gate.ts",
+    "tests/wap-gate/golden-aufnahme.selbsttest.ts",
+    "tests/wap-gate/golden-vergleich.gate.ts",
+    "tests/wap-gate/license.gate.ts",
+    "tests/wap-gate/license.selbsttest.ts",
+    "tests/wap-gate/mutation.gate.ts",
+    "tests/wap-gate/mutation.selbsttest.ts",
+    "tests/wap-gate/node-check-f-tools.gate.ts",
+    "tests/wap-gate/selftest-f-tools.selbsttest.ts",
+    "tests/wap-gate/selftest-lizenz.selbsttest.ts",
+    "tests/wap/golden/**",
+    "tests/wap-e2e/harness/f-tools.*",
+    "tests/wap-e2e/support/kernzustaende/f-tools.ts"
+  ],
+  "F-UX1": [
+    "tests/wap/unit/f-ux1/**",
+    "tests/wap-e2e/f-ux1/**"
+  ],
+  "F-IMPORT2": [
+    "tests/wap/unit/f-import2/**",
+    "tests/wap/reference/f-import2/**"
+  ],
+  "F-LAYOUT2": [
+    "tests/wap/unit/f-layout2/**"
+  ],
+  "F-ABDECKUNG": [
+    "tests/wap/unit/f-abdeckung/**"
+  ],
+  "F-UX2": [
+    "tests/wap/unit/f-ux2/**",
+    "tests/wap-e2e/f-ux2/**"
+  ],
+  "F-DOKU": [
+    "tests/wap/unit/f-doku/**",
+    "tests/wap/integration/f-doku/**",
+    "tests/wap-e2e/f-doku/**",
+    "tests/wap-perf/f-doku/**",
+    "tests/wap-perf/harness/entries/f-doku.ts"
+  ],
+  "F-FIX": [
+    "tests/wap/unit/f-fix/**",
+    "tests/wap-e2e/f-fix/**"
+  ],
+  "F-FLAKY": [
+    "tests/wap-e2e/support/aufwaermen.ts"
+  ],
+  "E1-AB": [
+    "tests/wap/reference/abnahme/**"
+  ],
+  "F-UX3": [
+    "tests/wap/unit/f-ux3/**",
+    "tests/wap-e2e/f-ux3/**",
+    "tests/wap-perf/f-ux3/**"
+  ],
+  "F-ABDECKUNG2": [
+    "tests/wap/unit/f-abdeckung2/**"
+  ],
+  "F-TOOLS4": [
+    "tests/wap-e2e/f-tools4/**"
+  ],
+  "F-ABDECKUNG3": [
+    "tests/wap/unit/f-abdeckung3/**"
+  ],
+  "GB-IMPORT": [
+    "tests/wap/unit/gb-import/**"
+  ],
+  "GB-LAYOUT": [
+    "tests/wap/unit/gb-layout/**"
+  ],
+  "GB-DOKU": [
+    "tests/wap-e2e/gb-doku/**",
+    "tests/wap/reference/gb-doku/**"
+  ]
+}

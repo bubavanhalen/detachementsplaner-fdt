@@ -1,0 +1,6 @@
+# Positivliste des Datenschutz-Scans. Feste E-Mail-Adressen eine pro Zeile (keine; der Commit-Trailer noreply@anthropic.com ist im Scan fest hinterlegt). Namenseintraege <Name>@<pfad> nur fuer die mit Q-005 freigegebenen Dateien PROMPT und PROJEKTBESCHRIEB (P36, P41).
+Philipp@docs/wap-planer/PROMPT_WAP_Planer.md
+Tischhauser@docs/wap-planer/PROMPT_WAP_Planer.md
+Philipp@docs/wap-planer/PROJEKTBESCHRIEB_WAP_Planer.md
+Tischhauser@docs/wap-planer/PROJEKTBESCHRIEB_WAP_Planer.md
+Stephan@tools/wap/licenses/hyph-de-1996.txt

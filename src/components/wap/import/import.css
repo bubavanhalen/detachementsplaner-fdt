@@ -1,0 +1,121 @@
+.wap-import-progress {
+  width: 100%;
+  height: 14px;
+}
+.wap-import-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.wap-import-report {
+  max-height: 70vh;
+  overflow: auto;
+  min-width: min(860px, 90vw);
+}
+.wap-import-balance {
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+.wap-import-balance caption {
+  text-align: left;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.wap-import-balance :is(th, td) {
+  border: 1px solid #c1cbd4;
+  padding: 3px 8px;
+  text-align: left;
+}
+.wap-import-report h3 {
+  font-size: 15px;
+  margin: 14px 0 6px;
+}
+.wap-import-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.wap-import-items > li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #e3e8ed;
+}
+.wap-import-where {
+  font-weight: 700;
+}
+.wap-import-next {
+  color: #3b4652;
+}
+.wap-import-items details ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+/* Importbericht angedockt im Seitenbereich (H-UI2, UX-H-10, TE-HUI2-02; UI-Richtlinie 2.2): verdeckt das Raster nie. */
+.wap-import-docked {
+  flex: none;
+  width: 380px;
+  max-width: 45%;
+  min-height: 0;
+  margin-left: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #87948b;
+  border-radius: 6px;
+  background: #f8faf8;
+  color: #17201b;
+  font-size: 13px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.wap-import-docked-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wap-import-docked-head h2 {
+  margin: 0 auto 0 0;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.wap-import-docked-note {
+  margin: 0;
+  font-size: 12px;
+  color: #3e4a43;
+}
+.wap-import-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.wap-import-seen {
+  font-size: 12px;
+  color: #2f6b3a;
+}
+
+/* Nicht übernommener Text einer Meldung (F-UX1 Runde 2, CR-D-2-02, CR-D-2-04). */
+.wap-import-lost {
+  margin: 0.25rem 0 0 1rem;
+  padding: 0;
+  color: var(--text-2);
+}
+/* Angedockt neben dem Raster bzw. unter dem Seitenfeld: der Bericht passt sich der Breite an, nichts wird seitlich
+   abgeschnitten oder verschoben (UX-AB-11); die Mindestbreite gilt nur für den Bericht im eigenen Dialog. */
+.wap-import-docked .wap-import-report {
+  min-width: 0;
+  max-height: none;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+}
+.wap-import-docked .wap-import-balance {
+  width: 100%;
+  table-layout: fixed;
+}

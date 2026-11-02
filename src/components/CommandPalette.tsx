@@ -16,6 +16,22 @@ interface Command {
   run: () => void;
 }
 
+/** Befehl einer Route mit eigener Kopfleiste (WAP-Planer, UI-Richtlinie 11.6, 13.1): erscheint in der Gruppe der Route. */
+export interface RouteCommand {
+  readonly id: string;
+  readonly label: string;
+  readonly hint?: string;
+  readonly keywords?: string;
+  readonly disabled?: boolean;
+  readonly run: () => void;
+}
+
+let routeCommands: (() => readonly RouteCommand[]) | null = null;
+/** Die offene Route liefert ihre Befehle (Gruppe «WAP-Planer»); null beim Verlassen. */
+export function setRouteCommands(source: (() => readonly RouteCommand[]) | null): void {
+  routeCommands = source;
+}
+
 /** Keyboard-first navigation and actions. Everything is searched in memory on this device. */
 export function CommandPalette({ onClose }: { onClose: () => void }) {
   const project = useProject();
@@ -48,7 +64,8 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
           | '/persons'
           | '/contacts'
           | '/vor-ort'
-          | '/pendenzen',
+          | '/pendenzen'
+          | '/wap',
       ) =>
       () =>
         void navigate({ to });
@@ -112,7 +129,29 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         run: go('/vor-ort'),
         hint: 'Alt 8',
       },
+      // WAP-Planer (UI-Richtlinie 2.1, 18 S-1): eigene Gruppe in der Palette.
+      {
+        id: 'n9',
+        group: 'WAP-Planer',
+        label: 'WAP-Planer öffnen',
+        icon: 'calendar',
+        keywords: 'wap wochenarbeitsplan woche raster pdf planen',
+        run: go('/wap'),
+        hint: 'Alt 9',
+      },
     ];
+    // Befehle der offenen WAP-Route (H-UI2, UX-H-08; UI-Richtlinie 11.6, 13.1): Gruppe «WAP-Planer».
+    for (const c of routeCommands?.() ?? [])
+      if (c.disabled !== true)
+        list.push({
+          id: `wap-${c.id}`,
+          group: 'WAP-Planer',
+          label: c.label,
+          icon: 'calendar',
+          keywords: `wap ${c.keywords ?? ''}`,
+          ...(c.hint === undefined ? {} : { hint: c.hint }),
+          run: c.run,
+        });
     if (!archived)
       list.push(
         {

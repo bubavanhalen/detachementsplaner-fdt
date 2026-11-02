@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "name": "Arimo 1.341 (Schrift, SIL Open Font License 1.1)",
+      "lizenz": "OFL-1.1",
+      "dateien": ["src/assets/wap-fonts/Arimo-Regular.ttf", "src/assets/wap-fonts/Arimo-Bold.ttf"],
+      "lizenztext": "src/assets/wap-fonts/OFL.txt"
+    },
+    {
+      "name": "hyph-de-1996 (deutsche Trennmuster im Paket hyphen, MIT)",
+      "lizenz": "MIT",
+      "dateien": ["node_modules/hyphen/patterns/de-1996.js"],
+      "lizenztext": "tools/wap/licenses/hyph-de-1996.txt"
+    }
+  ],
+  "ausnahmen": [
+    {
+      "paket": "axe-core",
+      "version": "4.13.0",
+      "lizenz": "MPL-2.0",
+      "nurEntwicklung": true,
+      "datum": "02.10.2026",
+      "entscheid": "Gate 0, Entscheid E3"
+    },
+    {
+      "paket": "@axe-core/playwright",
+      "version": "4.13.0",
+      "lizenz": "MPL-2.0",
+      "nurEntwicklung": true,
+      "datum": "02.10.2026",
+      "entscheid": "Gate 0, Entscheid E3"
+    },
+    {
+      "paket": "caniuse-lite",
+      "version": "1.0.30001814",
+      "lizenz": "CC-BY-4.0",
+      "nurEntwicklung": true,
+      "datum": "04.10.2026",
+      "entscheid": "Q-019 (Auftraggeber 04.10.2026), transitiv über @stryker-mutator/core"
+    },
+    {
+      "paket": "minimatch",
+      "version": "10.2.6",
+      "lizenz": "BlueOak-1.0.0",
+      "nurEntwicklung": true,
+      "datum": "04.10.2026",
+      "entscheid": "Q-019 (Auftraggeber 04.10.2026), transitiv über @stryker-mutator/core"
+    },
+    {
+      "paket": "foreground-child",
+      "version": "4.0.3",
+      "lizenz": "BlueOak-1.0.0",
+      "nurEntwicklung": true,
+      "datum": "04.10.2026",
+      "entscheid": "Q-019 (Auftraggeber 04.10.2026), transitiv über monocart-coverage-reports"
+    }
+  ]
+}

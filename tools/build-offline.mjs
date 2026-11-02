@@ -1,8 +1,9 @@
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { build } from 'vite';
 import { verifyRelease } from './verify-release.mjs';
+import { npmLizenz } from './wap/npm-lizenz.mjs';
 
 // A single self-contained build serves both the public app and local HTML exports.
 // User storage and user files are deliberately never read by the build process.
@@ -69,13 +70,47 @@ const bundledPackages = new Set(
   }),
 );
 const notices = [`WK Util Suite\n${await readFile('LICENSE', 'utf8')}`];
+// The package's own LICENSE* wins; only without one, a checked entry of tools/wap/licenses/npm-ersatz.json
+// applies (contract E1-01b, note «Lizenzen ohne LICENSE-Datei» no 6, Q-031). Both errors stop the build
+// before dist/ is emptied.
 for (const name of [...bundledPackages].sort()) {
-  const directory = resolve('node_modules', name);
-  const licenseFile = (await readdir(directory)).find((file) =>
-    /^licen[sc]e(?:\..*)?$/i.test(file),
+  const ordner = resolve('node_modules', name);
+  const licence = npmLizenz({ cwd: process.cwd(), paket: name, ordner });
+  if (!licence.ok) {
+    throw new Error(
+      licence.art === 'fehlt'
+        ? `Bundled dependency licence missing: ${name}`
+        : `Bundled dependency licence fallback invalid: ${licence.fehler}`,
+    );
+  }
+  notices.push(`${name}\n${licence.text}`);
+}
+// Bundled assets under their own licence (WAP-Planer, contract E1-02b section 4): the Arimo font
+// files ship under the SIL Open Font License, not under the licence of their npm source package.
+// The hyphenation patterns are listed only when the package `hyphen` is bundled (FT-V-01, F-TOOLS
+// 20.10.2026): a build without it, e.g. a fixture app, must not require their notice file.
+const assetNotices = [
+  ['Arimo 1.341 (Schrift, SIL Open Font License 1.1)', 'src/assets/wap-fonts/OFL.txt', true],
+  [
+    'hyph-de-1996 (deutsche Trennmuster im Paket hyphen, MIT)',
+    'tools/wap/licenses/hyph-de-1996.txt',
+    bundledPackages.has('hyphen'),
+  ],
+];
+for (const [heading, file, bundled] of assetNotices) {
+  if (bundled) notices.push(`${heading}\n${await readFile(String(file), 'utf8')}`);
+}
+// The German hyphenation patterns inside `hyphen` are MIT-licensed, separately from the package's ISC
+// licence (contract E1-02b section 4, E1-02b-05, Q-024). Never release them without that notice.
+const hyphenationNotice = 'hyph-de-1996 (deutsche Trennmuster im Paket hyphen, MIT)';
+if (
+  bundledPackages.has('hyphen') &&
+  !assetNotices.some(([heading]) => heading === hyphenationNotice)
+) {
+  throw new Error(
+    `Licence notice missing: the package "hyphen" is bundled, but "${hyphenationNotice}" is not in ` +
+      'the licence list. Add tools/wap/licenses/hyph-de-1996.txt to assetNotices, then rebuild.',
   );
-  if (!licenseFile) throw new Error(`Bundled dependency licence missing: ${name}`);
-  notices.push(`${name}\n${await readFile(resolve(directory, licenseFile), 'utf8')}`);
 }
 const licenseText = notices.join('\n\n').replaceAll('&', '&amp;').replaceAll('<', '&lt;');
 const html = template

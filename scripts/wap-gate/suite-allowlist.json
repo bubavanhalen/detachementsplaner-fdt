@@ -1,0 +1,24 @@
+{
+  "dateien": [
+    ".gitattributes",
+    ".gitignore",
+    "package.json",
+    "package-lock.json",
+    "biome.json",
+    "vitest.config.ts",
+    "src/io/wap/zip.ts",
+    "src/io/wap/xml.ts",
+    "src/io/wap/sheet.ts",
+    "src/io/wap/colors.ts",
+    "src/io/wap/drawing.ts",
+    "tools/build-offline.mjs",
+    "src/App.tsx",
+    "src/components/Shell.tsx",
+    "src/components/CommandPalette.tsx",
+    "src/components/Icon.tsx",
+    "AGENTS.md",
+    ".claude/agents/*.md",
+    ".claude/settings.json"
+  ],
+  "importe": []
+}

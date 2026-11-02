@@ -1,0 +1,9 @@
+/* Wochenansicht: Wochenseite und Fortsetzungsseiten untereinander (Vertrag E1-02f Abschnitt D1, V-02f-2).
+   Linksbündig, 16 px Abstand unabhängig vom Zoom; Grösse und Inhalt der Seiten regelt PageView. */
+
+.wap-woche {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}

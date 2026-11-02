@@ -1,0 +1,9 @@
+{ "version": 1, "quelle": "ADR-010 §8, Prompt §7, Beschrieb 11",
+  "budgets": [
+    { "anforderung": "R-11-11", "endung": "Bildzeit", "budgetMs": 16.7 },
+    { "anforderung": "R-11-11", "endung": "Aufgabe", "budgetMs": 50 },
+    { "anforderung": "R-11-12", "budgetMs": 300 },
+    { "anforderung": "R-11-14", "budgetMs": 500 },
+    { "anforderung": "R-11-15", "budgetMs": 3000 },
+    { "anforderung": "R-11-16", "budgetMs": 10000 },
+    { "anforderung": "R-11-17", "budgetMs": 15000 } ] }

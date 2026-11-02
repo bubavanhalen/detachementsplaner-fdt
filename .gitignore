@@ -22,3 +22,22 @@ coverage/
 
 # Real Tagesbefehl fixtures: local-only owner exception, never commit.
 fixtures-private/
+
+# WAP-Planer: echte Referenzen, Prüfartefakte und Wegwerf-Spikes bleiben lokal.
+reference/
+.qa/
+spikes/
+
+# WAP-Planer: pseudonymisierte Test-Fixtures werden versioniert (ADR-010 Entscheid E8);
+# der Datenschutz-Scan prüft ihren Inhalt (F3, V11).
+!tests/wap/fixtures/**/*.xlsx
+!tests/wap/fixtures/**/*.csv
+# Pseudonymisierte Fassung Anhang B-Kp (nur Masse, Farben, Platzhalter; Gate 0 F-51/B-F-10/N-03, Q-015).
+!docs/wap-planer/anhaenge/anhang-b-kp.csv
+# Nur Referenztests (*.ref.ts) und ihre Dateiliste unter tests/wap/reference/ sind versioniert; alles
+# andere dort bleibt ignoriert (CR-E101-11), die echten Referenzen bleiben unter reference/ des Haupt-Checkouts.
+!tests/wap/reference/
+tests/wap/reference/**
+!tests/wap/reference/**/
+!tests/wap/reference/**/*.ref.ts
+!tests/wap/reference/required-files.json

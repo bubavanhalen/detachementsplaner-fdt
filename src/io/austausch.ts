@@ -96,7 +96,12 @@ function database(): Promise<IDBDatabase | null> {
   return new Promise((resolve) => {
     const request = indexedDB.open(DB, 1);
     request.onupgradeneeded = () => request.result.createObjectStore(STORE);
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {
+      const db = request.result;
+      // Never block a deletion or upgrade from another page (e.g. clearing site data).
+      db.onversionchange = () => db.close();
+      resolve(db);
+    };
     request.onerror = () => resolve(null);
   });
 }
@@ -108,6 +113,8 @@ async function transact<T>(
   if (!db) return undefined;
   return new Promise((resolve) => {
     const request = run(db.transaction(STORE, mode).objectStore(STORE));
+    // One connection per call: it closes once the transaction is done, so none stays open.
+    db.close();
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => resolve(undefined);
   });
